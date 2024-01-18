@@ -1,5 +1,7 @@
 ﻿using DTBGEmulator.Classes;
+using DTBGEmulator.Classes.DTO;
 using DTBGEmulator.Forms;
+using DTBGEmulator.UserControls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,8 +18,11 @@ namespace DTBGEmulator
     public partial class MainForm : Form
     {
         SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
+       
         private FileData fileData = new FileData(); // FileData 인스턴스
         private FolderData folderData = new FolderData(); // FolderData 인스턴스
+        DataDTO dto;
+
 
         Setting settingForm; // setting 폼
 
@@ -25,9 +30,14 @@ namespace DTBGEmulator
         private Point mMousePosition = Point.Empty;         // 마우스 위치
 
         string ipAddress;
+        string currTime;
+        string TotalTime;
+
         public MainForm()
         {
             InitializeComponent();
+
+            
         }
 
 
@@ -138,14 +148,17 @@ namespace DTBGEmulator
             //string fileContentJson = fileData.GetFileContentJson();
             //Console.WriteLine($"fileContentJson: {fileContentJson}");
 
-            List<string> filePackets = fileData.GetFilePackets();
-            Console.WriteLine('1' + filePackets[0]);
-            //Console.WriteLine('2' + filePackets[1]);
-            //Console.WriteLine('3' + filePackets[2]);
-            //Console.WriteLine('4' + filePackets[3]);
-            string startTime = fileData.GetStartTime();
-            string endTime = fileData.GetEndTime();
-            string storageSize = fileData.GetStorageSize();
+            //List<string> filePackets = fileData.GetFilePackets();
+            //string startTime = fileData.GetStartTime();
+            //string endTime = fileData.GetEndTime();
+            //string storageSize = fileData.GetStorageSize();
+            // fileData.SetDataDTOValues(dto);
+            dto = fileData.GenerateDataDTO();
+            List<string> filePackets = dto.FilePackets;
+            Console.WriteLine($"fileContentJson: {filePackets}");
+            string startTime = dto.StartTimeStr;
+            string endTime = dto.EndTimeStr;
+            string storageSize = dto.Storage;
             dataInfoTextbox.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
         }
 
@@ -168,13 +181,17 @@ namespace DTBGEmulator
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            string currTime = "00:00:00";
-            string TotalTime = "01:00:00";
+            currTime = "00:00:00";
+            TotalTime = "00:10:01";
 
-            timeController1.TotalTime = ChangeTimeToStrSec(TotalTime);
-            timeController1.CurrTime = ChangeTimeToStrSec(currTime); ;
+            timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
+            timeController.CurrTime = ChangeTimeToStrSec(currTime);
+            timer_update.Start();
+
+            speedComboBox.SelectedIndex = 0;
         }
 
+        // 시간(문자) -> 시간초(숫자)
         private string ChangeTimeToStrSec(string dateTime)
         {
             int sec_HH = Convert.ToInt32(dateTime.Substring(0, 2)) * 3600;
@@ -184,6 +201,92 @@ namespace DTBGEmulator
             string strSec = (sec_HH + sec_mm + sec_ss).ToString();
 
             return strSec;
+        }
+
+        // 시간초(숫자) -> 시간(문자)
+        private string ChangeSecToTime(int totalSeconds)
+        {
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            int seconds = totalSeconds % 60;
+
+            string timeString = $"{hours:D2}:{minutes:D2}:{seconds:D2}";
+
+            return timeString;
+        }
+
+        // 시작버튼 클릭시
+        private void runBtn_Click(object sender, EventArgs e)
+        {
+            timeController.TotalTime = ChangeTimeToStrSec(endTimeText.Text);
+            timer_progress.Start();
+        }
+
+        // 타이머_프로그래스바 GUI 업데이트
+        private void timer_update_Tick(object sender, EventArgs e)
+        {
+            startTimeText.Text = ChangeSecToTime(timeController.StartTime);
+            endTimeText.Text = ChangeSecToTime(timeController.EndTime);
+            currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
+        }
+
+        // 타이머_1초마다 프로그래스바 업데이트
+        private void timer_progress_Tick(object sender, EventArgs e)
+        {
+            int getStart = timeController.StartTime;
+            int getEnd = timeController.EndTime;
+            int getCurr = Convert.ToInt32(timeController.CurrTime);
+            getCurr++;
+            Console.WriteLine(getStart);
+            Console.WriteLine(getEnd);
+            Console.WriteLine(getCurr);
+            if (getCurr > getEnd)
+            {
+                getCurr = getStart;
+            }
+            Console.WriteLine(ChangeSecToTime(getCurr));
+            timeController.CurrTime = getCurr.ToString();
+        }
+
+        // 속도 설정
+        private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (speedComboBox.SelectedIndex)
+            {
+                case 0:
+                    speedBindText.Text = "속도 (1.0x)";
+                    timer_progress.Interval = 1000 / 1;
+                    break;
+
+                case 1:
+                    speedBindText.Text = "속도 (2.0x)";
+
+                    timer_progress.Interval = 1000 / 2;
+                    break;
+
+                case 2:
+                    speedBindText.Text = "속도 (4.0x)";
+                    timer_progress.Interval = 1000 / 4;
+                    break;
+
+                case 3:
+                    speedBindText.Text = "속도 (8.0x)";
+                    timer_progress.Interval = 1000 / 8;
+                    break;
+
+                case 4:
+                    speedBindText.Text = "속도 (16.0x)";
+                    timer_progress.Interval = 1000 / 16;
+                    break;
+
+                case 5:
+                    speedBindText.Text = "속도 (32.0x)";
+                    timer_progress.Interval = 1000 / 32 ;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

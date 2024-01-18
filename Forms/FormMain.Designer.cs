@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.panelTop = new System.Windows.Forms.Panel();
             this.pictureBox_Close = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -41,17 +42,21 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.currTimeText = new System.Windows.Forms.Label();
+            this.timeController = new DTBGEmulator.UserControls.TimeController();
+            this.stopBtn = new System.Windows.Forms.Button();
+            this.pauseBtn = new System.Windows.Forms.Button();
+            this.runBtn = new System.Windows.Forms.Button();
+            this.speedBindText = new System.Windows.Forms.Label();
             this.labelSpeed = new System.Windows.Forms.Label();
             this.playSpeed = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.startTimeText = new System.Windows.Forms.TextBox();
             this.speedComboBox = new System.Windows.Forms.ComboBox();
             this.endTimeText = new System.Windows.Forms.TextBox();
             this.timeSetBtn = new System.Windows.Forms.Button();
-            this.speedBindText = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.timeController1 = new DTBGEmulator.UserControls.TimeController();
+            this.timer_update = new System.Windows.Forms.Timer(this.components);
+            this.timer_progress = new System.Windows.Forms.Timer(this.components);
+            this.label2 = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.panel2.SuspendLayout();
@@ -59,7 +64,6 @@
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // panelTop
             // 
@@ -208,14 +212,16 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.timeController1);
-            this.panel4.Controls.Add(this.button3);
-            this.panel4.Controls.Add(this.button2);
-            this.panel4.Controls.Add(this.button1);
+            this.panel4.Controls.Add(this.label2);
+            this.panel4.Controls.Add(this.currTimeText);
+            this.panel4.Controls.Add(this.timeController);
+            this.panel4.Controls.Add(this.stopBtn);
+            this.panel4.Controls.Add(this.pauseBtn);
+            this.panel4.Controls.Add(this.runBtn);
             this.panel4.Controls.Add(this.speedBindText);
             this.panel4.Controls.Add(this.labelSpeed);
             this.panel4.Controls.Add(this.playSpeed);
-            this.panel4.Controls.Add(this.textBox1);
+            this.panel4.Controls.Add(this.startTimeText);
             this.panel4.Controls.Add(this.speedComboBox);
             this.panel4.Controls.Add(this.endTimeText);
             this.panel4.Controls.Add(this.timeSetBtn);
@@ -223,6 +229,76 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(530, 190);
             this.panel4.TabIndex = 5;
+            // 
+            // currTimeText
+            // 
+            this.currTimeText.AutoSize = true;
+            this.currTimeText.ForeColor = System.Drawing.Color.Black;
+            this.currTimeText.Location = new System.Drawing.Point(452, 143);
+            this.currTimeText.Name = "currTimeText";
+            this.currTimeText.Size = new System.Drawing.Size(49, 12);
+            this.currTimeText.TabIndex = 19;
+            this.currTimeText.Text = "88:88:88";
+            // 
+            // timeController
+            // 
+            this.timeController.BackColor = System.Drawing.Color.White;
+            this.timeController.CurrTime = "0";
+            this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeController.Location = new System.Drawing.Point(3, 13);
+            this.timeController.Name = "timeController";
+            this.timeController.Size = new System.Drawing.Size(505, 44);
+            this.timeController.TabIndex = 18;
+            // 
+            // stopBtn
+            // 
+            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop;
+            this.stopBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.stopBtn.FlatAppearance.BorderSize = 0;
+            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.stopBtn.Location = new System.Drawing.Point(468, 78);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(40, 40);
+            this.stopBtn.TabIndex = 17;
+            this.stopBtn.UseVisualStyleBackColor = true;
+            // 
+            // pauseBtn
+            // 
+            this.pauseBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause;
+            this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pauseBtn.FlatAppearance.BorderSize = 0;
+            this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.pauseBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.pauseBtn.Location = new System.Drawing.Point(422, 78);
+            this.pauseBtn.Name = "pauseBtn";
+            this.pauseBtn.Size = new System.Drawing.Size(40, 40);
+            this.pauseBtn.TabIndex = 16;
+            this.pauseBtn.UseVisualStyleBackColor = true;
+            // 
+            // runBtn
+            // 
+            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.play;
+            this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.runBtn.FlatAppearance.BorderSize = 0;
+            this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.runBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runBtn.Location = new System.Drawing.Point(376, 78);
+            this.runBtn.Name = "runBtn";
+            this.runBtn.Size = new System.Drawing.Size(40, 40);
+            this.runBtn.TabIndex = 15;
+            this.runBtn.UseVisualStyleBackColor = true;
+            this.runBtn.Click += new System.EventHandler(this.runBtn_Click);
+            // 
+            // speedBindText
+            // 
+            this.speedBindText.AutoSize = true;
+            this.speedBindText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.speedBindText.Location = new System.Drawing.Point(260, 143);
+            this.speedBindText.Name = "speedBindText";
+            this.speedBindText.Size = new System.Drawing.Size(66, 12);
+            this.speedBindText.TabIndex = 14;
+            this.speedBindText.Text = "속도 (1.0x)";
             // 
             // labelSpeed
             // 
@@ -247,12 +323,12 @@
             this.playSpeed.TabIndex = 12;
             this.playSpeed.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // startTimeText
             // 
-            this.textBox1.Location = new System.Drawing.Point(27, 87);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 21);
-            this.textBox1.TabIndex = 3;
+            this.startTimeText.Location = new System.Drawing.Point(27, 87);
+            this.startTimeText.Name = "startTimeText";
+            this.startTimeText.Size = new System.Drawing.Size(100, 21);
+            this.startTimeText.TabIndex = 3;
             // 
             // speedComboBox
             // 
@@ -269,6 +345,7 @@
             this.speedComboBox.Name = "speedComboBox";
             this.speedComboBox.Size = new System.Drawing.Size(101, 20);
             this.speedComboBox.TabIndex = 2;
+            this.speedComboBox.SelectedIndexChanged += new System.EventHandler(this.speedComboBox_SelectedIndexChanged);
             // 
             // endTimeText
             // 
@@ -276,6 +353,7 @@
             this.endTimeText.Name = "endTimeText";
             this.endTimeText.Size = new System.Drawing.Size(100, 21);
             this.endTimeText.TabIndex = 1;
+            this.endTimeText.Text = "01:05:00";
             // 
             // timeSetBtn
             // 
@@ -289,63 +367,24 @@
             this.timeSetBtn.UseVisualStyleBackColor = false;
             this.timeSetBtn.Click += new System.EventHandler(this.timeSetBtn_Click);
             // 
-            // speedBindText
+            // timer_update
             // 
-            this.speedBindText.AutoSize = true;
-            this.speedBindText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.speedBindText.Location = new System.Drawing.Point(260, 143);
-            this.speedBindText.Name = "speedBindText";
-            this.speedBindText.Size = new System.Drawing.Size(66, 12);
-            this.speedBindText.TabIndex = 14;
-            this.speedBindText.Text = "속도 (1.0x)";
+            this.timer_update.Tick += new System.EventHandler(this.timer_update_Tick);
             // 
-            // button1
+            // timer_progress
             // 
-            this.button1.BackgroundImage = global::DTBGEmulator.Properties.Resources.play;
-            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button1.FlatAppearance.BorderSize = 0;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(376, 76);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(40, 40);
-            this.button1.TabIndex = 15;
-            this.button1.UseVisualStyleBackColor = true;
+            this.timer_progress.Interval = 1000;
+            this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
             // 
-            // button2
+            // label2
             // 
-            this.button2.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause;
-            this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button2.FlatAppearance.BorderSize = 0;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(422, 78);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(40, 40);
-            this.button2.TabIndex = 16;
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop;
-            this.button3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button3.FlatAppearance.BorderSize = 0;
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button3.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(468, 78);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(40, 40);
-            this.button3.TabIndex = 17;
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // timeController1
-            // 
-            this.timeController1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.timeController1.CurrTime = "0";
-            this.timeController1.Location = new System.Drawing.Point(3, 13);
-            this.timeController1.Name = "timeController1";
-            this.timeController1.Size = new System.Drawing.Size(513, 40);
-            this.timeController1.TabIndex = 18;
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.Black;
+            this.label2.Location = new System.Drawing.Point(386, 143);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 12);
+            this.label2.TabIndex = 20;
+            this.label2.Text = "현재시간 :";
             // 
             // MainForm
             // 
@@ -394,14 +433,19 @@
         private System.Windows.Forms.Button timeSetBtn;
         private System.Windows.Forms.TextBox endTimeText;
         private System.Windows.Forms.ComboBox speedComboBox;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox startTimeText;
         private System.Windows.Forms.Button playSpeed;
         private System.Windows.Forms.Label labelSpeed;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button stopBtn;
+        private System.Windows.Forms.Button pauseBtn;
+        private System.Windows.Forms.Button runBtn;
         private System.Windows.Forms.Label speedBindText;
         private UserControls.TimeController timeController1;
+        private UserControls.TimeController timeController;
+        private System.Windows.Forms.Timer timer_update;
+        private System.Windows.Forms.Label currTimeText;
+        private System.Windows.Forms.Timer timer_progress;
+        private System.Windows.Forms.Label label2;
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DTBGEmulator.Classes.DTO;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -68,10 +69,6 @@ namespace DTBGEmulator.Classes
                         filePackets[i] = filePackets[i].TrimEnd('}');
                         ExtractEndTime(filePackets[i]);
                     }
-
-                    // Display the processed packet
-                    //Console.WriteLine($"Packet {i + 1}:");
-                    //Console.WriteLine(filePackets[i]);
                 }
             }
             catch (Exception ex)
@@ -176,25 +173,26 @@ namespace DTBGEmulator.Classes
             return $"{fileSize} {sizeSuffixes[place]}";
         }
 
-
-        public string GetStorageSize()
+        public DataDTO GenerateDataDTO()
         {
-            return storage;
+            DataDTO dto = new DataDTO
+            {
+                Storage = storage,
+                StartTimeStr = startTimeStr,
+                EndTimeStr = endTimeStr,
+                FilePackets = filePackets
+            };
+
+            return dto;
         }
 
-        public string GetStartTime()
-        {
-            return startTimeStr;
-        }
-
-        public string GetEndTime()
-        {
-            return endTimeStr;
-        }
-
-        public List<string> GetFilePackets()
-        {
-            return filePackets;
-        }
+        //// DataDTO에 값을 설정하는 메서드 추가
+        //public void SetDataDTOValues(DataDTO dto)
+        //{
+        //    dto.Storage = storage;
+        //    dto.StartTimeStr = startTimeStr;
+        //    dto.EndTimeStr = endTimeStr;
+        //    dto.FilePackets = filePackets;
+        //}
     }
 }

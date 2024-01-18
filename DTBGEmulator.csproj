@@ -49,10 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\DTO\DataDTO.cs" />
     <Compile Include="Classes\FileData.cs" />
     <Compile Include="Classes\FileDatatest.cs" />
     <Compile Include="Classes\FolderData.cs" />
-    <Compile Include="Classes\SettingDTO.cs" />
+    <Compile Include="Classes\DTO\SettingDTO.cs" />
     <Compile Include="Forms\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>

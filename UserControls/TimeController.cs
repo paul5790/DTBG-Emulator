@@ -60,21 +60,21 @@ namespace DTBGEmulator.UserControls
 
         // Start Selector의 위치를 시간으로 치환한 값 [sec]
         private int mStartTime;
-        public string StartTime
+        public int StartTime
         {
             get
             {
-                return mStartTime.ToString();
+                return mStartTime;
             }
         }
 
         // End Selector의 위치를 시간으로 치환한 값 [sec]
         private int mEndTime;
-        public string EndTime
+        public int EndTime
         {
             get
             {
-                return mEndTime.ToString();
+                return mEndTime;
             }
         }
 
@@ -83,7 +83,7 @@ namespace DTBGEmulator.UserControls
         private float mTopMargin = 18.0f;
         private float mBarThickness = 2.0f;
         private float mProgress = 0.0f; // Progress Rate [0.0 ~ 1.0]
-        private float mRadius = 7.0f;
+        private float mRadius = 4.0f;
         private float mSelectorL = 13.0f;
         private int mSelectorGap = 15;
         private int mSelectorOffset = 2;
@@ -105,16 +105,35 @@ namespace DTBGEmulator.UserControls
         private float mEndTimeRatio;
         #endregion 변수 정의
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 생성자
         public TimeController()
         {
             InitializeComponent();
-            this.BackColor = Color.FromArgb(64, 64, 64);  // UC 백그라운드 색상 변경
 
             // Start/End TimeSelector 초기위치 설정
             mPointsStartTimeSelector[0] = new PointF(mHorizontalMargin, mTopMargin - mSelectorOffset);
             mPointsEndTimeSelector[0] = new PointF(panel_Middle.Width - mHorizontalMargin, mTopMargin - mSelectorOffset);
+
+            // Time Label 초기 텍스트 설정
+            label_Time_Zero.Text = "00 : 00 : 00";
+            label_Time_Total.Text = "00 : 00 : 00";
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // GDI+ 일괄 업데이트 시키는 함수
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                var cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;
+                return cp;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 초기화 함수
         private void DoInitialize()
         {
             mPointsStartTimeSelector[0] = new PointF(mHorizontalMargin, mTopMargin - mSelectorOffset);
@@ -122,16 +141,35 @@ namespace DTBGEmulator.UserControls
             mStartTime = 0;
             mEndTime = Convert.ToInt32(mTotalTime);
             mProgress = 0.0f;
+            PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
+            PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Time[sec]를 Start/End Time 텍스트 박스에 '00 : 00 : 00' 형태로 입력하는 함수
+        private void PutTimeToTxtbox(int time, string targetTxtbox)
+        {
+            switch (targetTxtbox)
+            {
+                case "StartTimeTxtbox":
+                    txtBox_StartTime_HH.Text = string.Format("{0:D2}", time / 3600);
+                    txtBox_StartTime_mm.Text = string.Format("{0:D2}", time % 3600 / 60);
+                    txtBox_StartTime_ss.Text = string.Format("{0:D2}", time % 60);
+                    break;
+                case "EndTimeTxtbox":
+                    txtBox_EndTime_HH.Text = string.Format("{0:D2}", time / 3600);
+                    txtBox_EndTime_mm.Text = string.Format("{0:D2}", time % 3600 / 60);
+                    txtBox_EndTime_ss.Text = string.Format("{0:D2}", time % 60);
+                    break;
+            }
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MainBar 업데이트
         private void UpdateMainBar(Graphics graphics)
         {
             if (mTotalTime != string.Empty)
+                label_Time_Total.Text = ConvertSecToTime(mTotalTime);
 
             mRectCircle = new RectangleF(mHorizontalMargin + (panel_Middle.Width - 2 * mHorizontalMargin) * mProgress - mRadius, mTopMargin + mBarThickness / 2.0f - mRadius, 2 * mRadius, 2 * mRadius);
 
@@ -140,15 +178,25 @@ namespace DTBGEmulator.UserControls
             float backBarLength = (panel_Middle.Width - 2 * mHorizontalMargin) - foreBarLength - aftBarLength;
 
             RectangleF rectFore = new RectangleF(mHorizontalMargin, mTopMargin, foreBarLength, mBarThickness);
+            float middleXSelector = (mPointsStartTimeSelector[2].X + mPointsStartTimeSelector[0].X) / 2;
+            float distanceBetweenSelectorAndCircle = middleXSelector - (mHorizontalMargin + mRadius);
+
+            // 원 기준의 왼쪽 부분
+            RectangleF rectLeftOfCircle = new RectangleF(mHorizontalMargin, mTopMargin, distanceBetweenSelectorAndCircle, mBarThickness); ;
+            // 원을 기준으로 오른쪽 부분
+            RectangleF rectRightOfCircle = new RectangleF(mHorizontalMargin + foreBarLength, mTopMargin, aftBarLength, mBarThickness);
             RectangleF rectAft = new RectangleF(mHorizontalMargin + foreBarLength, mTopMargin, aftBarLength, mBarThickness);
             RectangleF rectBackBar = new RectangleF(mHorizontalMargin + foreBarLength + aftBarLength, mTopMargin, backBarLength, mBarThickness);
 
-            using (SolidBrush brushForeBar = new SolidBrush(Color.FromArgb(146, 208, 80)))
-            using (SolidBrush brushAftBar = new SolidBrush(Color.White))
-            using (SolidBrush brushBackBar = new SolidBrush(Color.FromArgb(127, 127, 127)))
+            
+            using (SolidBrush brushGreen = new SolidBrush(Color.FromArgb(146, 208, 80)))
+            using (SolidBrush brushAftBar = new SolidBrush(Color.FromArgb(127, 127, 127)))
+            using (SolidBrush brushForeBar = new SolidBrush(Color.LightGray))
+            using (SolidBrush brushBackBar = new SolidBrush(Color.LightGray))
             {
-                graphics.FillRectangle(brushForeBar, rectFore);
-                graphics.FillRectangle(brushAftBar, rectAft);
+                graphics.FillRectangle(brushGreen, rectFore);
+                graphics.FillRectangle(brushForeBar, rectLeftOfCircle);
+                graphics.FillRectangle(brushAftBar, rectRightOfCircle);
                 graphics.FillRectangle(brushBackBar, rectBackBar);
 
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -171,7 +219,7 @@ namespace DTBGEmulator.UserControls
 
             mRegionStartTimeSelector = new Region(path);
 
-            using (SolidBrush brushSelector = new SolidBrush(Color.White))
+            using (SolidBrush brushSelector = new SolidBrush(Color.LightGray))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.FillPolygon(brushSelector, mPointsStartTimeSelector);
@@ -193,7 +241,7 @@ namespace DTBGEmulator.UserControls
 
             mRegionEndTimeSelector = new Region(path);
 
-            using (SolidBrush brushSelector = new SolidBrush(Color.White))
+            using (SolidBrush brushSelector = new SolidBrush(Color.LightGray))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.FillPolygon(brushSelector, mPointsEndTimeSelector);
@@ -218,7 +266,11 @@ namespace DTBGEmulator.UserControls
         #region 이벤트 함수
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 폼 로드시 처리
-
+        private void UC_TimeController_Load(object sender, EventArgs e)
+        {
+            // 시간 입력을 위한 텍스트 박스의 초기 Focus 제거
+            this.ActiveControl = label_Time_Zero;
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // panel_Middle 다시 그려져야 하는 이벤트 발생시 처리
@@ -321,10 +373,11 @@ namespace DTBGEmulator.UserControls
                     if (mTotalTime != string.Empty)
                         mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                    // StartTime 텍스트 박스 업데이트
+                    PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
 
                     // Circle 앞에서 뒤로 밀고가기
-                    if (e.X > mRectCircle.Left + mRadius)
-                    {
+    
                         if (e.X > mPointsEndTimeSelector[0].X - mSelectorGap)
                         {
                             if (!mRectCircle.Contains(mPointsEndTimeSelector[0]))
@@ -334,7 +387,7 @@ namespace DTBGEmulator.UserControls
                         {
                             mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                         }
-                    }
+                    
 
                     panel_Middle.Invalidate();
                 }
@@ -360,6 +413,8 @@ namespace DTBGEmulator.UserControls
                     if (mTotalTime != string.Empty)
                         mEndTime = (int)Math.Round((mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                    // StartTime 텍스트 박스 업데이트
+                    PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
 
                     // Circle 뒤에서 앞으로 밀고가기
                     if (e.X < mRectCircle.Right - mRadius)
@@ -413,6 +468,14 @@ namespace DTBGEmulator.UserControls
                 // 엔터 입력시 처리 ==============================================================================================
                 if (e.KeyChar == Convert.ToChar(Keys.Enter))
                 {
+                    try
+                    {
+                        mStartTime = Convert.ToInt16(txtBox_StartTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_StartTime_mm.Text) * 60 + Convert.ToInt16(txtBox_StartTime_ss.Text);
+                    }
+                    catch
+                    {
+                        return;
+                    }
 
                     if (mTotalTime != string.Empty)
                     {
@@ -430,6 +493,8 @@ namespace DTBGEmulator.UserControls
                         if (mTotalTime != string.Empty)
                             mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                        // StartTime 텍스트 박스 업데이트
+                        PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
 
                         // Circle 뒤로 밀고 가기 
                         mStartTimeRatio = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
@@ -441,6 +506,8 @@ namespace DTBGEmulator.UserControls
 
                         panel_Middle.Invalidate();
 
+                        // 텍스트 박스의 Focus 제거
+                        this.ActiveControl = label_Time_Zero;
                     }
                 }
                 else
@@ -460,6 +527,14 @@ namespace DTBGEmulator.UserControls
                 // 엔터 입력시 처리 ==============================================================================================
                 if (e.KeyChar == Convert.ToChar(Keys.Enter))
                 {
+                    try
+                    {
+                        mEndTime = Convert.ToInt16(txtBox_EndTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_EndTime_mm.Text) * 60 + Convert.ToInt16(txtBox_EndTime_ss.Text);
+                    }
+                    catch
+                    {
+                        return;
+                    }
 
                     // End Selector가 TotalTime을 초과하지 못하도록 제한
                     if (mTotalTime != string.Empty && mEndTime > Convert.ToInt32(mTotalTime))
@@ -483,6 +558,8 @@ namespace DTBGEmulator.UserControls
                         if (mTotalTime != string.Empty)
                             mEndTime = (int)Math.Round((mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                        // StartTime 텍스트 박스 업데이트
+                        PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
 
                         // Circle 앞으로 밀고 가기 
                         mEndTimeRatio = (mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
@@ -494,6 +571,8 @@ namespace DTBGEmulator.UserControls
 
                         panel_Middle.Invalidate();
 
+                        // 텍스트 박스의 Focus 제거
+                        this.ActiveControl = label_Time_Zero;
                     }
                 }
                 else
