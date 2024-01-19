@@ -1,5 +1,6 @@
 ﻿using DTBGEmulator.Classes.DTO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,13 +10,19 @@ namespace DTBGEmulator.Classes
 {
     public class FileData
     {
+        private string[] filePaths;
         private string filePath;
         private List<string> filePackets;
         private DateTime startTime;
         private DateTime endTime;
+        private string startDateStr;
+        private string endDateStr;
         private string startTimeStr;
         private string endTimeStr;
         private string storage;
+        private List<string> allFilePackets;
+        private int selectedFileCount;
+        private int totalPacketCount;
 
         public void SelectFile()
         {
@@ -24,16 +31,89 @@ namespace DTBGEmulator.Classes
             {
                 openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
                 openFileDialog.RestoreDirectory = true;
+                openFileDialog.Multiselect = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    filePath = openFileDialog.FileName;
-                    SplitIntoPackets();
-                    CalculateFileSize();
+                    // 선택한 파일 갯수
+                    selectedFileCount = openFileDialog.FileNames.Length;
+
+                    // 모든 파일의 패킷을 담을 리스트 초기화
+                    allFilePackets = new List<string>();
+
+                    // 여러 파일 경로를 배열에 저장
+                    filePaths = openFileDialog.FileNames;
+
+                    // 각 파일에 대한 처리를 위해 반복
+                    foreach (string filePath in filePaths)
+                    {
+                        // filePath를 현재 선택한 파일로 변경
+                        this.filePath = filePath;
+
+                        // 기존 코드 유지
+                        SplitIntoPackets();
+
+                        // 현재 파일의 패킷을 전체 리스트에 추가
+                        allFilePackets.AddRange(filePackets);
+
+                        CalculateFileSize();
+                    }
+
+                    // 추가: List에 담긴 변수 갯수 (전체) 설정
+                    totalPacketCount = allFilePackets.Count;
+
+                    Console.WriteLine(selectedFileCount);
+                    Console.WriteLine("패킷 파일" + totalPacketCount);
+
+                    // Get the first packet's Start value
+                    string startDate = ExtractStartEndDate(allFilePackets[0], "Start");
+
+                    // Get the last packet's End value
+                    string endDate = ExtractStartEndDate(allFilePackets[allFilePackets.Count - 1], "End");
+
+                    startDateStr = ConvertToLocalTime(startDate).ToString("yyyy.MM.dd. HH:mm:ss");
+                    endDateStr = ConvertToLocalTime(endDate).ToString("yyyy.MM.dd. HH:mm:ss");
+
+
+                    Console.WriteLine(startDateStr);
+                    Console.WriteLine(endDateStr);
                 }
             }
         }
 
+        // 포맷 변환
+        private DateTime ConvertToLocalTime(string utcDateTime)
+        {
+            try
+            {
+                // UTC 형식의 문자열을 DateTime으로 파싱하고 로컬 시간으로 변환
+                DateTime utcTime = DateTime.Parse(utcDateTime);
+                DateTime localTime = utcTime.ToLocalTime();
+                return localTime;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UTC 시간을 로컬 시간으로 변환하는 중 오류 발생: {ex.Message}");
+                return DateTime.MinValue;
+            }
+        }
+
+        // Json 변환, Time 찾기
+        private string ExtractStartEndDate(string packet, string key)
+        {
+            try
+            {
+                JObject jsonPacket = JObject.Parse(packet);
+                return jsonPacket["Package"]["Header"]["TimeSpan"][key].ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error extracting {key} from packet: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        // 패키지 별로 리스트에 저장
         private void SplitIntoPackets()
         {
             try
@@ -43,8 +123,6 @@ namespace DTBGEmulator.Classes
 
                 // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
                 filePackets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{" }, StringSplitOptions.None));
-
-                Console.WriteLine("Split Into Packets:");
 
                 // Iterate through each packet and process it
                 for (int i = 0; i < filePackets.Count; i++)
@@ -56,19 +134,18 @@ namespace DTBGEmulator.Classes
                     if (i == 0)
                     {
                         filePackets[i] = filePackets[i] + "\r\n}";
-                        ExtractStartTime(filePackets[i]);
                     }
                     else
                     {
-                        filePackets[i] = "{\r\n  " + filePackets[i] +"\r\n}";
+                        filePackets[i] = "{\r\n  " + filePackets[i] + "\r\n}";
                     }
 
                     // Add closing brace to the last packet
                     if (i == filePackets.Count - 1)
                     {
                         filePackets[i] = filePackets[i].TrimEnd('}');
-                        ExtractEndTime(filePackets[i]);
                     }
+
                 }
             }
             catch (Exception ex)
@@ -77,78 +154,22 @@ namespace DTBGEmulator.Classes
             }
         }
 
-        private void ExtractStartTime(string packet)
-        {
-            try
-            {
-                // Deserialize the JSON to dynamic object
-                dynamic jsonObj = JsonConvert.DeserializeObject(packet);
-
-                // Extract the TimeSpan values from the first packet
-                startTimeStr = jsonObj.Package.Header.TimeSpan.Start;
-
-                // Output the startTimeStr for debugging
-                Console.WriteLine($"StartTimeStr: {startTimeStr}");
-
-                // Use the appropriate format for parsing
-                startTime = DateTime.ParseExact(startTimeStr, "MM/dd/yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.AssumeUniversal);
-
-                // Convert to UTC if it's not already
-                startTime = startTime.Kind == DateTimeKind.Utc ? startTime : startTime.ToUniversalTime();
-
-                startTimeStr = startTime.ToString("yyyy.MM.dd. HH:mm:ss");
-
-                // Output in the desired format
-                Console.WriteLine($"StartTime (Formatted): {startTime.ToString("yyyy.MM.dd. HH:mm:ss")}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error extracting start time: {ex.Message}");
-            }
-        }
-
-        private void ExtractEndTime(string packet)
-        {
-            try
-            {
-                // Deserialize the JSON to dynamic object
-                dynamic jsonObj = JsonConvert.DeserializeObject(packet);
-
-                // Extract the TimeSpan values from the last packet
-                endTimeStr = jsonObj.Package.Header.TimeSpan.End;
-
-                // Output the endTimeStr for debugging
-                Console.WriteLine($"EndTimeStr: {endTimeStr}");
-
-                // Use the appropriate format for parsing
-                endTime = DateTime.ParseExact(endTimeStr, "MM/dd/yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.AssumeUniversal);
-
-                // Convert to UTC if it's not already
-                endTime = endTime.Kind == DateTimeKind.Utc ? endTime : endTime.ToUniversalTime();
-
-                endTimeStr = endTime.ToString("yyyy.MM.dd. HH:mm:ss");
-
-                // Output in the desired format
-                Console.WriteLine($"EndTime (Formatted): {endTime.ToString("yyyy.MM.dd. HH:mm:ss")}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error extracting end time: {ex.Message}");
-            }
-        }
-
+        // 파일 크기 저장
         private void CalculateFileSize()
         {
             if (!string.IsNullOrEmpty(filePath))
             {
                 try
                 {
-                    // 파일의 크기를 바이트로 가져오기
-                    FileInfo fileInfo = new FileInfo(filePath);
-                    long fileSizeInBytes = fileInfo.Length;
+                    long totalFileSizeInBytes = 0;
 
-                    // 파일 크기를 적절한 단위로 변환하여 storage 변수에 할당
-                    storage = FormatFileSize(fileSizeInBytes);
+                    foreach (string selectedFile in filePaths)
+                    {
+                        FileInfo fileInfo = new FileInfo(selectedFile);
+                        totalFileSizeInBytes += fileInfo.Length;
+                    }
+
+                    storage = FormatFileSize(totalFileSizeInBytes);
                     Console.WriteLine(storage);
                 }
                 catch (Exception ex)
@@ -168,31 +189,39 @@ namespace DTBGEmulator.Classes
                 return "0 " + sizeSuffixes[0];
 
             int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, byteConversion)));
-            double fileSize = Math.Round(bytes / Math.Pow(byteConversion, place), 2);
+            double fileSize = bytes / Math.Pow(byteConversion, place);
 
-            return $"{fileSize} {sizeSuffixes[place]}";
+            // 추가: 로그에 파일 크기 출력
+            Console.WriteLine($"File Size (Bytes): {bytes}");
+            Console.WriteLine($"File Size (Formatted): {fileSize} {sizeSuffixes[place]}");
+
+            return $"{fileSize:F2} {sizeSuffixes[place]}";
         }
 
         public DataDTO GenerateDataDTO()
         {
+            // 파일을 선택하지 않았거나 null인 경우 null을 반환
+            if (string.IsNullOrEmpty(filePath) || filePaths == null || filePaths.Length == 0)
+            {
+                // 여기에 처리를 추가할 수 있습니다.
+                Console.WriteLine("파일을 선택해주세요.");
+                return null;
+            }
+
             DataDTO dto = new DataDTO
             {
                 Storage = storage,
+                StartDateStr = startDateStr,
                 StartTimeStr = startTimeStr,
+                EndDateStr = endDateStr,
                 EndTimeStr = endTimeStr,
-                FilePackets = filePackets
+                FilePackets = allFilePackets,
+                FileCount = selectedFileCount,
+                PacketCount = totalPacketCount
             };
 
             return dto;
         }
 
-        //// DataDTO에 값을 설정하는 메서드 추가
-        //public void SetDataDTOValues(DataDTO dto)
-        //{
-        //    dto.Storage = storage;
-        //    dto.StartTimeStr = startTimeStr;
-        //    dto.EndTimeStr = endTimeStr;
-        //    dto.FilePackets = filePackets;
-        //}
     }
 }

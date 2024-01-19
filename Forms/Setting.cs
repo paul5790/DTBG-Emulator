@@ -13,8 +13,6 @@ namespace DTBGEmulator.Forms
 {
     public partial class Setting : Form
     {
-        private MainForm mainForm; // MainForm을 참조하기 위한 변수
-
         SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
         private string ipAddress = "192.168.0.11";
 

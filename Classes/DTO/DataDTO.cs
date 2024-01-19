@@ -9,8 +9,12 @@ namespace DTBGEmulator.Classes.DTO
     public class DataDTO
     {
         public string Storage { get; set; }
+        public string StartDateStr { get; set; }
+        public string EndDateStr { get; set; }
         public string StartTimeStr { get; set; }
         public string EndTimeStr { get; set; }
         public List<string> FilePackets { get; set; }
+        public int FileCount { get; set; }
+        public int PacketCount { get; set; }
     }
 }

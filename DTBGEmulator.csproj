@@ -137,5 +137,23 @@
   <ItemGroup>
     <None Include="Resources\stop.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\run_c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\run_n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pause_c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pause_n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop_c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop_n.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

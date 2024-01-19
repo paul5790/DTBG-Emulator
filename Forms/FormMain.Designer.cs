@@ -42,21 +42,15 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
             this.currTimeText = new System.Windows.Forms.Label();
             this.timeController = new DTBGEmulator.UserControls.TimeController();
             this.stopBtn = new System.Windows.Forms.Button();
             this.pauseBtn = new System.Windows.Forms.Button();
             this.runBtn = new System.Windows.Forms.Button();
-            this.speedBindText = new System.Windows.Forms.Label();
-            this.labelSpeed = new System.Windows.Forms.Label();
-            this.playSpeed = new System.Windows.Forms.Button();
-            this.startTimeText = new System.Windows.Forms.TextBox();
             this.speedComboBox = new System.Windows.Forms.ComboBox();
-            this.endTimeText = new System.Windows.Forms.TextBox();
-            this.timeSetBtn = new System.Windows.Forms.Button();
             this.timer_update = new System.Windows.Forms.Timer(this.components);
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
-            this.label2 = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.panel2.SuspendLayout();
@@ -205,7 +199,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel3.Location = new System.Drawing.Point(0, 250);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(560, 230);
+            this.panel3.Size = new System.Drawing.Size(560, 196);
             this.panel3.TabIndex = 6;
             // 
             // panel4
@@ -218,27 +212,33 @@
             this.panel4.Controls.Add(this.stopBtn);
             this.panel4.Controls.Add(this.pauseBtn);
             this.panel4.Controls.Add(this.runBtn);
-            this.panel4.Controls.Add(this.speedBindText);
-            this.panel4.Controls.Add(this.labelSpeed);
-            this.panel4.Controls.Add(this.playSpeed);
-            this.panel4.Controls.Add(this.startTimeText);
             this.panel4.Controls.Add(this.speedComboBox);
-            this.panel4.Controls.Add(this.endTimeText);
-            this.panel4.Controls.Add(this.timeSetBtn);
             this.panel4.Location = new System.Drawing.Point(15, 30);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(530, 190);
+            this.panel4.Size = new System.Drawing.Size(530, 149);
             this.panel4.TabIndex = 5;
+            this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.Black;
+            this.label2.Location = new System.Drawing.Point(373, 96);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 12);
+            this.label2.TabIndex = 20;
+            this.label2.Text = "현재시간 :";
             // 
             // currTimeText
             // 
             this.currTimeText.AutoSize = true;
             this.currTimeText.ForeColor = System.Drawing.Color.Black;
-            this.currTimeText.Location = new System.Drawing.Point(452, 143);
+            this.currTimeText.Location = new System.Drawing.Point(439, 96);
             this.currTimeText.Name = "currTimeText";
             this.currTimeText.Size = new System.Drawing.Size(49, 12);
             this.currTimeText.TabIndex = 19;
             this.currTimeText.Text = "88:88:88";
+            this.currTimeText.Click += new System.EventHandler(this.currTimeText_Click);
             // 
             // timeController
             // 
@@ -252,83 +252,45 @@
             // 
             // stopBtn
             // 
-            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop;
+            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop_c;
             this.stopBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.stopBtn.FlatAppearance.BorderSize = 0;
             this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stopBtn.Location = new System.Drawing.Point(468, 78);
+            this.stopBtn.Location = new System.Drawing.Point(284, 75);
             this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(40, 40);
+            this.stopBtn.Size = new System.Drawing.Size(45, 45);
             this.stopBtn.TabIndex = 17;
             this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
             // 
             // pauseBtn
             // 
-            this.pauseBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause;
+            this.pauseBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause_c;
             this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pauseBtn.FlatAppearance.BorderSize = 0;
             this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.pauseBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pauseBtn.Location = new System.Drawing.Point(422, 78);
+            this.pauseBtn.Location = new System.Drawing.Point(233, 75);
             this.pauseBtn.Name = "pauseBtn";
-            this.pauseBtn.Size = new System.Drawing.Size(40, 40);
+            this.pauseBtn.Size = new System.Drawing.Size(45, 45);
             this.pauseBtn.TabIndex = 16;
             this.pauseBtn.UseVisualStyleBackColor = true;
+            this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
             // 
             // runBtn
             // 
-            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.play;
+            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.run_n;
             this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.runBtn.FlatAppearance.BorderSize = 0;
             this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.runBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runBtn.Location = new System.Drawing.Point(376, 78);
+            this.runBtn.Location = new System.Drawing.Point(182, 75);
             this.runBtn.Name = "runBtn";
-            this.runBtn.Size = new System.Drawing.Size(40, 40);
+            this.runBtn.Size = new System.Drawing.Size(45, 45);
             this.runBtn.TabIndex = 15;
             this.runBtn.UseVisualStyleBackColor = true;
             this.runBtn.Click += new System.EventHandler(this.runBtn_Click);
-            // 
-            // speedBindText
-            // 
-            this.speedBindText.AutoSize = true;
-            this.speedBindText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.speedBindText.Location = new System.Drawing.Point(260, 143);
-            this.speedBindText.Name = "speedBindText";
-            this.speedBindText.Size = new System.Drawing.Size(66, 12);
-            this.speedBindText.TabIndex = 14;
-            this.speedBindText.Text = "속도 (1.0x)";
-            // 
-            // labelSpeed
-            // 
-            this.labelSpeed.AutoSize = true;
-            this.labelSpeed.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.labelSpeed.Location = new System.Drawing.Point(182, 143);
-            this.labelSpeed.Name = "labelSpeed";
-            this.labelSpeed.Size = new System.Drawing.Size(65, 12);
-            this.labelSpeed.TabIndex = 13;
-            this.labelSpeed.Text = "전송 속도 :";
-            // 
-            // playSpeed
-            // 
-            this.playSpeed.BackgroundImage = global::DTBGEmulator.Properties.Resources.play_speed;
-            this.playSpeed.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.playSpeed.FlatAppearance.BorderSize = 0;
-            this.playSpeed.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.playSpeed.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playSpeed.Location = new System.Drawing.Point(148, 135);
-            this.playSpeed.Name = "playSpeed";
-            this.playSpeed.Size = new System.Drawing.Size(28, 25);
-            this.playSpeed.TabIndex = 12;
-            this.playSpeed.UseVisualStyleBackColor = true;
-            // 
-            // startTimeText
-            // 
-            this.startTimeText.Location = new System.Drawing.Point(27, 87);
-            this.startTimeText.Name = "startTimeText";
-            this.startTimeText.Size = new System.Drawing.Size(100, 21);
-            this.startTimeText.TabIndex = 3;
             // 
             // speedComboBox
             // 
@@ -341,31 +303,11 @@
             "속도 (8.0x)",
             "속도 (16.0x)",
             "속도 (32.0x)"});
-            this.speedComboBox.Location = new System.Drawing.Point(27, 138);
+            this.speedComboBox.Location = new System.Drawing.Point(29, 88);
             this.speedComboBox.Name = "speedComboBox";
             this.speedComboBox.Size = new System.Drawing.Size(101, 20);
             this.speedComboBox.TabIndex = 2;
             this.speedComboBox.SelectedIndexChanged += new System.EventHandler(this.speedComboBox_SelectedIndexChanged);
-            // 
-            // endTimeText
-            // 
-            this.endTimeText.Location = new System.Drawing.Point(150, 87);
-            this.endTimeText.Name = "endTimeText";
-            this.endTimeText.Size = new System.Drawing.Size(100, 21);
-            this.endTimeText.TabIndex = 1;
-            this.endTimeText.Text = "01:05:00";
-            // 
-            // timeSetBtn
-            // 
-            this.timeSetBtn.BackColor = System.Drawing.Color.Gainsboro;
-            this.timeSetBtn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.timeSetBtn.Location = new System.Drawing.Point(274, 87);
-            this.timeSetBtn.Name = "timeSetBtn";
-            this.timeSetBtn.Size = new System.Drawing.Size(75, 23);
-            this.timeSetBtn.TabIndex = 0;
-            this.timeSetBtn.Text = "적용하기";
-            this.timeSetBtn.UseVisualStyleBackColor = false;
-            this.timeSetBtn.Click += new System.EventHandler(this.timeSetBtn_Click);
             // 
             // timer_update
             // 
@@ -376,23 +318,13 @@
             this.timer_progress.Interval = 1000;
             this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.Black;
-            this.label2.Location = new System.Drawing.Point(386, 143);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(61, 12);
-            this.label2.TabIndex = 20;
-            this.label2.Text = "현재시간 :";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(560, 510);
+            this.ClientSize = new System.Drawing.Size(560, 470);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
@@ -400,6 +332,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MainForm";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.panelTop.ResumeLayout(false);
@@ -430,16 +363,10 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.PictureBox pictureBox_Close;
         private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.Button timeSetBtn;
-        private System.Windows.Forms.TextBox endTimeText;
         private System.Windows.Forms.ComboBox speedComboBox;
-        private System.Windows.Forms.TextBox startTimeText;
-        private System.Windows.Forms.Button playSpeed;
-        private System.Windows.Forms.Label labelSpeed;
         private System.Windows.Forms.Button stopBtn;
         private System.Windows.Forms.Button pauseBtn;
         private System.Windows.Forms.Button runBtn;
-        private System.Windows.Forms.Label speedBindText;
         private UserControls.TimeController timeController1;
         private UserControls.TimeController timeController;
         private System.Windows.Forms.Timer timer_update;
