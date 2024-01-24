@@ -94,7 +94,7 @@
             this.shipPort.Name = "shipPort";
             this.shipPort.Size = new System.Drawing.Size(60, 21);
             this.shipPort.TabIndex = 7;
-            this.shipPort.Text = "8879";
+            this.shipPort.Text = "1234";
             // 
             // shipIP
             // 
@@ -225,6 +225,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Setting";
             this.Text = "Setting";
+            this.Load += new System.EventHandler(this.Setting_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();

@@ -9,9 +9,9 @@ namespace DTBGEmulator.Classes
     public class SettingDTO
     {
         // IP,Port Setting
-        public string shipIPAddress { get; set; }
+        public string shipIPAddress { get; set; } = "192.168.0.55";
         public string controlIPAddress { get; set; }
-        public string shipPort { get; set; }
+        public string shipPort { get; set; } = "12345";
         public string controlPort { get; set; }
 
     }

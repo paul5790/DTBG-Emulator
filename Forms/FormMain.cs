@@ -21,42 +21,45 @@ namespace DTBGEmulator
     public partial class MainForm : Form
     {
         #region 변수 정의
-        SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
+
+        private Setting setting = new Setting();
+        private SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
        
         private FileData fileData = new FileData(); // FileData 인스턴스
         private FolderData folderData = new FolderData(); // FolderData 인스턴스
 
         private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
 
-        DataDTO dto;
+        private DataDTO dto;
+        private SettingDTO sdto;
 
         // 쓰레드 관련
-        Thread udpSenderThread;
+        private Thread udpSenderThread;
 
-        Setting settingForm; // setting 폼
+        private Setting settingForm; // setting 폼
 
         private bool mDragForm = false;                     // 폼 이동 플래그
         private Point mMousePosition = Point.Empty;         // 마우스 위치
 
         // 
-        string ipAddress;
+        private string ipAddress;
 
         // 속도
-        int dataSpeed;
+        private int dataSpeed;
 
         // timecotroller 데이터
-        string currTime;
-        string TotalTime;
+        private string currTime;
+        private string TotalTime;
 
         // 파일, 폴더 데이터
-        List<string> filePackets;
-        int packetCount;
-        string startTime;
-        string endTime;
-        string storageSize;
+        private List<string> filePackets;
+        private int packetCount;
+        private string startTime;
+        private string endTime;
+        private string storageSize;
 
         // 데이터 재생
-        string runState = "stop";
+        private string runState = "stop";
 
         #endregion 변수 정의
         public MainForm()
@@ -67,7 +70,7 @@ namespace DTBGEmulator
         private void MainForm_Load(object sender, EventArgs e)
         {
             currTime = "00:00:00";
-            TotalTime = "01:00:00";
+            TotalTime = "00:01:00";
 
             timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
@@ -76,10 +79,10 @@ namespace DTBGEmulator
             speedComboBox.SelectedIndex = 0;
 
             // 버튼 설정
-            UpdateButtonState("stop");
+            UpdateButtonState("default");
         }
 
-        private void udpSender(string data)
+        private void udpSender(string data, string ip, string port)
         {
             try
             {
@@ -90,8 +93,8 @@ namespace DTBGEmulator
                 byte[] byteData = Encoding.UTF8.GetBytes(data);
 
                 // 서버의 IP 주소와 포트 번호
-                IPAddress serverIP = IPAddress.Parse("127.0.0.1");
-                int serverPort = 12345;
+                IPAddress serverIP = IPAddress.Parse(ip);
+                int serverPort = Convert.ToInt32(port);
 
                 // 데이터 전송
                 udpClient.Send(byteData, byteData.Length, new IPEndPoint(serverIP, serverPort));
@@ -107,42 +110,39 @@ namespace DTBGEmulator
 
         private void UdpSenderThread()
         {
-            // 예시: 10초에 한 번씩 데이터를 전송하는 무한 루프
-            int idx = 0;
-            while (true)
+            sdto = setting.GenerateSettingDTO();
+            if (dto != null)
             {
-                int sleepTime;
-                if (packetCount > 60)
+                string setip = sdto.shipIPAddress;
+                string setport = sdto.shipPort;
+
+                int sleepTime = packetCount > 60 ? dataSpeed / (packetCount / 60) : dataSpeed * (60 / packetCount);
+                int idx = 0;
+
+                while (true)
                 {
-                    sleepTime = dataSpeed / (packetCount / 60);
+                    // 일시정지 여부 확인
+                    pauseEvent.WaitOne();
+
+                    if (idx == packetCount)
+                    {
+                        idx = 0;
+                    }
+
+                    string dataToSend = filePackets[idx];
+
+                    // UDP 데이터 전송
+                    udpSender(dataToSend, setip, setport);
+
+                    idx++;
+
+                    // 대기
+                    Thread.Sleep(sleepTime);
                 }
-                else
-                {
-                    // packetCount가 60 이하인 경우에는 packetCount를 기반으로 60까지의 시간으로 변환하여 계산
-                    sleepTime = dataSpeed * (60 / packetCount);
-                }
-                if (idx == packetCount)
-                {
-                    idx = 0;
-                }
-
-                // 일시정지 여부 확인
-                pauseEvent.WaitOne();
-
-                // 예시 데이터 생성 (실제로는 필요한 데이터를 가져와서 사용)
-                string dataToSend = $"{filePackets[idx]}";
-
-                // Console.WriteLine($"확인{dataToSend}");
-                Console.WriteLine($"확인{sleepTime}");
-                Console.WriteLine($"확인{Convert.ToInt32(sleepTime)}");
-
-                // UDP 데이터 전송
-                udpSender(dataToSend);
-
-                idx++;
-
-                // 1초 대기
-                Thread.Sleep(Convert.ToInt32(sleepTime));
+            }
+            else
+            {
+                MessageBox.Show("IP 설정을 해주세요");
             }
         }
 
@@ -150,7 +150,7 @@ namespace DTBGEmulator
         private void pictureBox_Close_Click(object sender, EventArgs e)
         {
 
-            DialogResult dialog = MessageBox.Show("ss", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            DialogResult dialog = MessageBox.Show("프로그램을 종료하시겠습니까?", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
 
             if (dialog == DialogResult.OK)
             {
@@ -165,18 +165,18 @@ namespace DTBGEmulator
         private void settingBtn_Click(object sender, EventArgs e)
         {
             // 버튼을 클릭했을 때 모달로 표시될 SettingForm 인스턴스 생성
-            settingForm = new Setting(settingDTO);
+            
 
             // MainForm의 정 가운데 계산
-            int mainFormCenterX = this.Left + (this.Width - settingForm.Width) / 2;
-            int mainFormCenterY = this.Top + (this.Height - settingForm.Height) / 2 - 20;
+            int mainFormCenterX = this.Left + (this.Width - setting.Width) / 2;
+            int mainFormCenterY = this.Top + (this.Height - setting.Height) / 2 - 20;
 
             // SettingForm 위치 설정
-            settingForm.StartPosition = FormStartPosition.Manual;
-            settingForm.Location = new Point(mainFormCenterX, mainFormCenterY);
+            setting.StartPosition = FormStartPosition.Manual;
+            setting.Location = new Point(mainFormCenterX, mainFormCenterY);
 
             // ShowDialog 메서드를 사용하여 모달로 표시
-            settingForm.ShowDialog();
+            setting.ShowDialog();
         }
 
         #region 상단바 드래그
@@ -280,11 +280,16 @@ namespace DTBGEmulator
                 storageSize = dto.Storage;
                 dataInfoTextbox.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
 
-                currTime = "00:00:00";
-                TotalTime = "00:10:00";
 
-                timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
+                int fileNum = dto.FileCount;
+                currTime = "00:00:00";
+                string totalTimeNum = $"{fileNum * 60}";
+
+                timeController.TotalTime = totalTimeNum;
                 timeController.CurrTime = ChangeTimeToStrSec(currTime);
+
+                // 버튼 설정
+                UpdateButtonState("stop");
             }
             else
             {
@@ -303,16 +308,34 @@ namespace DTBGEmulator
             // addFolderBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
             folderData.SelectFolder();
 
-            Dictionary<string, string> fileContents = folderData.GetFileContents();
-            Console.WriteLine($"fileContents: {fileContents}");
-
-            // 개별 파일 내용 출력
-            foreach (var entry in fileContents)
+            dto = folderData.GenerateDataDTO();
+            if (dto != null)
             {
-                Console.WriteLine($"File Name: {entry.Key}");
-                Console.WriteLine($"File Content: {entry.Value}");
-                Console.WriteLine("-----------------------");
+                filePackets = dto.FilePackets;
+                packetCount = filePackets.Count;
+
+                startTime = dto.StartDateStr;
+                endTime = dto.EndDateStr;
+                storageSize = dto.Storage;
+                dataInfoTextbox.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
+
+
+                int fileNum = dto.FileCount;
+                currTime = "00:00:00";
+                string totalTimeNum = $"{fileNum * 60}";
+
+                timeController.TotalTime = totalTimeNum;
+                timeController.CurrTime = ChangeTimeToStrSec(currTime);
+
+                // 버튼 설정
+                UpdateButtonState("stop");
             }
+            else
+            {
+                // null일 때의 처리
+                Console.WriteLine("파일을 선택해주세요.");
+            }
+
         }
 
 
@@ -344,10 +367,19 @@ namespace DTBGEmulator
         private void UpdateButtonState(string newState)
         {
             string runImageKey, pauseImageKey, stopImageKey;
-            bool runEnabled, pauseEnabled, stopEnabled;
+            bool runEnabled, pauseEnabled, stopEnabled, selectEnabled;
 
             switch (newState)
             {
+                case "default":
+                    runImageKey = "run_c";
+                    pauseImageKey = "pause_c";
+                    stopImageKey = "stop_c";
+                    runEnabled = false;
+                    pauseEnabled = false;
+                    stopEnabled = false;
+                    selectEnabled = true;
+                    break;
                 case "run":
                     runImageKey = "run_c";
                     pauseImageKey = "pause_n";
@@ -355,6 +387,7 @@ namespace DTBGEmulator
                     runEnabled = false;
                     pauseEnabled = true;
                     stopEnabled = true;
+                    selectEnabled = false;
                     break;
                 case "pause":
                     runImageKey = "run_n";
@@ -363,6 +396,7 @@ namespace DTBGEmulator
                     runEnabled = true;
                     pauseEnabled = false;
                     stopEnabled = true;
+                    selectEnabled = false;
                     break;
                 case "stop":
                     runImageKey = "run_n";
@@ -371,6 +405,7 @@ namespace DTBGEmulator
                     runEnabled = true;
                     pauseEnabled = false;
                     stopEnabled = false;
+                    selectEnabled = true;
                     break;
                 default:
                     return;
@@ -386,6 +421,8 @@ namespace DTBGEmulator
             runBtn.Enabled = runEnabled;
             pauseBtn.Enabled = pauseEnabled;
             stopBtn.Enabled = stopEnabled;
+            addFileBtn.Enabled = selectEnabled;
+            addFolderBtn.Enabled = selectEnabled;
         }
 
         private void runBtn_Click(object sender, EventArgs e)

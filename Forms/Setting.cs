@@ -1,4 +1,5 @@
 ﻿using DTBGEmulator.Classes;
+using DTBGEmulator.Classes.DTO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,16 +14,28 @@ namespace DTBGEmulator.Forms
 {
     public partial class Setting : Form
     {
+        SettingDTO dto = new SettingDTO();
         SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
         private string ipAddress = "192.168.0.11";
+
+        // ip 설정 주소
+        private string shipIPAddress;
+        private string controlIPAddress;
+        private string shipPortAddress;
+        private string controlPortAddress;
 
         private bool mDragForm = false;                     // 폼 이동 플래그
         private Point mMousePosition = Point.Empty;         // 마우스 위치
 
-        public Setting(SettingDTO mainFormSettingDTO)
+        public Setting()
         {
             InitializeComponent();
-            settingDTO = mainFormSettingDTO;
+        }
+
+        private void Setting_Load(object sender, EventArgs e)
+        {
+            shipIP.Text = dto.shipIPAddress;
+            shipPort.Text = dto.shipPort;
         }
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
@@ -97,14 +110,19 @@ namespace DTBGEmulator.Forms
 
         private void button_Ok_Click(object sender, EventArgs e)
         {
-
-            settingDTO.shipIPAddress = shipIP.Text;
-            settingDTO.controlIPAddress = controlIP.Text;
-            settingDTO.shipPort = shipPort.Text;
-            settingDTO.controlPort = controlPort.Text;
-
-            Console.WriteLine($"IPAddress: {ipAddress}");
-            Console.WriteLine($"settingDTO.IPAddress: {settingDTO.shipIPAddress}");
+            dto.shipIPAddress = shipIP.Text;
+            controlIPAddress = controlIP.Text;
+            dto.shipPort = shipPort.Text;
+            controlPortAddress = controlPort.Text;
+            MessageBox.Show("설정이 완료되었습니다.");
+            shipIP.Text = dto.shipIPAddress;
+            shipPort.Text = dto.shipPort;
         }
+
+        public SettingDTO GenerateSettingDTO()
+        {
+            return dto;
+        }
+
     }
 }

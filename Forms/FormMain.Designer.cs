@@ -51,6 +51,7 @@
             this.speedComboBox = new System.Windows.Forms.ComboBox();
             this.timer_update = new System.Windows.Forms.Timer(this.components);
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
+            this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.panel2.SuspendLayout();
@@ -92,9 +93,9 @@
             this.label1.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(105, 12);
+            this.label1.Size = new System.Drawing.Size(245, 12);
             this.label1.TabIndex = 0;
-            this.label1.Text = "DTBG Emulator";
+            this.label1.Text = "ESCORT-DTBG 연동시험용 에뮬레이터";
             this.label1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.label1_MouseDown);
             this.label1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.label1_MouseMove);
             this.label1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.label1_MouseUp);
@@ -245,9 +246,9 @@
             this.timeController.BackColor = System.Drawing.Color.White;
             this.timeController.CurrTime = "0";
             this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.timeController.Location = new System.Drawing.Point(3, 13);
+            this.timeController.Location = new System.Drawing.Point(10, 15);
             this.timeController.Name = "timeController";
-            this.timeController.Size = new System.Drawing.Size(505, 44);
+            this.timeController.Size = new System.Drawing.Size(510, 44);
             this.timeController.TabIndex = 18;
             // 
             // stopBtn
@@ -280,7 +281,7 @@
             // 
             // runBtn
             // 
-            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.run_n;
+            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.run_c;
             this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.runBtn.FlatAppearance.BorderSize = 0;
             this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -373,6 +374,7 @@
         private System.Windows.Forms.Label currTimeText;
         private System.Windows.Forms.Timer timer_progress;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Timer timer_udp;
     }
 }
 

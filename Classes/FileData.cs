@@ -13,8 +13,6 @@ namespace DTBGEmulator.Classes
         private string[] filePaths;
         private string filePath;
         private List<string> filePackets;
-        private DateTime startTime;
-        private DateTime endTime;
         private string startDateStr;
         private string endDateStr;
         private string startTimeStr;
@@ -73,7 +71,8 @@ namespace DTBGEmulator.Classes
 
                     startDateStr = ConvertToLocalTime(startDate).ToString("yyyy.MM.dd. HH:mm:ss");
                     endDateStr = ConvertToLocalTime(endDate).ToString("yyyy.MM.dd. HH:mm:ss");
-
+                    startTimeStr = ConvertToLocalTime(startDate).ToString("HH:mm:ss");
+                    endTimeStr = ConvertToLocalTime(endDate).ToString("HH:mm:ss");
 
                     Console.WriteLine(startDateStr);
                     Console.WriteLine(endDateStr);
