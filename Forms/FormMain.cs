@@ -14,6 +14,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -112,6 +113,9 @@ namespace DTBGEmulator
             }
         }
 
+        private System.Threading.Timer timer; // 클래스 멤버로 선언
+        private int idx = 0;
+
         private void UdpSenderThread()
         {
             sdto = setting.GenerateSettingDTO();
@@ -122,51 +126,12 @@ namespace DTBGEmulator
 
                 int a = (packetCount / 60) + 1;
                 int sleepTime = packetCount > 60 ? dataSpeed / (packetCount / 60) : dataSpeed * (60 / packetCount);
-                int idx = 0;
+                int b = 0;
+                
 
-                while (true)
-                {
-                    // 일시정지 여부 확인
-                    pauseEvent.WaitOne();
-
-                    int getStart = timeController.StartTime;
-                    int getEnd = timeController.EndTime;
-                    int getCurr = Convert.ToInt32(timeController.CurrTime);
-                    getCurr++;
-                    if (getCurr > getEnd)
-                    {
-                        getCurr = getStart;
-                    }
-                    timeController.CurrTime = getCurr.ToString();
-
-                    if (idx == packetCount)
-                    {
-                        idx = 0;
-                    }
-
-                    //string dataToSend = filePackets[idx];
-
-                    Console.WriteLine(packetCount);
-                    for (int i = 0; i < 176; i++)
-                    {
-                        if (idx == packetCount)
-                        {
-                            idx = 0;
-                        }
-                        string dataToSend = filePackets[idx];
-                        udpSender(dataToSend, setip, setport);
-                        idx++;
-
-                    }
-
-                    // UDP 데이터 전송
-                    //udpSender(dataToSend, setip, setport);
-
-                    //idx++;
-
-                    // 대기
-                    Thread.Sleep(1000);
-                }
+                // TimerCallback 함수를 1초 간격으로 호출하는 타이머 생성
+                timer = new System.Threading.Timer(TimerCallback, new Tuple<string, string>(setip, setport), 0, 1000 - 12);
+                b++;
             }
             else
             {
@@ -174,6 +139,43 @@ namespace DTBGEmulator
             }
         }
 
+        private void TimerCallback(object state)
+        {
+            // TimerCallback 함수에서는 짧은 시간 동안만 블록되어야 함
+            Tuple<string, string> parameters = (Tuple<string, string>)state;
+            string setip = parameters.Item1;
+            string setport = parameters.Item2;
+
+            // 일시정지 여부 확인
+            pauseEvent.WaitOne();
+
+            int getStart = timeController.StartTime;
+            int getEnd = timeController.EndTime;
+            int getCurr = Convert.ToInt32(timeController.CurrTime);
+            getCurr++;
+            if (getCurr > getEnd)
+            {
+                getCurr = getStart;
+            }
+            timeController.CurrTime = getCurr.ToString();
+
+            if (idx == packetCount)
+            {
+                idx = 0;
+            }
+            Console.WriteLine($"TimerCallback executed at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+            Console.WriteLine(packetCount);
+            for (int i = 0; i < 87; i++)
+            {
+                if (idx == packetCount)
+                {
+                    idx = 0;
+                }
+                string dataToSend = filePackets[idx];
+                udpSender(dataToSend, setip, setport);
+                idx++;
+            }
+        }
 
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
@@ -599,6 +601,20 @@ namespace DTBGEmulator
 
         private void label3_Click(object sender, EventArgs e)
         {
+
+        }
+        int seconds = 0;
+        private void timer_progress_Tick(object sender, EventArgs e)
+        {
+            
+            seconds++;
+
+            // TimeSpan을 사용하여 초를 시:분:초 형태의 문자열로 변환
+            TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
+            string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
+
+            // 변환된 문자열을 UI에 표시
+            realTime.Text = formattedTime;
 
         }
     }

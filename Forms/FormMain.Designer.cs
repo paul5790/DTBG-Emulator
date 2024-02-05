@@ -63,6 +63,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.realTime = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.currTimeText = new System.Windows.Forms.Label();
             this.timeController = new DTBGEmulator.UserControls.TimeController();
@@ -452,6 +453,7 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.realTime);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.currTimeText);
             this.panel4.Controls.Add(this.timeController);
@@ -460,6 +462,16 @@
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
             this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
+            // 
+            // realTime
+            // 
+            this.realTime.AutoSize = true;
+            this.realTime.ForeColor = System.Drawing.Color.Black;
+            this.realTime.Location = new System.Drawing.Point(391, 72);
+            this.realTime.Name = "realTime";
+            this.realTime.Size = new System.Drawing.Size(49, 12);
+            this.realTime.TabIndex = 21;
+            this.realTime.Text = "88:88:88";
             // 
             // label2
             // 
@@ -499,6 +511,7 @@
             // timer_progress
             // 
             this.timer_progress.Interval = 1000;
+            this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
             // 
             // MainForm
             // 
@@ -579,6 +592,7 @@
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.ComboBox speedComboBox;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label realTime;
     }
 }
 
