@@ -24,6 +24,7 @@ namespace DTBGEmulator.Classes
         private List<string> allFilePackets;
         private int selectedFileCount;
         private int totalPacketCount;
+        Dictionary<string, List<string>> dictPackets = new Dictionary<string, List<string>>();
 
         private Dictionary<string, string> folderContents = new Dictionary<string, string>(); // 폴더 이름과 내용을 저장하는 Dictionary
 
@@ -205,11 +206,6 @@ namespace DTBGEmulator.Classes
 
             DataDTO dto = new DataDTO
             {
-                Storage = storage,
-                StartDateStr = startDateStr,
-                StartTimeStr = startTimeStr,
-                EndDateStr = endDateStr,
-                EndTimeStr = endTimeStr,
                 FilePackets = allFilePackets,
                 FileCount = selectedFileCount,
                 PacketCount = totalPacketCount

@@ -16,5 +16,7 @@ namespace DTBGEmulator.Classes.DTO
         public List<string> FilePackets { get; set; }
         public int FileCount { get; set; }
         public int PacketCount { get; set; }
+        public string FirstFileName { get; set; }
+        public string LastFileName { get; set; }
     }
 }
