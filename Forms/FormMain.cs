@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -91,30 +92,42 @@ namespace DTBGEmulator
         {
             try
             {
-                // UDP 클라이언트 생성 (임의의 IP 주소와 포트 사용)
-                UdpClient udpClient = new UdpClient();
+                using (UdpClient udpClient = new UdpClient())
+                {
+                    // 서버의 IP 주소와 포트 번호
+                    IPAddress serverIP = IPAddress.Parse(ip);
+                    int serverPort = Convert.ToInt32(port);
 
-                // 전송할 데이터를 바이트 배열로 변환
-                byte[] byteData = Encoding.UTF8.GetBytes(data);
+                    // 전송할 데이터를 바이트 배열로 변환
+                    byte[] byteData = Encoding.UTF8.GetBytes(data);
 
-                // 서버의 IP 주소와 포트 번호
-                IPAddress serverIP = IPAddress.Parse(ip);
-                int serverPort = Convert.ToInt32(port);
+                    // MTU(Maximum Transmission Unit) 크기를 고려하여 패킷을 나눔
+                    int mtu = 1400; // 조절 가능한 MTU 크기
 
-                // 데이터 전송
-                udpClient.Send(byteData, byteData.Length, new IPEndPoint(serverIP, serverPort));
+                    if (byteData.Length > mtu)
+                    {
+                        for (int i = 0; i < byteData.Length; i += mtu)
+                        {
+                            int remainingBytes = Math.Min(mtu, byteData.Length - i);
+                            byte[] segment = new byte[remainingBytes];
+                            Array.Copy(byteData, i, segment, 0, remainingBytes);
 
-                // UDP 클라이언트 종료
-                udpClient.Close();
+                            // 데이터 분할 전송
+                            udpClient.Send(segment, segment.Length, new IPEndPoint(serverIP, serverPort));
+                        }
+                    }
+                    else
+                    {
+                        // 데이터 크기가 MTU보다 작으면 전체 데이터를 한 번에 전송
+                        udpClient.Send(byteData, byteData.Length, new IPEndPoint(serverIP, serverPort));
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending UDP data: {ex.Message}");
             }
         }
-
-        private System.Threading.Timer timer; // 클래스 멤버로 선언
-        private int idx = 0;
 
         private void UdpSenderThread()
         {
@@ -124,14 +137,92 @@ namespace DTBGEmulator
                 string setip = sdto.shipIPAddress;
                 string setport = sdto.shipPort;
 
-                int a = (packetCount / 60) + 1;
-                int sleepTime = packetCount > 60 ? dataSpeed / (packetCount / 60) : dataSpeed * (60 / packetCount);
-                int b = 0;
-                
+                int setTime = 1000;
+                int sleepTime = setTime;
+                int diffTime = 0;
+                int idx = 0;
+                // Stopwatch 객체 생성
+                Stopwatch stopwatch = new Stopwatch();
+                while (true)
+                {
+                    // 코드 실행 시작 시간 기록
+                    stopwatch.Start();
+                    // 일시정지 여부 확인
+                    pauseEvent.WaitOne();
 
-                // TimerCallback 함수를 1초 간격으로 호출하는 타이머 생성
-                timer = new System.Threading.Timer(TimerCallback, new Tuple<string, string>(setip, setport), 0, 1000 - 12);
-                b++;
+                    int getStart = timeController.StartTime;
+                    int getEnd = timeController.EndTime;
+                    int getCurr = Convert.ToInt32(timeController.CurrTime);
+                    getCurr++;
+                    if (getCurr > getEnd)
+                    {
+                        getCurr = getStart;
+                    }
+                    timeController.CurrTime = getCurr.ToString();
+
+                    if (idx == packetCount)
+                    {
+                        idx = 0;
+                    }
+
+                    // Console.WriteLine(packetCount);
+                    for (int i = 0; i < 88; i++)
+                    {
+                        if (idx == packetCount)
+                        {
+                            idx = 0;
+                        }
+                        string dataToSend = filePackets[idx];
+                        udpSender(dataToSend, setip, setport);
+                        idx++;
+
+                    }
+                    if (sleepTime < 0)
+                    {
+                        sleepTime = setTime / dataSpeed;
+                        if (sleepTime < 0)
+                        {
+                            sleepTime = setTime / dataSpeed;
+                        }
+                        // 대기
+                        Thread.Sleep(sleepTime);
+                    }
+                    else
+                    {
+                        sleepTime = (setTime / dataSpeed) - diffTime;
+                        if (sleepTime < 0)
+                        {
+                            sleepTime = setTime / dataSpeed;
+                        }
+                        // 대기
+                        Thread.Sleep(sleepTime);
+                    }
+
+                    // 코드 실행 종료 시간 기록
+                    stopwatch.Stop();
+
+                    // 코드 실행 시간 출력
+                    Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                    int intStopwatch = (int)stopwatch.ElapsedMilliseconds;
+                    //if (intStopwatch > (setTime / dataSpeed) && intStopwatch <= 1500 )
+                    //{
+                    //    diffTime = (intStopwatch - (setTime / dataSpeed)) * 2;
+                    //    stopwatch.Reset(); // Stopwatch 초기화
+                    //}
+                    //else
+                    //{
+                    //    diffTime = 0;
+                    //    stopwatch.Reset(); // Stopwatch 초기화
+                    //}
+                    if (intStopwatch <= 1500)
+                    {
+                        // diffTime = Math.Abs(intStopwatch - (setTime / dataSpeed));
+                        diffTime = 30;
+                        stopwatch.Reset(); // Stopwatch 초기화
+                    }
+
+                    Console.WriteLine($"TimerCallback executed at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+                }
             }
             else
             {
@@ -139,43 +230,7 @@ namespace DTBGEmulator
             }
         }
 
-        private void TimerCallback(object state)
-        {
-            // TimerCallback 함수에서는 짧은 시간 동안만 블록되어야 함
-            Tuple<string, string> parameters = (Tuple<string, string>)state;
-            string setip = parameters.Item1;
-            string setport = parameters.Item2;
 
-            // 일시정지 여부 확인
-            pauseEvent.WaitOne();
-
-            int getStart = timeController.StartTime;
-            int getEnd = timeController.EndTime;
-            int getCurr = Convert.ToInt32(timeController.CurrTime);
-            getCurr++;
-            if (getCurr > getEnd)
-            {
-                getCurr = getStart;
-            }
-            timeController.CurrTime = getCurr.ToString();
-
-            if (idx == packetCount)
-            {
-                idx = 0;
-            }
-            Console.WriteLine($"TimerCallback executed at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
-            Console.WriteLine(packetCount);
-            for (int i = 0; i < 87; i++)
-            {
-                if (idx == packetCount)
-                {
-                    idx = 0;
-                }
-                string dataToSend = filePackets[idx];
-                udpSender(dataToSend, setip, setport);
-                idx++;
-            }
-        }
 
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
@@ -579,7 +634,7 @@ namespace DTBGEmulator
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1, 2, 4, 8, 16, 32 };
+            int[] speedValues = { 1, 2, 4, 10, 20, 50 };
 
             // 선택된 인덱스를 이용하여 데이터 속도 설정
             if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
