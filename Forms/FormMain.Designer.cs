@@ -63,13 +63,16 @@
             this.label3 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.realTime = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.currTimeText = new System.Windows.Forms.Label();
             this.timeController = new DTBGEmulator.UserControls.TimeController();
             this.timer_update = new System.Windows.Forms.Timer(this.components);
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
+            this.label13 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -209,6 +212,9 @@
             this.speedComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.speedComboBox.FormattingEnabled = true;
             this.speedComboBox.Items.AddRange(new object[] {
+            "속도 (0.1x)",
+            "속도 (0.25x)",
+            "속도 (0.5x)",
             "속도 (1.0x)",
             "속도 (2.0x)",
             "속도 (4.0x)",
@@ -453,7 +459,10 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.realTime);
+            this.panel4.Controls.Add(this.label16);
+            this.panel4.Controls.Add(this.label13);
+            this.panel4.Controls.Add(this.label12);
+            this.panel4.Controls.Add(this.label11);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Controls.Add(this.currTimeText);
             this.panel4.Controls.Add(this.timeController);
@@ -463,20 +472,32 @@
             this.panel4.TabIndex = 5;
             this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
             // 
-            // realTime
+            // label12
             // 
-            this.realTime.AutoSize = true;
-            this.realTime.ForeColor = System.Drawing.Color.Black;
-            this.realTime.Location = new System.Drawing.Point(391, 72);
-            this.realTime.Name = "realTime";
-            this.realTime.Size = new System.Drawing.Size(49, 12);
-            this.realTime.TabIndex = 21;
-            this.realTime.Text = "88:88:88";
+            this.label12.Font = new System.Drawing.Font("Roboto", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label12.Location = new System.Drawing.Point(111, 60);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(70, 15);
+            this.label12.TabIndex = 23;
+            this.label12.Text = "시작시간";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label11
+            // 
+            this.label11.Font = new System.Drawing.Font("Roboto", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label11.Location = new System.Drawing.Point(349, 60);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(70, 15);
+            this.label11.TabIndex = 22;
+            this.label11.Text = "종료시간";
+            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.Black;
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
             this.label2.Location = new System.Drawing.Point(191, 71);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 12);
@@ -486,7 +507,7 @@
             // currTimeText
             // 
             this.currTimeText.AutoSize = true;
-            this.currTimeText.ForeColor = System.Drawing.Color.Black;
+            this.currTimeText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
             this.currTimeText.Location = new System.Drawing.Point(285, 72);
             this.currTimeText.Name = "currTimeText";
             this.currTimeText.Size = new System.Drawing.Size(49, 12);
@@ -512,6 +533,28 @@
             // 
             this.timer_progress.Interval = 1000;
             this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
+            // 
+            // label13
+            // 
+            this.label13.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label13.Location = new System.Drawing.Point(6, 9);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(100, 13);
+            this.label13.TabIndex = 24;
+            this.label13.Text = "구간반복 시작시간";
+            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label16
+            // 
+            this.label16.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label16.Location = new System.Drawing.Point(423, 9);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(100, 13);
+            this.label16.TabIndex = 26;
+            this.label16.Text = "구간반복 종료시간";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // MainForm
             // 
@@ -592,7 +635,10 @@
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.ComboBox speedComboBox;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label realTime;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label16;
     }
 }
 

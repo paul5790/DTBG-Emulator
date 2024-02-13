@@ -88,7 +88,7 @@
             this.txtBox_EndTime_HH.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_EndTime_HH.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_EndTime_HH.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_EndTime_HH.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_EndTime_HH.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_EndTime_HH.Location = new System.Drawing.Point(1, 3);
             this.txtBox_EndTime_HH.MaxLength = 2;
             this.txtBox_EndTime_HH.Name = "txtBox_EndTime_HH";
@@ -104,7 +104,7 @@
             this.txtBox_EndTime_mm.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_EndTime_mm.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_EndTime_mm.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_EndTime_mm.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_EndTime_mm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_EndTime_mm.Location = new System.Drawing.Point(33, 3);
             this.txtBox_EndTime_mm.MaxLength = 2;
             this.txtBox_EndTime_mm.Name = "txtBox_EndTime_mm";
@@ -120,7 +120,7 @@
             this.txtBox_EndTime_ss.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_EndTime_ss.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_EndTime_ss.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_EndTime_ss.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_EndTime_ss.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_EndTime_ss.Location = new System.Drawing.Point(65, 3);
             this.txtBox_EndTime_ss.MaxLength = 2;
             this.txtBox_EndTime_ss.Name = "txtBox_EndTime_ss";
@@ -134,7 +134,7 @@
             // label_EndTime_Colon1
             // 
             this.label_EndTime_Colon1.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_EndTime_Colon1.ForeColor = System.Drawing.Color.Black;
+            this.label_EndTime_Colon1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.label_EndTime_Colon1.Location = new System.Drawing.Point(21, 3);
             this.label_EndTime_Colon1.Name = "label_EndTime_Colon1";
             this.label_EndTime_Colon1.Size = new System.Drawing.Size(12, 15);
@@ -145,7 +145,7 @@
             // label_EndTime_Colon2
             // 
             this.label_EndTime_Colon2.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_EndTime_Colon2.ForeColor = System.Drawing.Color.Black;
+            this.label_EndTime_Colon2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.label_EndTime_Colon2.Location = new System.Drawing.Point(53, 3);
             this.label_EndTime_Colon2.Name = "label_EndTime_Colon2";
             this.label_EndTime_Colon2.Size = new System.Drawing.Size(12, 15);
@@ -163,7 +163,7 @@
             this.panel_Right.Controls.Add(this.txtBox_EndTime_mm);
             this.panel_Right.Controls.Add(this.txtBox_EndTime_HH);
             this.panel_Right.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel_Right.Location = new System.Drawing.Point(661, 9);
+            this.panel_Right.Location = new System.Drawing.Point(661, 14);
             this.panel_Right.Name = "panel_Right";
             this.panel_Right.Size = new System.Drawing.Size(86, 20);
             this.panel_Right.TabIndex = 8;
@@ -173,7 +173,7 @@
             this.txtBox_StartTime_HH.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_StartTime_HH.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_StartTime_HH.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_StartTime_HH.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_StartTime_HH.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_StartTime_HH.Location = new System.Drawing.Point(1, 3);
             this.txtBox_StartTime_HH.MaxLength = 2;
             this.txtBox_StartTime_HH.Name = "txtBox_StartTime_HH";
@@ -189,7 +189,7 @@
             this.txtBox_StartTime_mm.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_StartTime_mm.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_StartTime_mm.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_StartTime_mm.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_StartTime_mm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_StartTime_mm.Location = new System.Drawing.Point(33, 3);
             this.txtBox_StartTime_mm.MaxLength = 2;
             this.txtBox_StartTime_mm.Name = "txtBox_StartTime_mm";
@@ -205,7 +205,7 @@
             this.txtBox_StartTime_ss.BackColor = System.Drawing.SystemColors.Control;
             this.txtBox_StartTime_ss.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBox_StartTime_ss.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBox_StartTime_ss.ForeColor = System.Drawing.Color.Black;
+            this.txtBox_StartTime_ss.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.txtBox_StartTime_ss.Location = new System.Drawing.Point(65, 3);
             this.txtBox_StartTime_ss.MaxLength = 2;
             this.txtBox_StartTime_ss.Name = "txtBox_StartTime_ss";
@@ -219,7 +219,7 @@
             // label_StartTime_Colon1
             // 
             this.label_StartTime_Colon1.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_StartTime_Colon1.ForeColor = System.Drawing.Color.Black;
+            this.label_StartTime_Colon1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.label_StartTime_Colon1.Location = new System.Drawing.Point(21, 3);
             this.label_StartTime_Colon1.Name = "label_StartTime_Colon1";
             this.label_StartTime_Colon1.Size = new System.Drawing.Size(12, 15);
@@ -230,7 +230,7 @@
             // label_StartTime_Colon2
             // 
             this.label_StartTime_Colon2.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_StartTime_Colon2.ForeColor = System.Drawing.Color.Black;
+            this.label_StartTime_Colon2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
             this.label_StartTime_Colon2.Location = new System.Drawing.Point(53, 3);
             this.label_StartTime_Colon2.Name = "label_StartTime_Colon2";
             this.label_StartTime_Colon2.Size = new System.Drawing.Size(12, 15);
@@ -247,7 +247,7 @@
             this.panel_Left.Controls.Add(this.txtBox_StartTime_mm);
             this.panel_Left.Controls.Add(this.txtBox_StartTime_HH);
             this.panel_Left.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel_Left.Location = new System.Drawing.Point(3, 9);
+            this.panel_Left.Location = new System.Drawing.Point(3, 14);
             this.panel_Left.Name = "panel_Left";
             this.panel_Left.Size = new System.Drawing.Size(86, 20);
             this.panel_Left.TabIndex = 2;

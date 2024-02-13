@@ -82,7 +82,7 @@ namespace DTBGEmulator
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
             timer_update.Start();
 
-            speedComboBox.SelectedIndex = 0;
+            speedComboBox.SelectedIndex = 3;
 
             // 버튼 설정
             UpdateButtonState("default");
@@ -143,10 +143,12 @@ namespace DTBGEmulator
                 int idx = 0;
                 // Stopwatch 객체 생성
                 Stopwatch stopwatch = new Stopwatch();
+                Stopwatch stopwatch1= new Stopwatch();
                 while (true)
                 {
                     // 코드 실행 시작 시간 기록
                     stopwatch.Start();
+                    stopwatch1.Start();
                     // 일시정지 여부 확인
                     pauseEvent.WaitOne();
 
@@ -177,6 +179,7 @@ namespace DTBGEmulator
                         idx++;
 
                     }
+                    stopwatch1.Stop();
                     if (sleepTime < 0)
                     {
                         sleepTime = setTime / dataSpeed;
@@ -203,6 +206,7 @@ namespace DTBGEmulator
 
                     // 코드 실행 시간 출력
                     Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"Code execution time1: {stopwatch1.ElapsedMilliseconds} ms");
                     int intStopwatch = (int)stopwatch.ElapsedMilliseconds;
                     //if (intStopwatch > (setTime / dataSpeed) && intStopwatch <= 1500 )
                     //{
@@ -219,6 +223,7 @@ namespace DTBGEmulator
                         // diffTime = Math.Abs(intStopwatch - (setTime / dataSpeed));
                         diffTime = 30;
                         stopwatch.Reset(); // Stopwatch 초기화
+                        stopwatch1.Reset(); // Stopwatch 초기화
                     }
 
                     Console.WriteLine($"TimerCallback executed at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
@@ -357,10 +362,6 @@ namespace DTBGEmulator
             // null 체크 추가
             if (dto != null)
             {
-                //filePackets = dto.FilePackets;
-                //packetCount = filePackets.Count;
-                //Console.WriteLine("패킷메인" + packetCount);
-
                 startTime = dto.FirstFileName;
                 endTime = dto.LastFileName;
                 Console.WriteLine("시간확인" + dto.FirstFileName + dto.LastFileName);
@@ -379,6 +380,8 @@ namespace DTBGEmulator
                 // 새로운 형식의 문자열로 변환
                 string formattedStartTime = dateStartTime.ToString("yyyy.MM.dd. HH:mm:ss");
                 string formattedEndTime = dateEndTime.ToString("yyyy.MM.dd. HH:mm");
+                string timeControllerStartTime = dateStartTime.ToString("HH:mm:ss");
+                string timeControllerEndTime = dateEndTime.ToString("HH:mm") + "59";
 
                 startTimeData.Text = formattedStartTime;
                 endTimeData.Text = formattedEndTime+":59";
@@ -394,6 +397,8 @@ namespace DTBGEmulator
                     fullTimeData.Text = $"{hours}시간 {minutes}분";
                 }
 
+
+
                 //int fileNum = dto.FileCount;
                 //currTime = "00:00:00";
                 //string totalTimeNum = $"{fileNum * 60}";
@@ -405,6 +410,7 @@ namespace DTBGEmulator
                 UpdateButtonState("stop");
 
 
+                // 비동기 로드 후
                 await fileData.LoadFile();
                 dto = fileData.GenerateDataDTO();
 
@@ -419,6 +425,8 @@ namespace DTBGEmulator
                     string totalTimeNum = $"{fileNum * 60}";
 
                     timeController.TotalTime = totalTimeNum;
+
+
                     timeController.CurrTime = ChangeTimeToStrSec(currTime);
                 }
                 else
@@ -433,9 +441,6 @@ namespace DTBGEmulator
                 // null일 때의 처리
                 Console.WriteLine("파일을 선택해주세요.");
             }
-
-
-
         }
 
         private void addFolderBtn_Click(object sender, EventArgs e)
@@ -634,7 +639,7 @@ namespace DTBGEmulator
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1, 2, 4, 10, 20, 50 };
+            int[] speedValues = { 1/10, 1/4, 1/2, 1, 2, 4, 10, 20, 50 };
 
             // 선택된 인덱스를 이용하여 데이터 속도 설정
             if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
@@ -669,8 +674,9 @@ namespace DTBGEmulator
             string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
 
             // 변환된 문자열을 UI에 표시
-            realTime.Text = formattedTime;
+            // realTime.Text = formattedTime;
 
         }
+
     }
 }
