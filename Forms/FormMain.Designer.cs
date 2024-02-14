@@ -61,8 +61,11 @@
             this.addFolderBtn = new System.Windows.Forms.Button();
             this.addFileBtn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -71,8 +74,7 @@
             this.timer_update = new System.Windows.Forms.Timer(this.components);
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
-            this.label13 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
+            this.dataViewTextBox = new System.Windows.Forms.TextBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -176,9 +178,9 @@
             this.dataInfo.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.dataInfo.Location = new System.Drawing.Point(15, 10);
             this.dataInfo.Name = "dataInfo";
-            this.dataInfo.Size = new System.Drawing.Size(69, 12);
+            this.dataInfo.Size = new System.Drawing.Size(97, 12);
             this.dataInfo.TabIndex = 4;
-            this.dataInfo.Text = "데이터 정보";
+            this.dataInfo.Text = "데이터 재생 현황";
             // 
             // panel1
             // 
@@ -191,7 +193,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 65);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(570, 202);
+            this.panel1.Size = new System.Drawing.Size(570, 191);
             this.panel1.TabIndex = 5;
             // 
             // panel7
@@ -443,16 +445,29 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(69, 12);
             this.label3.TabIndex = 4;
-            this.label3.Text = "데이터 정보";
+            this.label3.Text = "데이터 선택";
+            // 
+            // dataViewCheckBox
+            // 
+            this.dataViewCheckBox.AutoSize = true;
+            this.dataViewCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.dataViewCheckBox.Location = new System.Drawing.Point(474, 6);
+            this.dataViewCheckBox.Name = "dataViewCheckBox";
+            this.dataViewCheckBox.Size = new System.Drawing.Size(88, 16);
+            this.dataViewCheckBox.TabIndex = 20;
+            this.dataViewCheckBox.Text = "데이터 표시";
+            this.dataViewCheckBox.UseVisualStyleBackColor = true;
+            this.dataViewCheckBox.CheckedChanged += new System.EventHandler(this.dataViewCheckBox_CheckedChanged);
             // 
             // panel3
             // 
+            this.panel3.Controls.Add(this.dataViewCheckBox);
             this.panel3.Controls.Add(this.panel4);
             this.panel3.Controls.Add(this.dataInfo);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel3.Location = new System.Drawing.Point(0, 267);
+            this.panel3.Location = new System.Drawing.Point(0, 256);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(570, 148);
+            this.panel3.Size = new System.Drawing.Size(570, 145);
             this.panel3.TabIndex = 6;
             // 
             // panel4
@@ -471,6 +486,28 @@
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
             this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
+            // 
+            // label16
+            // 
+            this.label16.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label16.Location = new System.Drawing.Point(423, 9);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(100, 13);
+            this.label16.TabIndex = 26;
+            this.label16.Text = "구간반복 종료시간";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label13
+            // 
+            this.label13.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
+            this.label13.Location = new System.Drawing.Point(6, 9);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(100, 13);
+            this.label13.TabIndex = 24;
+            this.label13.Text = "구간반복 시작시간";
+            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label12
             // 
@@ -534,27 +571,16 @@
             this.timer_progress.Interval = 1000;
             this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
             // 
-            // label13
+            // dataViewTextBox
             // 
-            this.label13.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
-            this.label13.Location = new System.Drawing.Point(6, 9);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(100, 13);
-            this.label13.TabIndex = 24;
-            this.label13.Text = "구간반복 시작시간";
-            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label16
-            // 
-            this.label16.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
-            this.label16.Location = new System.Drawing.Point(423, 9);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(100, 13);
-            this.label16.TabIndex = 26;
-            this.label16.Text = "구간반복 종료시간";
-            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.dataViewTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.dataViewTextBox.Location = new System.Drawing.Point(15, 403);
+            this.dataViewTextBox.Multiline = true;
+            this.dataViewTextBox.Name = "dataViewTextBox";
+            this.dataViewTextBox.ReadOnly = true;
+            this.dataViewTextBox.Size = new System.Drawing.Size(540, 380);
+            this.dataViewTextBox.TabIndex = 7;
+            this.dataViewTextBox.Visible = false;
             // 
             // MainForm
             // 
@@ -562,7 +588,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(570, 412);
+            this.ClientSize = new System.Drawing.Size(570, 400);
+            this.Controls.Add(this.dataViewTextBox);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
@@ -590,6 +617,7 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -639,6 +667,8 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.CheckBox dataViewCheckBox;
+        private System.Windows.Forms.TextBox dataViewTextBox;
     }
 }
 

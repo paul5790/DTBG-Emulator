@@ -206,7 +206,7 @@ namespace DTBGEmulator.Classes
 
             DataDTO dto = new DataDTO
             {
-                FilePackets = allFilePackets,
+                //FilePackets = allFilePackets,
                 FileCount = selectedFileCount,
                 PacketCount = totalPacketCount
             };

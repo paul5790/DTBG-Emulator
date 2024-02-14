@@ -29,6 +29,7 @@ namespace DTBGEmulator
         private SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
        
         private FileData fileData = new FileData(); // FileData 인스턴스
+        private FileDatatest fileDatatest = new FileDatatest(); // FileData 인스턴스
         private FolderData folderData = new FolderData(); // FolderData 인스턴스
 
         private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
@@ -55,8 +56,10 @@ namespace DTBGEmulator
         private string TotalTime;
 
         // 파일, 폴더 데이터
-        private List<string> filePackets;
+        private Dictionary<string, List<string>> filePackets;
+        private Dictionary<string, List<List<string>>> filePacketsData;
         private int fileCount;
+        private int takenTime;
         private int packetCount;
         private string startTime;
         private string endTime;
@@ -127,6 +130,7 @@ namespace DTBGEmulator
             {
                 Console.WriteLine($"Error sending UDP data: {ex.Message}");
             }
+            dataViewTextBox.Text = data;
         }
 
         private void UdpSenderThread()
@@ -155,7 +159,7 @@ namespace DTBGEmulator
                     int getStart = timeController.StartTime;
                     int getEnd = timeController.EndTime;
                     int getCurr = Convert.ToInt32(timeController.CurrTime);
-                    getCurr++;
+                    getCurr = getCurr += 1;
                     if (getCurr > getEnd)
                     {
                         getCurr = getStart;
@@ -167,66 +171,72 @@ namespace DTBGEmulator
                         idx = 0;
                     }
 
-                    // Console.WriteLine(packetCount);
-                    for (int i = 0; i < 88; i++)
-                    {
-                        if (idx == packetCount)
-                        {
-                            idx = 0;
-                        }
-                        string dataToSend = filePackets[idx];
-                        udpSender(dataToSend, setip, setport);
-                        idx++;
+                    //int sixty = 60;
 
-                    }
-                    stopwatch1.Stop();
-                    if (sleepTime < 0)
-                    {
-                        sleepTime = setTime / dataSpeed;
-                        if (sleepTime < 0)
-                        {
-                            sleepTime = setTime / dataSpeed;
-                        }
-                        // 대기
-                        Thread.Sleep(sleepTime);
-                    }
-                    else
-                    {
-                        sleepTime = (setTime / dataSpeed) - diffTime;
-                        if (sleepTime < 0)
-                        {
-                            sleepTime = setTime / dataSpeed;
-                        }
-                        // 대기
-                        Thread.Sleep(sleepTime);
-                    }
-
-                    // 코드 실행 종료 시간 기록
-                    stopwatch.Stop();
-
-                    // 코드 실행 시간 출력
-                    Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
-                    Console.WriteLine($"Code execution time1: {stopwatch1.ElapsedMilliseconds} ms");
-                    int intStopwatch = (int)stopwatch.ElapsedMilliseconds;
-                    //if (intStopwatch > (setTime / dataSpeed) && intStopwatch <= 1500 )
+                    //for (int i = 0; i < takenTime; i++)
                     //{
-                    //    diffTime = (intStopwatch - (setTime / dataSpeed)) * 2;
-                    //    stopwatch.Reset(); // Stopwatch 초기화
+                    //    for (int j = 0; j < sixty / dataSpeed; j++)
+                    //    {
+                    //        stopwatch.Reset();
+                    //        stopwatch.Start();
+                    //        for (int k = 0; k < dataSpeed; k++)
+                    //        {
+                    //            var secondKey = filePacketsData.Keys.ElementAt(i);
+                    //            var ListInKey = filePacketsData[secondKey][j];
+                    //            foreach (var item in ListInKey)
+                    //            {
+                    //                // Console.WriteLine(item);
+                    //                dataViewTextBox.Text = item;
+                    //            }
+                    //        }
+
+
+                    //        // 코드
+                    //        Thread.Sleep(sleepTime / 2 - 10);
+                    //        stopwatch.Stop();
+                    //        Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                    //    }
                     //}
-                    //else
-                    //{
-                    //    diffTime = 0;
-                    //    stopwatch.Reset(); // Stopwatch 초기화
-                    //}
-                    if (intStopwatch <= 1500)
+
+                    //stopwatch1.Stop();
+
+                    int sixty = 60;
+                    int keyCount = filePackets.Count;
+                    int keyIndex = 1; // 첫 번째 키부터 시작
+                    foreach (var kvp in filePackets)
                     {
-                        // diffTime = Math.Abs(intStopwatch - (setTime / dataSpeed));
-                        diffTime = 30;
-                        stopwatch.Reset(); // Stopwatch 초기화
-                        stopwatch1.Reset(); // Stopwatch 초기화
+                        Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
+                        keyIndex++;
+                        if (keyIndex > keyCount) keyIndex = 1;
+                        int count = 0;
+                        for (int j = 0; j < sixty / dataSpeed; j++)
+                        {
+                            stopwatch.Reset();
+                            stopwatch.Start();
+                            
+                            for (int k = 0; k < kvp.Value.Count / 60 + 1; k++)
+                            {
+                                try
+                                {
+                                    Console.WriteLine(kvp.Value[count].ToString());
+                                    udpSender(kvp.Value[count].ToString(), setip, setport);
+                                    count++;
+                                }
+                                catch (ArgumentOutOfRangeException)
+                                {
+                                    // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
+                                    Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
+                                    break; // for 루프를 중지하고 다음 키로 이동
+                                }
+                            }
+
+                            // 코드
+                            Thread.Sleep(sleepTime / 2 - 10);
+                            stopwatch.Stop();
+                            Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                        }
                     }
 
-                    Console.WriteLine($"TimerCallback executed at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
                 }
             }
             else
@@ -356,7 +366,7 @@ namespace DTBGEmulator
                 udpSenderThread.Abort();
             }
             // addFileBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
-            await fileData.SelectFile();
+            fileData.SelectFile();
             // 선택된 파일의 데이터를 읽어와서 사용하거나 저장할 수 있음
             dto = fileData.GenerateDataDTO();
             // null 체크 추가
@@ -367,7 +377,8 @@ namespace DTBGEmulator
                 Console.WriteLine("시간확인" + dto.FirstFileName + dto.LastFileName);
                 firstFileName.Text = $"{startTime}";
                 lastFileName.Text = $"{endTime}";
-                fileCount = dto.FileCount;
+                // fileCount = dto.FileCount;
+                takenTime = dto.takenTime;
 
                 // "yyyyMMdd HHmm" 형식으로 변환
                 string formattedStartDateTime = startTime.Substring(0, 4) + startTime.Substring(5, 2) + startTime.Substring(8, 2) + " " + startTime.Substring(11, 4);
@@ -386,8 +397,8 @@ namespace DTBGEmulator
                 startTimeData.Text = formattedStartTime;
                 endTimeData.Text = formattedEndTime+":59";
 
-                int hours = fileCount / 60;
-                int minutes = fileCount % 60;
+                int hours = takenTime / 60;
+                int minutes = takenTime % 60;
                 if (hours <= 0)
                 {
                     fullTimeData.Text = $"{minutes}분";
@@ -417,6 +428,7 @@ namespace DTBGEmulator
                 if (dto != null)
                 {
                     filePackets = dto.FilePackets;
+                    filePacketsData = dto.FilePacketsData;
                     packetCount = filePackets.Count;
                     Console.WriteLine("패킷메인" + packetCount);
 
@@ -443,43 +455,63 @@ namespace DTBGEmulator
             }
         }
 
-        private void addFolderBtn_Click(object sender, EventArgs e)
+        private async void addFolderBtn_Click(object sender, EventArgs e)
         {
             // 쓰레드 실행중이면 정지
             if (udpSenderThread != null && udpSenderThread.IsAlive)
             {
                 udpSenderThread.Abort();
             }
-            // addFolderBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
-            folderData.SelectFolder();
-
-            dto = folderData.GenerateDataDTO();
-            if (dto != null)
-            {
-                filePackets = dto.FilePackets;
-                packetCount = filePackets.Count;
-
-                startTime = dto.StartDateStr;
-                endTime = dto.EndDateStr;
-                storageSize = dto.Storage;
-                fileLocation.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
+            // addFileBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
+            fileDatatest.SelectFile();
+            // 선택된 파일의 데이터를 읽어와서 사용하거나 저장할 수 있음
+            dto = fileDatatest.GenerateDataDTO();
+            takenTime = dto.takenTime;
 
 
-                int fileNum = dto.FileCount;
-                currTime = "00:00:00";
-                string totalTimeNum = $"{fileNum * 60}";
+            await fileDatatest.LoadFile();
+            dto = fileDatatest.GenerateDataDTO();
+            filePackets = dto.FilePackets;
+            // 버튼 설정
+            UpdateButtonState("stop");
 
-                timeController.TotalTime = totalTimeNum;
-                timeController.CurrTime = ChangeTimeToStrSec(currTime);
+            packetCount = filePackets.Count;
+            Console.WriteLine("패킷메인" + packetCount);
 
-                // 버튼 설정
-                UpdateButtonState("stop");
-            }
-            else
-            {
-                // null일 때의 처리
-                Console.WriteLine("파일을 선택해주세요.");
-            }
+            //// 쓰레드 실행중이면 정지
+            //if (udpSenderThread != null && udpSenderThread.IsAlive)
+            //{
+            //    udpSenderThread.Abort();
+            //}
+            //// addFolderBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
+            //folderData.SelectFolder();
+
+            //dto = folderData.GenerateDataDTO();
+            //if (dto != null)
+            //{
+            //    filePackets = dto.FilePackets;
+            //    packetCount = filePackets.Count;
+
+            //    startTime = dto.FirstFileName;
+            //    endTime = dto.LastFileName;
+            //    fileLocation.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
+
+
+            //    int fileNum = dto.FileCount;
+            //    currTime = "00:00:00";
+            //    string totalTimeNum = $"{fileNum * 60}";
+
+            //    timeController.TotalTime = totalTimeNum;
+            //    timeController.CurrTime = ChangeTimeToStrSec(currTime);
+
+            //    // 버튼 설정
+            //    UpdateButtonState("stop");
+            //}
+            //else
+            //{
+            //    // null일 때의 처리
+            //    Console.WriteLine("파일을 선택해주세요.");
+            //}
 
         }
 
@@ -572,7 +604,7 @@ namespace DTBGEmulator
 
         private void runBtn_Click(object sender, EventArgs e)
         {
-            if (packetCount > 0)
+            if (takenTime > 0)
             {
                 timer_progress.Start();
                 // 쓰레드가 실행 중이 아니라면 시작
@@ -646,6 +678,17 @@ namespace DTBGEmulator
             {
                 dataSpeed = speedValues[speedComboBox.SelectedIndex];
             }
+
+            if (speedComboBox.SelectedIndex >= 4)
+            {
+                dataViewCheckBox.Visible = false;
+                dataViewTextBox.Visible = false;
+                this.Size = new Size(570, 400);
+            }
+            else
+            {
+                dataViewCheckBox.Visible = true;
+            }
         }
 
 
@@ -678,5 +721,20 @@ namespace DTBGEmulator
 
         }
 
+        private void dataViewCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dataViewCheckBox.Checked)
+            {
+                // 체크되었을 때의 폼 크기 설정
+                dataViewTextBox.Visible = true;
+                this.Size = new Size(570, 800);
+            }
+            else
+            {
+                // 체크가 해제되었을 때의 폼 크기 설정
+                dataViewTextBox.Visible = false;
+                this.Size = new Size(570, 400);
+            }
+        }
     }
 }
