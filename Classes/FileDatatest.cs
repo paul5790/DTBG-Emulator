@@ -13,13 +13,14 @@ namespace DTBGEmulator.Classes
 {
     public class FileDatatest
     {
-        private Dictionary<string, List<string>> fileDataDictionary; // 파일 이름을 키로 갖는 Dictionary
+        // private Dictionary<string, List<string>> fileDataDictionary; // 파일 이름을 키로 갖는 Dictionary
         private string[] filePaths = null;
         private int selectedFileCount = 0;
         private int totalPacketCount = 0;
         private string firstFileName;
         private string lastFileName;
         private int takenTime;
+        private SortedDictionary<string, List<string>> fileDataDictionary;
 
         public void SelectFile()
         {
@@ -57,7 +58,7 @@ namespace DTBGEmulator.Classes
 
         public async Task LoadFile()
         {
-            fileDataDictionary = new Dictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
+            fileDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             // 각 파일에 대한 처리를 위해 반복
             foreach (string filePath in filePaths)
             {
@@ -152,27 +153,57 @@ namespace DTBGEmulator.Classes
             }
         }
 
-        public DataDTO GenerateDataDTO()
+        public string FirstFileName
         {
-            // 파일을 선택하지 않았거나 null인 경우 null을 반환
-            if (filePaths == null || filePaths.Length == 0)
-            {
-                // 여기에 처리를 추가할 수 있습니다.
-                Console.WriteLine("파일을 선택해주세요.");
-                return null;
-            }
-
-            DataDTO dto = new DataDTO
-            {
-                FilePackets = fileDataDictionary,
-                FileCount = selectedFileCount,
-                PacketCount = totalPacketCount,
-                FirstFileName = firstFileName,
-                LastFileName = lastFileName,
-                takenTime = takenTime
-            };
-
-            return dto;
+            get { return firstFileName; }
+            set { firstFileName = value; }
         }
+
+        public string LastFileName
+        {
+            get { return lastFileName; }
+            set { lastFileName = value; }
+        }
+
+        public int TakenTime
+        {
+            get { return takenTime; }
+            set { takenTime = value; }
+        }
+
+        public int SelectedFileCount
+        {
+            get { return selectedFileCount; }
+            set { selectedFileCount = value; }
+        }
+
+        public SortedDictionary<string, List<string>> FileDataDictionary
+        {
+            get { return fileDataDictionary; }
+            set { fileDataDictionary = value; }
+        }
+
+        //public DataDTO GenerateDataDTO()
+        //{
+        //    // 파일을 선택하지 않았거나 null인 경우 null을 반환
+        //    if (filePaths == null || filePaths.Length == 0)
+        //    {
+        //        // 여기에 처리를 추가할 수 있습니다.
+        //        Console.WriteLine("파일을 선택해주세요.");
+        //        return null;
+        //    }
+
+        //    DataDTO dto = new DataDTO
+        //    {
+        //        FilePackets = fileDataDictionary,
+        //        FileCount = selectedFileCount,
+        //        PacketCount = totalPacketCount,
+        //        FirstFileName = firstFileName,
+        //        LastFileName = lastFileName,
+        //        takenTime = takenTime
+        //    };
+
+        //    return dto;
+        //}
     }
 }

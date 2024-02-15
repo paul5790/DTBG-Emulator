@@ -485,7 +485,6 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
-            this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
             // 
             // label16
             // 
@@ -550,7 +549,6 @@
             this.currTimeText.Size = new System.Drawing.Size(49, 12);
             this.currTimeText.TabIndex = 19;
             this.currTimeText.Text = "88:88:88";
-            this.currTimeText.Click += new System.EventHandler(this.currTimeText_Click);
             // 
             // timeController
             // 
