@@ -1,4 +1,5 @@
 ﻿using DTBGEmulator.Classes.DTO;
+using DTBGEmulator.Properties;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,31 @@ namespace DTBGEmulator.Classes
 {
     public class FileDatatest
     {
+        private static FileDatatest instance = null;
         // private Dictionary<string, List<string>> fileDataDictionary; // 파일 이름을 키로 갖는 Dictionary
         private string[] filePaths = null;
         private int selectedFileCount = 0;
-        private int totalPacketCount = 0;
         private string firstFileName;
         private string lastFileName;
         private int takenTime;
         private SortedDictionary<string, List<string>> fileDataDictionary;
 
+        private FileDatatest() { }
+
+        public static FileDatatest Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new FileDatatest();
+                }
+                return instance;
+            }
+        }
+        /// <summary>
+        /// 파일 열고 메타데이터 추출
+        /// </summary>
         public void SelectFile()
         {
             // OpenFileDialog를 사용하여 텍스트 파일 선택
@@ -48,53 +65,37 @@ namespace DTBGEmulator.Classes
                     string[] lastfileNameParts = Path.GetFileNameWithoutExtension(lastFileName).Split(' ');
                     string lastfileDate = new string(lastfileNameParts[1].Where(char.IsDigit).ToArray());
 
-                    Console.WriteLine("첫번째 파일" + firstfileDate);
-                    Console.WriteLine("마지막 파일" + lastfileDate);
-                    takenTime = Convert.ToInt32(lastfileDate) - Convert.ToInt32(firstfileDate) + 1;
-                    Console.WriteLine("소요 시간: " + takenTime + "분");
+                    takenTime = Math.Abs(Convert.ToInt32(firstfileDate) - Convert.ToInt32(lastfileDate)) + 1;
                 }
             }
         }
 
-        public async Task LoadFile()
+        /// <summary>
+        /// 데이터 메모리 저장
+        /// </summary>
+        /// <returns></returns>
+        public bool LoadFile()
         {
             fileDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             // 각 파일에 대한 처리를 위해 반복
-            foreach (string filePath in filePaths)
+            try
             {
-                await ProcessFileAsync(filePath);
-            }
-
-            // 추가: List에 담긴 변수 갯수 (전체) 설정
-            totalPacketCount = fileDataDictionary.Values.Sum(list => list.Count);
-
-            foreach (var key in fileDataDictionary.Keys)
-            {
-                Console.WriteLine($"Key: {key}");
-            }
-
-            // LoadFile 메서드 안에서 fileDataDictionary의 특정 key 값에 대한 value를 출력하는 부분입니다.
-            foreach (var kvp in fileDataDictionary)
-            {
-                if (kvp.Key == "1000") // key가 '1000'인 것을 찾습니다.
+                foreach (string filePath in filePaths)
                 {
-                    Console.WriteLine($"Key: {kvp.Key}");
-                    foreach (var value in kvp.Value)
-                    {
-                        //Console.WriteLine(value);
-                    }
+                    ProcessFileAsync(filePath);
                 }
-                else { Console.WriteLine("존재 x"); }
+                return true;
             }
-
-            Console.WriteLine(selectedFileCount);
-            Console.WriteLine("패킷 파일" + totalPacketCount);
+            catch (Exception e)
+            {
+                return false;
+            }
         }
 
-        private async Task ProcessFileAsync(string filePath)
+        private void ProcessFileAsync(string filePath)
         {
             // 비동기적으로 파일 읽고 처리
-            string fileContent = await ReadFileAsync(filePath);
+            string fileContent = ReadFileAsync(filePath);
             List<string> filePackets = SplitIntoPackets(fileContent);
 
             // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
@@ -104,6 +105,24 @@ namespace DTBGEmulator.Classes
             // 현재 파일의 패킷을 전체 리스트에 추가
             fileDataDictionary.Add(fileName, filePackets);
         }
+
+        private string ReadFileAsync(string filePath)
+        {
+            try
+            {
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    string content = reader.ReadToEnd();
+                    return content;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading file asynchronously: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
 
         private List<string> SplitIntoPackets(string fileContent)
         {
@@ -136,22 +155,7 @@ namespace DTBGEmulator.Classes
             return packets;
         }
 
-        private async Task<string> ReadFileAsync(string filePath)
-        {
-            try
-            {
-                // StreamReader를 사용하여 비동기적으로 파일 읽기
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    return await reader.ReadToEndAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading file asynchronously: {ex.Message}");
-                return string.Empty;
-            }
-        }
+
 
         public string FirstFileName
         {
@@ -182,28 +186,5 @@ namespace DTBGEmulator.Classes
             get { return fileDataDictionary; }
             set { fileDataDictionary = value; }
         }
-
-        //public DataDTO GenerateDataDTO()
-        //{
-        //    // 파일을 선택하지 않았거나 null인 경우 null을 반환
-        //    if (filePaths == null || filePaths.Length == 0)
-        //    {
-        //        // 여기에 처리를 추가할 수 있습니다.
-        //        Console.WriteLine("파일을 선택해주세요.");
-        //        return null;
-        //    }
-
-        //    DataDTO dto = new DataDTO
-        //    {
-        //        FilePackets = fileDataDictionary,
-        //        FileCount = selectedFileCount,
-        //        PacketCount = totalPacketCount,
-        //        FirstFileName = firstFileName,
-        //        LastFileName = lastFileName,
-        //        takenTime = takenTime
-        //    };
-
-        //    return dto;
-        //}
     }
 }
