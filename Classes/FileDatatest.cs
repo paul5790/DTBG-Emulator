@@ -14,6 +14,7 @@ namespace DTBGEmulator.Classes
 {
     public class FileDatatest
     {
+        #region 변수 정의
         private static FileDatatest instance = null;
         // private Dictionary<string, List<string>> fileDataDictionary; // 파일 이름을 키로 갖는 Dictionary
         private string[] filePaths = null;
@@ -23,6 +24,45 @@ namespace DTBGEmulator.Classes
         private int takenTime;
         private SortedDictionary<string, List<string>> fileDataDictionary;
 
+
+        string formattedStartTime;
+        string formattedEndTime;
+        string timeControllerStartTime;
+        string timeControllerEndTime;
+
+        #endregion 변수 정의
+        #region 프로퍼티 정의
+        public string FirstFileName
+        {
+            get { return firstFileName; }
+            set { firstFileName = value; }
+        }
+
+        public string LastFileName
+        {
+            get { return lastFileName; }
+            set { lastFileName = value; }
+        }
+
+        public int TakenTime
+        {
+            get { return takenTime; }
+            set { takenTime = value; }
+        }
+
+        public int SelectedFileCount
+        {
+            get { return selectedFileCount; }
+            set { selectedFileCount = value; }
+        }
+
+        public SortedDictionary<string, List<string>> FileDataDictionary
+        {
+            get { return fileDataDictionary; }
+            set { fileDataDictionary = value; }
+        }
+
+        #endregion 프로퍼티 정의
         private FileDatatest() { }
 
         public static FileDatatest Instance
@@ -41,7 +81,6 @@ namespace DTBGEmulator.Classes
         /// </summary>
         public void SelectFile()
         {
-            // OpenFileDialog를 사용하여 텍스트 파일 선택
             using (var openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
@@ -57,17 +96,30 @@ namespace DTBGEmulator.Classes
                     firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
                     lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
 
-                    // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
-                    string[] firstfileNameParts = Path.GetFileNameWithoutExtension(firstFileName).Split(' ');
-                    string firstfileDate = new string(firstfileNameParts[1].Where(char.IsDigit).ToArray());
-
-                    // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
-                    string[] lastfileNameParts = Path.GetFileNameWithoutExtension(lastFileName).Split(' ');
-                    string lastfileDate = new string(lastfileNameParts[1].Where(char.IsDigit).ToArray());
-
-                    takenTime = Math.Abs(Convert.ToInt32(firstfileDate) - Convert.ToInt32(lastfileDate)) + 1;
+                    // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
+                    takenTime = CalculateTimeDifference(firstFileName, lastFileName);
                 }
             }
+        }
+
+        private int CalculateTimeDifference(string firstFileName, string lastFileName)
+        {
+            // 파일 이름에서 시간 부분을 추출하여 분 단위로 변환
+            int firstTimeInMinutes = ExtractTimeInMinutes(firstFileName);
+            int lastTimeInMinutes = ExtractTimeInMinutes(lastFileName);
+
+            // 시간 차이를 절대값으로 반환
+            return Math.Abs(lastTimeInMinutes - firstTimeInMinutes) + 1;
+        }
+
+        private int ExtractTimeInMinutes(string fileName)
+        {
+            // 파일 이름에서 숫자 부분을 추출하여 시간과 분으로 나누고 분 단위로 계산
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
+            int hour = int.Parse(fileNameParts[1].Substring(0, 2));
+            int minute = int.Parse(fileNameParts[1].Substring(2, 2));
+
+            return hour * 60 + minute;
         }
 
         /// <summary>
@@ -82,7 +134,7 @@ namespace DTBGEmulator.Classes
             {
                 foreach (string filePath in filePaths)
                 {
-                    ProcessFileAsync(filePath);
+                    ProcessFile(filePath);
                 }
                 return true;
             }
@@ -92,10 +144,10 @@ namespace DTBGEmulator.Classes
             }
         }
 
-        private void ProcessFileAsync(string filePath)
+        private void ProcessFile(string filePath)
         {
-            // 비동기적으로 파일 읽고 처리
-            string fileContent = ReadFileAsync(filePath);
+            
+            string fileContent = ReadFile(filePath);
             List<string> filePackets = SplitIntoPackets(fileContent);
 
             // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
@@ -106,7 +158,7 @@ namespace DTBGEmulator.Classes
             fileDataDictionary.Add(fileName, filePackets);
         }
 
-        private string ReadFileAsync(string filePath)
+        private string ReadFile(string filePath)
         {
             try
             {
@@ -155,36 +207,16 @@ namespace DTBGEmulator.Classes
             return packets;
         }
 
-
-
-        public string FirstFileName
+        /// <summary>
+        /// 파일 이름에서 숫자 부분을 추출합니다.
+        /// </summary>
+        /// <param name="fileName">파일 이름</param>
+        /// <returns>숫자 부분</returns>
+        private string ExtractNumberPart(string fileName)
         {
-            get { return firstFileName; }
-            set { firstFileName = value; }
-        }
-
-        public string LastFileName
-        {
-            get { return lastFileName; }
-            set { lastFileName = value; }
-        }
-
-        public int TakenTime
-        {
-            get { return takenTime; }
-            set { takenTime = value; }
-        }
-
-        public int SelectedFileCount
-        {
-            get { return selectedFileCount; }
-            set { selectedFileCount = value; }
-        }
-
-        public SortedDictionary<string, List<string>> FileDataDictionary
-        {
-            get { return fileDataDictionary; }
-            set { fileDataDictionary = value; }
+            // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
+            return new string(fileNameParts[1].Where(char.IsDigit).ToArray());
         }
     }
 }

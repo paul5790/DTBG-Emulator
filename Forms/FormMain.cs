@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace DTBGEmulator
 {
@@ -27,7 +28,7 @@ namespace DTBGEmulator
 
         private Setting setting = new Setting();
         private SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
-       
+
         private FileData fileData = new FileData(); // FileData 인스턴스
         private FolderData folderData = new FolderData(); // FolderData 인스턴스
 
@@ -48,10 +49,15 @@ namespace DTBGEmulator
 
         // 속도
         private int dataSpeed;
+        private int dustTime;
+        int invokeControl = 1;
 
         // timecotroller 데이터
         private string currTime;
         private string TotalTime;
+        private string timeControllerStartTime;
+        private string timeControllerEndTime;
+        private string timeControllerCurrText;
 
         // 파일, 폴더 데이터
         private SortedDictionary<string, List<string>> filePackets;
@@ -61,6 +67,7 @@ namespace DTBGEmulator
         private int packetCount;
         private string startTime;
         private string endTime;
+
 
         // 데이터 재생
         private string runState = "stop";
@@ -75,8 +82,8 @@ namespace DTBGEmulator
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            currTime = "00:00:00";
-            TotalTime = "00:01:00";
+            currTime = "00 : 00 : 00";
+            TotalTime = "00 : 01 : 00";
 
             timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
@@ -158,10 +165,11 @@ namespace DTBGEmulator
             int sleepTime = setTime;
             // Stopwatch 객체 생성
             Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch1 = new Stopwatch();
             while (true)
             {
                 // 코드 실행 시작 시간 기록
-                
+
 
                 int sixty = 60;
                 int keyCount = filePackets.Count;
@@ -176,6 +184,10 @@ namespace DTBGEmulator
                     int count = 0;
                     for (int j = 0; j < sixty / dataSpeed; j++)
                     {
+                        stopwatch1.Reset();
+                        stopwatch1.Start();
+                        stopwatch.Reset();
+                        stopwatch.Start();
 
                         int getStart = timeController.StartTime;
                         int getEnd = timeController.EndTime;
@@ -186,15 +198,14 @@ namespace DTBGEmulator
                             getCurr = getStart;
                         }
                         timeController.CurrTime = getCurr.ToString();
-                        
+
                         for (int k = 0; k < kvp.Value.Count / 60 + 1; k++)
                         {
                             try
                             {
-
                                 // Console.WriteLine(kvp.Value[count].ToString());
                                 udpSender(kvp.Value[count].ToString(), setip, setport);
-                                
+
                                 count++;
                             }
                             catch (ArgumentOutOfRangeException)
@@ -204,22 +215,95 @@ namespace DTBGEmulator
                                 break; // for 루프를 중지하고 다음 키로 이동
                             }
                         }
+                        Console.WriteLine(timeController.CurrTime);
+                        UpdateDataViewTextBox(kvp.Value[count - 1].ToString());
+                        UpdateCurrTimeText();
 
-                        UpdateDataViewTextBox(kvp.Value[count-1].ToString());
-
-                        // 코드
-                        stopwatch.Reset();
-                        stopwatch.Start();
-                        Thread.Sleep(1000);
                         stopwatch.Stop();
+                        sleepTime = (1000 / dataSpeed - dustTime) - Convert.ToInt32(stopwatch.ElapsedMilliseconds);
+                        if (sleepTime <= 0) sleepTime = 0;
+                        Thread.Sleep(sleepTime);
+                        
+
+
                         // 일시정지 여부 확인
                         pauseEvent.WaitOne();
-                        
-                        Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                        stopwatch.Stop();
+                        //Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+                        Console.WriteLine($"Code execution time: {stopwatch1.ElapsedMilliseconds} ms");
                     }
                 }
-
             }
+        }
+
+        private void UpdateCurrTimeText()
+        {
+            // IncrementTimeByOneSecond 메서드를 사용하여 시간을 1초씩 증가시킴
+            string incrementedTime = IncrementTimeByOneSecond(timeControllerCurrText);
+
+            // dataSpeed에 따라서 Invoke 호출 빈도를 결정
+            if (ShouldInvokeUpdate(dataSpeed))
+            {
+                currTimeText.Invoke((MethodInvoker)delegate
+                {
+                    // currTimeText에 증가된 시간을 할당
+                    currTimeText.Text = incrementedTime;
+                });
+            }
+            invokeControl++;
+            timeControllerCurrText = incrementedTime;
+        }
+
+        private bool ShouldInvokeUpdate(int speed)
+        {
+            // dataSpeed에 따라서 조건에 따른 Invoke 호출 빈도 결정
+            if (speed >= 20)
+            {
+                return invokeControl % 4 == 0;
+            }
+            else if (speed >= 10 && speed < 20)
+            {
+                return invokeControl % 2 == 0;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private void CurrTimeInvoke(string time)
+        {
+            currTimeText.Invoke((MethodInvoker)delegate
+            {
+                // currTimeText에 증가된 시간을 할당
+                currTimeText.Text = time;
+            });
+        }
+
+        private string IncrementTimeByOneSecond(string time)
+        {
+            // 공백을 제거하여 시간 문자열 파싱
+            string trimmedTime = time.Replace(" ", "");
+            TimeSpan currentTime = TimeSpan.ParseExact(trimmedTime, "hh':'mm':'ss", CultureInfo.InvariantCulture);
+
+            // 1초 추가
+            currentTime = currentTime.Add(TimeSpan.FromSeconds(1));
+
+            // TimeSpan을 다시 문자열로 변환
+            string incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
+
+            // endTime을 TimeSpan으로 변환
+            string trimmedEndTime = timeControllerEndTime.Replace(" ", "");
+            TimeSpan end = TimeSpan.ParseExact(trimmedEndTime, "hh':'mm':'ss", CultureInfo.InvariantCulture);
+
+            // 만약 incrementedTime이 endTime보다 크다면 startTime으로 변경
+            if (currentTime > end)
+            {
+                currentTime = TimeSpan.ParseExact(timeControllerStartTime.Replace(" ", ""), "hh':'mm':'ss", CultureInfo.InvariantCulture);
+                incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
+            }
+
+            return incrementedTime;
         }
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
@@ -240,7 +324,7 @@ namespace DTBGEmulator
         private void settingBtn_Click(object sender, EventArgs e)
         {
             // 버튼을 클릭했을 때 모달로 표시될 SettingForm 인스턴스 생성
-            
+
 
             // MainForm의 정 가운데 계산
             int mainFormCenterX = this.Left + (this.Width - setting.Width) / 2;
@@ -320,7 +404,7 @@ namespace DTBGEmulator
 
 
         // 파일 데이터 처리
-        private async void addFileBtn_Click(object sender, EventArgs e)
+        private void addFileBtn_Click(object sender, EventArgs e)
         {
             // 쓰레드 실행중이면 정지
             if (udpSenderThread != null && udpSenderThread.IsAlive)
@@ -328,7 +412,8 @@ namespace DTBGEmulator
                 udpSenderThread.Abort();
             }
             FileDatatest.Instance.SelectFile();
-            FileDatatest.Instance.LoadFile();
+            Thread dataLoadThread = new Thread(() => FileDatatest.Instance.LoadFile());
+            dataLoadThread.Start();
             startTime = FileDatatest.Instance.FirstFileName;
             endTime = FileDatatest.Instance.LastFileName;
             firstFileName.Text = $"{startTime}";
@@ -347,11 +432,14 @@ namespace DTBGEmulator
             // 새로운 형식의 문자열로 변환
             string formattedStartTime = dateStartTime.ToString("yyyy.MM.dd. HH:mm:ss");
             string formattedEndTime = dateEndTime.ToString("yyyy.MM.dd. HH:mm");
-            string timeControllerStartTime = dateStartTime.ToString("HH:mm:ss");
-            string timeControllerEndTime = dateEndTime.ToString("HH:mm") + "59";
+            timeControllerStartTime = dateStartTime.ToString("HH : mm : ss");
+            timeControllerEndTime = dateEndTime.ToString("HH : mm ") + ": 59";
 
             startTimeData.Text = formattedStartTime;
             endTimeData.Text = formattedEndTime + ":59";
+
+            timeController.StartFileTime = timeControllerStartTime;
+            timeController.EndFileTime = timeControllerEndTime;
 
             int hours = takenTime / 60;
             int minutes = takenTime % 60;
@@ -364,34 +452,32 @@ namespace DTBGEmulator
                 fullTimeData.Text = $"{hours}시간 {minutes}분";
             }
 
-
-
-            //int fileNum = dto.FileCount;
-            //currTime = "00:00:00";
-            //string totalTimeNum = $"{fileNum * 60}";
-
-            //timeController.TotalTime = totalTimeNum;
-            //timeController.CurrTime = ChangeTimeToStrSec(currTime);
-
             // 버튼 설정
             UpdateButtonState("stop");
 
-
             // 비동기 로드 후
-            //await fileData.LoadFile();
             filePackets = FileDatatest.Instance.FileDataDictionary;
             packetCount = filePackets.Count;
             Console.WriteLine("패킷메인" + packetCount);
 
             int fileNum = FileDatatest.Instance.SelectedFileCount;
-            currTime = "00:00:00";
-            string totalTimeNum = $"{fileNum * 60}";
+            currTime = "00 : 00 : 00";
+            string totalTimeNum = $"{fileNum * 60 - 1}";
 
             timeController.TotalTime = totalTimeNum;
 
-
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
 
+            timeController.StartRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime));
+            timeController.EndRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerEndTime));
+
+
+            Console.WriteLine(ChangeTimeToStrSec(currTime));
+            Console.WriteLine(ChangeTimeToStrSec(timeControllerStartTime));
+            Console.WriteLine(ChangeTimeToStrSec(timeControllerEndTime));
+
+            timeControllerCurrText = timeControllerStartTime;
+            currTimeText.Text = timeControllerCurrText;
         }
 
         private async void addFolderBtn_Click(object sender, EventArgs e)
@@ -459,8 +545,8 @@ namespace DTBGEmulator
         private string ChangeTimeToStrSec(string dateTime)
         {
             int sec_HH = Convert.ToInt32(dateTime.Substring(0, 2)) * 3600;
-            int sec_mm = Convert.ToInt32(dateTime.Substring(3, 2)) * 60;
-            int sec_ss = Convert.ToInt32(dateTime.Substring(6, 2));
+            int sec_mm = Convert.ToInt32(dateTime.Substring(5, 2)) * 60;
+            int sec_ss = Convert.ToInt32(dateTime.Substring(10, 2));
 
             string strSec = (sec_HH + sec_mm + sec_ss).ToString();
 
@@ -584,8 +670,8 @@ namespace DTBGEmulator
                 if (udpSenderThread != null && udpSenderThread.IsAlive)
                 {
                     udpSenderThread.Abort();
-                    TotalTime = "01:00:00";
-                    currTime = "00:00:00";
+                    TotalTime = "01 : 00 : 00";
+                    currTime = "00 : 00 : 00";
                     timeController.CurrTime = ChangeTimeToStrSec(currTime);
                     timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
                     stopRequested = true;
@@ -598,11 +684,11 @@ namespace DTBGEmulator
 
 
         // 타이머_프로그래스바 GUI 업데이트
-        private void timer_update_Tick(object sender, EventArgs e)
-        {
-            // 변환 시도
-            currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
-        }
+        //private void timer_update_Tick(object sender, EventArgs e)
+        //{
+        //    // 변환 시도
+        //    // currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
+        //}
 
         // 타이머_1초마다 프로그래스바 업데이트
 
@@ -610,12 +696,14 @@ namespace DTBGEmulator
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1/10, 1/4, 1/2, 1, 2, 4, 10, 20, 50 };
+            int[] speedValues = { 1 / 10, 1 / 4, 1 / 2, 1, 2, 4, 10, 20, 800 };
+            int[] dustTimeValues = { 1 / 10, 1 / 4, 1 / 2, 10, 10, 10, 10, 10, 0 };
 
             // 선택된 인덱스를 이용하여 데이터 속도 설정
             if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
             {
                 dataSpeed = speedValues[speedComboBox.SelectedIndex];
+                dustTime = dustTimeValues[speedComboBox.SelectedIndex];
             }
 
             if (speedComboBox.SelectedIndex >= 4)
@@ -633,7 +721,7 @@ namespace DTBGEmulator
         int seconds = 0;
         private void timer_progress_Tick(object sender, EventArgs e)
         {
-            
+
             seconds++;
 
             // TimeSpan을 사용하여 초를 시:분:초 형태의 문자열로 변환

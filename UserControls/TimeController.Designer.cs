@@ -67,7 +67,7 @@
             this.label_Time_Total.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label_Time_Total.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_Time_Total.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
-            this.label_Time_Total.Location = new System.Drawing.Point(475, 30);
+            this.label_Time_Total.Location = new System.Drawing.Point(478, 30);
             this.label_Time_Total.Name = "label_Time_Total";
             this.label_Time_Total.Size = new System.Drawing.Size(67, 11);
             this.label_Time_Total.TabIndex = 8;
@@ -77,7 +77,7 @@
             // 
             this.label_Time_Zero.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_Time_Zero.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
-            this.label_Time_Zero.Location = new System.Drawing.Point(5, 30);
+            this.label_Time_Zero.Location = new System.Drawing.Point(0, 30);
             this.label_Time_Zero.Name = "label_Time_Zero";
             this.label_Time_Zero.Size = new System.Drawing.Size(70, 11);
             this.label_Time_Zero.TabIndex = 7;

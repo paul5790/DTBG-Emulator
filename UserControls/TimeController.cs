@@ -15,6 +15,37 @@ namespace DTBGEmulator.UserControls
     {
         #region 변수 정의
         // 전체 시뮬레이션 시간 [sec]
+
+        private string startFileTime = "00 : 00 : 00";
+        private string endFileTime = "00 : 00 : 00";
+
+        public string StartFileTime
+        {
+            get { return startFileTime; }
+            set { startFileTime = value; }
+        }
+
+        public string EndFileTime
+        {
+            get { return endFileTime; }
+            set { endFileTime = value; }
+        }
+
+        private int startRepeatTime = 0;
+        private int endRepeatTime = 0;
+
+        public int StartRepeatTime
+        {
+            get { return startRepeatTime; }
+            set { startRepeatTime = value; }
+        }
+
+        public int EndRepeatTime
+        {
+            get { return endRepeatTime; }
+            set { endRepeatTime = value; }
+        }
+
         private string mTotalTime = string.Empty;
         public string TotalTime
         {
@@ -168,8 +199,12 @@ namespace DTBGEmulator.UserControls
         // MainBar 업데이트
         private void UpdateMainBar(Graphics graphics)
         {
-            if (mTotalTime != string.Empty)
-                label_Time_Total.Text = ConvertSecToTime(mTotalTime);
+   
+            label_Time_Zero.Text = startFileTime;
+            label_Time_Total.Text = endFileTime;
+            PutTimeToTxtbox(startRepeatTime, "StartTimeTxtbox");
+            PutTimeToTxtbox(endRepeatTime, "EndTimeTxtbox");
+            
 
             mRectCircle = new RectangleF(mHorizontalMargin + (panel_Middle.Width - 2 * mHorizontalMargin) * mProgress - mRadius, mTopMargin + mBarThickness / 2.0f - mRadius, 2 * mRadius, 2 * mRadius);
 
@@ -377,7 +412,8 @@ namespace DTBGEmulator.UserControls
                     PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
 
                     // Circle 앞에서 뒤로 밀고가기
-    
+                    if (e.X > mRectCircle.Left + mRadius)
+                    {
                         if (e.X > mPointsEndTimeSelector[0].X - mSelectorGap)
                         {
                             if (!mRectCircle.Contains(mPointsEndTimeSelector[0]))
@@ -387,7 +423,7 @@ namespace DTBGEmulator.UserControls
                         {
                             mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                         }
-                    
+                    }
 
                     panel_Middle.Invalidate();
                 }

@@ -534,7 +534,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.label2.Location = new System.Drawing.Point(191, 71);
+            this.label2.Location = new System.Drawing.Point(183, 71);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 12);
             this.label2.TabIndex = 20;
@@ -544,25 +544,23 @@
             // 
             this.currTimeText.AutoSize = true;
             this.currTimeText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.currTimeText.Location = new System.Drawing.Point(285, 72);
+            this.currTimeText.Location = new System.Drawing.Point(277, 72);
             this.currTimeText.Name = "currTimeText";
-            this.currTimeText.Size = new System.Drawing.Size(49, 12);
+            this.currTimeText.Size = new System.Drawing.Size(65, 12);
             this.currTimeText.TabIndex = 19;
-            this.currTimeText.Text = "88:88:88";
+            this.currTimeText.Text = "88 : 88 : 88";
             // 
             // timeController
             // 
             this.timeController.BackColor = System.Drawing.Color.White;
             this.timeController.CurrTime = "0";
+            this.timeController.EndFileTime = "00 : 00 : 00";
             this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.timeController.Location = new System.Drawing.Point(10, 15);
             this.timeController.Name = "timeController";
             this.timeController.Size = new System.Drawing.Size(510, 44);
+            this.timeController.StartFileTime = "00 : 00 : 00";
             this.timeController.TabIndex = 18;
-            // 
-            // timer_update
-            // 
-            this.timer_update.Tick += new System.EventHandler(this.timer_update_Tick);
             // 
             // timer_progress
             // 
