@@ -17,7 +17,8 @@ namespace DTBGEmulator.UserControls
         // 전체 시뮬레이션 시간 [sec]
         int startAction;
         int endAction;
-
+        // 쓰레드 재시작
+        private bool threadRestart = false;
 
         public bool UseController { get; set; } = false;
         public bool First { get; set; } = true;
@@ -374,7 +375,7 @@ namespace DTBGEmulator.UserControls
 
         private void panel_Middle_MouseMove(object sender, MouseEventArgs e)
         {
-            if (UseController)
+            if (true)
             {
                 MainForm mainForm = this.FindForm() as MainForm;
                 if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
@@ -395,7 +396,8 @@ namespace DTBGEmulator.UserControls
                         {
                             mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                         }
-
+                        threadRestart = true;
+                        mainForm.currEvent = true;
                         panel_Middle.Invalidate();
                     }
 
@@ -437,6 +439,7 @@ namespace DTBGEmulator.UserControls
                             {
                                 mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                             }
+                            threadRestart = true;
                         }
                         // MainForm의 test 변수를 TextBox에 표시
                         int minutes = (startAction % 3600) / 60;
@@ -489,6 +492,7 @@ namespace DTBGEmulator.UserControls
                             {
                                 mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                             }
+                            threadRestart = true;
                         }
                         int minutes = (endAction % 3600) / 60;
                         int seconds = endAction % 60;
@@ -501,16 +505,11 @@ namespace DTBGEmulator.UserControls
             }
         }
 
-        private int ChangeSecToTime(int totalSeconds)
-        {
-            int minutes = (totalSeconds % 3600) / 60;
-            return minutes;
-        }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // panel_Middle 마우스 업 이벤트 발생시 처리
         private void panel_Middle_MouseUp(object sender, MouseEventArgs e)
         {
+            MainForm mainForm = this.FindForm() as MainForm;
             // Mainbar - Circle 마우스 업시 처리 =================================================================================
             if (mIsCircleClicking)
             {
@@ -527,6 +526,12 @@ namespace DTBGEmulator.UserControls
             if (mIsEndTimeSelectorClicking)
             {
                 mIsEndTimeSelectorClicking = false;
+            }
+
+            if (threadRestart == true)
+            {
+                mainForm.threadRestart();
+                threadRestart = false;
             }
         }
 

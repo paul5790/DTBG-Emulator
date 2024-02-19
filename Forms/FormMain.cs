@@ -66,11 +66,14 @@ namespace DTBGEmulator
         public int firstMinutes; // 4
         public int lastSeconds; // 59
         public int firstSeconds; // 0
-        private int immutableMinutes; // 4
+        public int currentMinutes; // 0
+        public int currentSeconds; // 0
+        private int immutablefirstMinutes; // 4
+        private int immutablelastMinutes; // 4
 
         // timecontroller 사용제어
         private bool available = false;
-
+        public bool currEvent = false;
 
 
         // 파일, 폴더 데이터
@@ -188,8 +191,18 @@ namespace DTBGEmulator
                 int keyIndex = 1; // 첫 번째 키부터 시작
                 //foreach (var kvp in filePackets)
                 //for (int i = 0; i < takenTime; i++)
-                int defingI = firstMinutes - immutableMinutes;
-                int loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutableMinutes);
+                int defingI;
+                int loopI;
+                if (currEvent)
+                {
+                    defingI = currentMinutes - immutablefirstMinutes;
+                    loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutablefirstMinutes);
+                }
+                else
+                {
+                    defingI = firstMinutes - immutablefirstMinutes;
+                    loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutablefirstMinutes);
+                }
                 for (int i = defingI; i < loopI; i++)
                     {
                     var kvp = filePackets.ElementAt(i);
@@ -199,30 +212,36 @@ namespace DTBGEmulator
                     int loopJ = sixty;
                     int defingK = 0;
                     int loopK = kvp.Value.Count / 60 + 1;
-
-                    if (keyIndex == 1)
+                    if (currEvent)
                     {
-                        // 첫번째 루프일때
-                        int check1 = firstSeconds * loopK;
-                        count = check1;
-                        if (keyCount == keyIndex)
-                        {
-                            loopJ = lastSeconds - firstSeconds + 1;
-                        }
-                        else
-                        {
-                            loopJ = sixty - firstSeconds;
-                        }
-                            
-                    }
-                    else if (keyCount == keyIndex)
-                    {
-                        // 마지막 루프일때
-                        loopJ = lastSeconds + 1;
+                        loopJ = sixty - currentSeconds;
+                        count = currentSeconds * loopK;
+                        currEvent = false;
                     }
                     else
                     {
-                        // 중간 루프일때
+                        if (keyIndex == 1)
+                        {
+                            // 첫번째 루프일때
+                            count = firstSeconds * loopK;
+                            if (keyCount == keyIndex)
+                            {
+                                loopJ = lastSeconds - firstSeconds + 1;
+                            }
+                            else
+                            {
+                                loopJ = sixty - firstSeconds;
+                            }
+                        }
+                        else if (keyCount == keyIndex)
+                        {
+                            // 마지막 루프일때
+                            loopJ = lastSeconds + 1;
+                        }
+                        else
+                        {
+                            // 중간 루프일때
+                        }
                     }
                     for (int j = 0; j < loopJ; j++)
                     {
@@ -237,7 +256,9 @@ namespace DTBGEmulator
                         getCurr = getCurr += 1;
                         if (getCurr > getEnd)
                         {
-                            getCurr = getStart;
+                            timeController.CurrTime = getStart.ToString();
+                            // 여기~~~~~
+                            break; // 루프를 중지하고 다음 while 루프로 이동
                         }
                         timeController.CurrTime = getCurr.ToString();
 
@@ -327,6 +348,9 @@ namespace DTBGEmulator
             // TimeSpan을 다시 문자열로 변환
             string incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
 
+            currentMinutes = Convert.ToInt32(currentTime.ToString(@"mm"));
+            currentSeconds = Convert.ToInt32(currentTime.ToString(@"ss"));
+
             return incrementedTime;
         }
 
@@ -400,7 +424,8 @@ namespace DTBGEmulator
 
             lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
             firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
-            immutableMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            immutablefirstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            immutablelastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
 
             timeController.StartFileTime = timeControllerStartTime;
             timeController.EndFileTime = timeControllerEndTime;
@@ -527,6 +552,8 @@ namespace DTBGEmulator
             int minutes = (totalSeconds % 3600) / 60;
             int seconds = totalSeconds % 60;
 
+            currentMinutes = minutes;
+            currentSeconds = seconds;
             string timeString = $"{hours:D2} : {minutes:D2} : {seconds:D2}";
 
             return timeString;
@@ -537,6 +564,8 @@ namespace DTBGEmulator
             int updatecurrTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime)) + Convert.ToInt32(currTime);
 
             currTimeText.Text = ChangeSecToTime(updatecurrTime);
+
+
         }
 
         
@@ -592,9 +621,18 @@ namespace DTBGEmulator
 
         }
 
-        public void changeTimeControllerValue()
+        public void threadRestart()
         {
+            if (runState == "run")
+            {
+                udpSenderThread.Abort();
 
+                if (udpSenderThread == null || !udpSenderThread.IsAlive)
+                {
+                    udpSenderThread = new Thread(UdpSenderThread);
+                    udpSenderThread.Start();
+                }
+            }
         }
 
         private void dataViewCheckBox_CheckedChanged(object sender, EventArgs e)

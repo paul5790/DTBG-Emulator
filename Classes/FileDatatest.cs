@@ -175,7 +175,6 @@ namespace DTBGEmulator.Classes
             }
         }
 
-
         private List<string> SplitIntoPackets(string fileContent)
         {
             // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
@@ -205,18 +204,6 @@ namespace DTBGEmulator.Classes
             }
 
             return packets;
-        }
-
-        /// <summary>
-        /// 파일 이름에서 숫자 부분을 추출합니다.
-        /// </summary>
-        /// <param name="fileName">파일 이름</param>
-        /// <returns>숫자 부분</returns>
-        private string ExtractNumberPart(string fileName)
-        {
-            // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
-            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
-            return new string(fileNameParts[1].Where(char.IsDigit).ToArray());
         }
     }
 }
