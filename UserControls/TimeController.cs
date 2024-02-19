@@ -15,7 +15,12 @@ namespace DTBGEmulator.UserControls
     {
         #region 변수 정의
         // 전체 시뮬레이션 시간 [sec]
+        int startAction;
+        int endAction;
 
+
+        public bool UseController { get; set; } = false;
+        public bool First { get; set; } = true;
         private string startFileTime = "00 : 00 : 00";
         private string endFileTime = "00 : 00 : 00";
 
@@ -199,12 +204,14 @@ namespace DTBGEmulator.UserControls
         // MainBar 업데이트
         private void UpdateMainBar(Graphics graphics)
         {
-   
-            label_Time_Zero.Text = startFileTime;
-            label_Time_Total.Text = endFileTime;
-            PutTimeToTxtbox(startRepeatTime, "StartTimeTxtbox");
-            PutTimeToTxtbox(endRepeatTime, "EndTimeTxtbox");
-            
+            if (First)
+            {
+                label_Time_Zero.Text = startFileTime;
+                label_Time_Total.Text = endFileTime;
+                PutTimeToTxtbox(startRepeatTime, "StartTimeTxtbox");
+                PutTimeToTxtbox(endRepeatTime, "EndTimeTxtbox");
+                First = false;
+            }
 
             mRectCircle = new RectangleF(mHorizontalMargin + (panel_Middle.Width - 2 * mHorizontalMargin) * mProgress - mRadius, mTopMargin + mBarThickness / 2.0f - mRadius, 2 * mRadius, 2 * mRadius);
 
@@ -364,111 +371,140 @@ namespace DTBGEmulator.UserControls
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // panel_Middle 마우스 이동 이벤트 발생시 처리
+
         private void panel_Middle_MouseMove(object sender, MouseEventArgs e)
         {
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+            if (UseController)
             {
-                // Circle 클릭상태로 마우스 이동시 처리 ===========================================================================
-                if (mIsCircleClicking)
+                MainForm mainForm = this.FindForm() as MainForm;
+                if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
                 {
-                    if (e.X < mPointsStartTimeSelector[0].X)
+                    mainForm.updateCurrTime(CurrTime);
+                    // Circle 클릭상태로 마우스 이동시 처리 ===========================================================================
+                    if (mIsCircleClicking)
                     {
-                        mProgress = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
-                    }
-                    else if (e.X > mPointsEndTimeSelector[0].X)
-                    {
-                        mProgress = (mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
-                    }
-                    else
-                    {
-                        mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                        if (e.X < mPointsStartTimeSelector[0].X)
+                        {
+                            mProgress = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                        }
+                        else if (e.X > mPointsEndTimeSelector[0].X)
+                        {
+                            mProgress = (mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                        }
+                        else
+                        {
+                            mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                        }
+
+                        panel_Middle.Invalidate();
                     }
 
-                    panel_Middle.Invalidate();
-                }
-
-                // StartTime Selector 클릭상태로 마우스 이동시 처리 ===============================================================
-                if (mIsStartTimeSelectorClicking)
-                {
-                    // X 좌표 제한
-                    if (e.X > mPointsEndTimeSelector[0].X - mSelectorGap)
+                    // StartTime Selector 클릭상태로 마우스 이동시 처리 ===============================================================
+                    if (mIsStartTimeSelectorClicking)
                     {
-                        mPointsStartTimeSelector[0].X = mPointsEndTimeSelector[0].X - mSelectorGap;
-                    }
-                    else if (e.X < mHorizontalMargin)
-                    {
-                        mPointsStartTimeSelector[0].X = mHorizontalMargin;
-                    }
-                    else
-                    {
-                        mPointsStartTimeSelector[0].X = e.X;
-                    }
 
-                    // StartTimeSelector의 X좌표로부터 mStartTime 계산
-                    if (mTotalTime != string.Empty)
-                        mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
-
-                    // StartTime 텍스트 박스 업데이트
-                    PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
-
-                    // Circle 앞에서 뒤로 밀고가기
-                    if (e.X > mRectCircle.Left + mRadius)
-                    {
+                        // X 좌표 제한
                         if (e.X > mPointsEndTimeSelector[0].X - mSelectorGap)
                         {
-                            if (!mRectCircle.Contains(mPointsEndTimeSelector[0]))
-                                mProgress = (mPointsEndTimeSelector[0].X - mSelectorGap - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            mPointsStartTimeSelector[0].X = mPointsEndTimeSelector[0].X - mSelectorGap;
+                        }
+                        else if (e.X < mHorizontalMargin)
+                        {
+                            mPointsStartTimeSelector[0].X = mHorizontalMargin;
                         }
                         else
                         {
-                            mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            mPointsStartTimeSelector[0].X = e.X;
                         }
+
+                        // StartTimeSelector의 X좌표로부터 mStartTime 계산
+                        if (mTotalTime != string.Empty)
+                            mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
+
+                        startAction = startRepeatTime + mStartTime;
+                        // StartTime 텍스트 박스 업데이트
+                        PutTimeToTxtbox(startAction, "StartTimeTxtbox");
+
+                        // Circle 앞에서 뒤로 밀고가기
+                        if (e.X > mRectCircle.Left + mRadius)
+                        {
+                            if (e.X > mPointsEndTimeSelector[0].X - mSelectorGap)
+                            {
+                                if (!mRectCircle.Contains(mPointsEndTimeSelector[0]))
+                                    mProgress = (mPointsEndTimeSelector[0].X - mSelectorGap - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            }
+                            else
+                            {
+                                mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            }
+                        }
+                        // MainForm의 test 변수를 TextBox에 표시
+                        int minutes = (startAction % 3600) / 60;
+                        int seconds = startAction % 60;
+                        mainForm.firstMinutes = minutes;
+                        mainForm.firstSeconds = seconds;
+                        mainForm.label14.Text = minutes.ToString();
+
+                        panel_Middle.Invalidate();
+
+
                     }
 
-                    panel_Middle.Invalidate();
-                }
-
-                // EndTime Selector 클릭상태로 마우스 이동시 처리 =================================================================
-                if (mIsEndTimeSelectorClicking)
-                {
-                    // X 좌표 제한
-                    if (e.X < mPointsStartTimeSelector[0].X + mSelectorGap)
+                    // EndTime Selector 클릭상태로 마우스 이동시 처리 =================================================================
+                    if (mIsEndTimeSelectorClicking)
                     {
-                        mPointsEndTimeSelector[0].X = mPointsStartTimeSelector[0].X + mSelectorGap;
-                    }
-                    else if (e.X > panel_Middle.Width - mHorizontalMargin)
-                    {
-                        mPointsEndTimeSelector[0].X = panel_Middle.Width - mHorizontalMargin; ;
-                    }
-                    else
-                    {
-                        mPointsEndTimeSelector[0].X = e.X;
-                    }
 
-                    // EndTimeSelector의 X좌표로부터 mEndTime 계산
-                    if (mTotalTime != string.Empty)
-                        mEndTime = (int)Math.Round((mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
-
-                    // StartTime 텍스트 박스 업데이트
-                    PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
-
-                    // Circle 뒤에서 앞으로 밀고가기
-                    if (e.X < mRectCircle.Right - mRadius)
-                    {
+                        // X 좌표 제한
                         if (e.X < mPointsStartTimeSelector[0].X + mSelectorGap)
                         {
-                            if (!mRectCircle.Contains(mPointsStartTimeSelector[0]))
-                                mProgress = (mPointsStartTimeSelector[0].X + mSelectorGap - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            mPointsEndTimeSelector[0].X = mPointsStartTimeSelector[0].X + mSelectorGap;
+                        }
+                        else if (e.X > panel_Middle.Width - mHorizontalMargin)
+                        {
+                            mPointsEndTimeSelector[0].X = panel_Middle.Width - mHorizontalMargin; ;
                         }
                         else
                         {
-                            mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            mPointsEndTimeSelector[0].X = e.X;
                         }
-                    }
 
-                    panel_Middle.Invalidate();
+                        // EndTimeSelector의 X좌표로부터 mEndTime 계산
+                        if (mTotalTime != string.Empty)
+                            mEndTime = (int)Math.Round((mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
+
+                        endAction = startRepeatTime + mEndTime;
+
+                        // StartTime 텍스트 박스 업데이트
+                        PutTimeToTxtbox(endAction, "EndTimeTxtbox");
+
+                        // Circle 뒤에서 앞으로 밀고가기
+                        if (e.X < mRectCircle.Right - mRadius)
+                        {
+                            if (e.X < mPointsStartTimeSelector[0].X + mSelectorGap)
+                            {
+                                if (!mRectCircle.Contains(mPointsStartTimeSelector[0]))
+                                    mProgress = (mPointsStartTimeSelector[0].X + mSelectorGap - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            }
+                            else
+                            {
+                                mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+                            }
+                        }
+                        int minutes = (endAction % 3600) / 60;
+                        int seconds = endAction % 60;
+                        mainForm.lastSeconds = seconds;
+                        mainForm.lastMinutes = minutes;
+                        mainForm.label15.Text = minutes.ToString();
+                        panel_Middle.Invalidate();
+                    }
                 }
             }
+        }
+
+        private int ChangeSecToTime(int totalSeconds)
+        {
+            int minutes = (totalSeconds % 3600) / 60;
+            return minutes;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

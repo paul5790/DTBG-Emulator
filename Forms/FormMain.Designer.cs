@@ -26,6 +26,7 @@
         /// 디자이너 지원에 필요한 메서드입니다. 
         /// 이 메서드의 내용을 코드 편집기로 수정하지 마세요.
         /// </summary>
+        /// 
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
@@ -64,6 +65,7 @@
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label14 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -75,6 +77,7 @@
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -474,6 +477,8 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.label15);
+            this.panel4.Controls.Add(this.label14);
             this.panel4.Controls.Add(this.label16);
             this.panel4.Controls.Add(this.label13);
             this.panel4.Controls.Add(this.label12);
@@ -485,6 +490,16 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.ForeColor = System.Drawing.Color.Black;
+            this.label14.Location = new System.Drawing.Point(24, 72);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(44, 12);
+            this.label14.TabIndex = 27;
+            this.label14.Text = "label14";
             // 
             // label16
             // 
@@ -534,7 +549,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.label2.Location = new System.Drawing.Point(183, 71);
+            this.label2.Location = new System.Drawing.Point(376, 82);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 12);
             this.label2.TabIndex = 20;
@@ -544,7 +559,7 @@
             // 
             this.currTimeText.AutoSize = true;
             this.currTimeText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.currTimeText.Location = new System.Drawing.Point(277, 72);
+            this.currTimeText.Location = new System.Drawing.Point(470, 83);
             this.currTimeText.Name = "currTimeText";
             this.currTimeText.Size = new System.Drawing.Size(65, 12);
             this.currTimeText.TabIndex = 19;
@@ -555,11 +570,14 @@
             this.timeController.BackColor = System.Drawing.Color.White;
             this.timeController.CurrTime = "0";
             this.timeController.EndFileTime = "00 : 00 : 00";
+            this.timeController.EndRepeatTime = 0;
+            this.timeController.First = false;
             this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.timeController.Location = new System.Drawing.Point(10, 15);
             this.timeController.Name = "timeController";
             this.timeController.Size = new System.Drawing.Size(510, 44);
             this.timeController.StartFileTime = "00 : 00 : 00";
+            this.timeController.StartRepeatTime = 0;
             this.timeController.TabIndex = 18;
             // 
             // timer_progress
@@ -577,6 +595,16 @@
             this.dataViewTextBox.Size = new System.Drawing.Size(540, 380);
             this.dataViewTextBox.TabIndex = 7;
             this.dataViewTextBox.Visible = false;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.ForeColor = System.Drawing.Color.Black;
+            this.label15.Location = new System.Drawing.Point(83, 82);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(44, 12);
+            this.label15.TabIndex = 28;
+            this.label15.Text = "label15";
             // 
             // MainForm
             // 
@@ -632,9 +660,8 @@
         private System.Windows.Forms.Button pauseBtn;
         private System.Windows.Forms.Button runBtn;
         private UserControls.TimeController timeController1;
-        private UserControls.TimeController timeController;
         private System.Windows.Forms.Timer timer_update;
-        private System.Windows.Forms.Label currTimeText;
+        public System.Windows.Forms.Label currTimeText;
         private System.Windows.Forms.Timer timer_progress;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Timer timer_udp;
@@ -665,6 +692,9 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.CheckBox dataViewCheckBox;
         private System.Windows.Forms.TextBox dataViewTextBox;
+        private UserControls.TimeController timeController;
+        public System.Windows.Forms.Label label14;
+        public System.Windows.Forms.Label label15;
     }
 }
 

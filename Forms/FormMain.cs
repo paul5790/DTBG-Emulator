@@ -26,6 +26,8 @@ namespace DTBGEmulator
     {
         #region 변수 정의
 
+        public int test = 0;
+
         private Setting setting = new Setting();
         private SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
 
@@ -52,12 +54,24 @@ namespace DTBGEmulator
         private int dustTime;
         int invokeControl = 1;
 
-        // timecotroller 데이터
-        private string currTime;
-        private string TotalTime;
+        // timecotroller 데이터   // "00 : 00 : 00"
+        private string currTime;  
+        private string TotalTime; 
         private string timeControllerStartTime;
         private string timeControllerEndTime;
         private string timeControllerCurrText;
+
+        // timecontroller와 데이터와 파일 데이터 연동
+        public int lastMinutes; // 8
+        public int firstMinutes; // 4
+        public int lastSeconds; // 59
+        public int firstSeconds; // 0
+        private int immutableMinutes; // 4
+
+        // timecontroller 사용제어
+        private bool available = false;
+
+
 
         // 파일, 폴더 데이터
         private SortedDictionary<string, List<string>> filePackets;
@@ -169,20 +183,48 @@ namespace DTBGEmulator
             while (true)
             {
                 // 코드 실행 시작 시간 기록
-
-
                 int sixty = 60;
                 int keyCount = filePackets.Count;
                 int keyIndex = 1; // 첫 번째 키부터 시작
                 //foreach (var kvp in filePackets)
-                for (int i = 0; i < takenTime; i++)
-                {
+                //for (int i = 0; i < takenTime; i++)
+                int defingI = firstMinutes - immutableMinutes;
+                int loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutableMinutes);
+                for (int i = defingI; i < loopI; i++)
+                    {
                     var kvp = filePackets.ElementAt(i);
                     Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
-                    keyIndex++;
-                    if (keyIndex > keyCount) keyIndex = 1;
+
                     int count = 0;
-                    for (int j = 0; j < sixty / dataSpeed; j++)
+                    int loopJ = sixty;
+                    int defingK = 0;
+                    int loopK = kvp.Value.Count / 60 + 1;
+
+                    if (keyIndex == 1)
+                    {
+                        // 첫번째 루프일때
+                        int check1 = firstSeconds * loopK;
+                        count = check1;
+                        if (keyCount == keyIndex)
+                        {
+                            loopJ = lastSeconds - firstSeconds + 1;
+                        }
+                        else
+                        {
+                            loopJ = sixty - firstSeconds;
+                        }
+                            
+                    }
+                    else if (keyCount == keyIndex)
+                    {
+                        // 마지막 루프일때
+                        loopJ = lastSeconds + 1;
+                    }
+                    else
+                    {
+                        // 중간 루프일때
+                    }
+                    for (int j = 0; j < loopJ; j++)
                     {
                         stopwatch1.Reset();
                         stopwatch1.Start();
@@ -199,7 +241,7 @@ namespace DTBGEmulator
                         }
                         timeController.CurrTime = getCurr.ToString();
 
-                        for (int k = 0; k < kvp.Value.Count / 60 + 1; k++)
+                        for (int k = defingK; k < loopK; k++)
                         {
                             try
                             {
@@ -232,6 +274,8 @@ namespace DTBGEmulator
                         //Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
                         Console.WriteLine($"Code execution time: {stopwatch1.ElapsedMilliseconds} ms");
                     }
+                    keyIndex++;
+                    if (keyIndex > keyCount) keyIndex = 1;
                 }
             }
         }
@@ -239,7 +283,7 @@ namespace DTBGEmulator
         private void UpdateCurrTimeText()
         {
             // IncrementTimeByOneSecond 메서드를 사용하여 시간을 1초씩 증가시킴
-            string incrementedTime = IncrementTimeByOneSecond(timeControllerCurrText);
+            string incrementedTime = IncrementTimeByOneSecond(timeControllerStartTime);
 
             // dataSpeed에 따라서 Invoke 호출 빈도를 결정
             if (ShouldInvokeUpdate(dataSpeed))
@@ -251,7 +295,7 @@ namespace DTBGEmulator
                 });
             }
             invokeControl++;
-            timeControllerCurrText = incrementedTime;
+            // timeControllerCurrText = incrementedTime;
         }
 
         private bool ShouldInvokeUpdate(int speed)
@@ -271,15 +315,6 @@ namespace DTBGEmulator
             }
         }
 
-        private void CurrTimeInvoke(string time)
-        {
-            currTimeText.Invoke((MethodInvoker)delegate
-            {
-                // currTimeText에 증가된 시간을 할당
-                currTimeText.Text = time;
-            });
-        }
-
         private string IncrementTimeByOneSecond(string time)
         {
             // 공백을 제거하여 시간 문자열 파싱
@@ -287,21 +322,10 @@ namespace DTBGEmulator
             TimeSpan currentTime = TimeSpan.ParseExact(trimmedTime, "hh':'mm':'ss", CultureInfo.InvariantCulture);
 
             // 1초 추가
-            currentTime = currentTime.Add(TimeSpan.FromSeconds(1));
+            currentTime = currentTime.Add(TimeSpan.FromSeconds(Convert.ToInt32(timeController.CurrTime)));
 
             // TimeSpan을 다시 문자열로 변환
             string incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
-
-            // endTime을 TimeSpan으로 변환
-            string trimmedEndTime = timeControllerEndTime.Replace(" ", "");
-            TimeSpan end = TimeSpan.ParseExact(trimmedEndTime, "hh':'mm':'ss", CultureInfo.InvariantCulture);
-
-            // 만약 incrementedTime이 endTime보다 크다면 startTime으로 변경
-            if (currentTime > end)
-            {
-                currentTime = TimeSpan.ParseExact(timeControllerStartTime.Replace(" ", ""), "hh':'mm':'ss", CultureInfo.InvariantCulture);
-                incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
-            }
 
             return incrementedTime;
         }
@@ -338,71 +362,6 @@ namespace DTBGEmulator
             setting.ShowDialog();
         }
 
-        #region 상단바 드래그
-        private void panelTop_MouseDown(object sender, MouseEventArgs e)
-        {
-            mDragForm = true;
-
-            Control control = sender as Control;
-
-            if (control.GetType() == typeof(Panel))
-            {
-                mMousePosition = e.Location;
-            }
-            else
-            {
-                Point point = new Point(e.Location.X + control.Location.X, e.Location.Y + control.Location.Y);
-                mMousePosition = point;
-            }
-        }
-
-        private void panelTop_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (mDragForm)
-            {
-                this.SetDesktopLocation(MousePosition.X - mMousePosition.X, MousePosition.Y - mMousePosition.Y);
-            }
-        }
-
-        private void panelTop_MouseUp(object sender, MouseEventArgs e)
-        {
-            mDragForm = false;
-            mMousePosition = Point.Empty;
-        }
-
-        private void label1_MouseDown(object sender, MouseEventArgs e)
-        {
-            mDragForm = true;
-
-            Control control = sender as Control;
-
-            if (control.GetType() == typeof(Panel))
-            {
-                mMousePosition = e.Location;
-            }
-            else
-            {
-                Point point = new Point(e.Location.X + control.Location.X, e.Location.Y + control.Location.Y);
-                mMousePosition = point;
-            }
-        }
-
-        private void label1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (mDragForm)
-            {
-                this.SetDesktopLocation(MousePosition.X - mMousePosition.X, MousePosition.Y - mMousePosition.Y);
-            }
-        }
-
-        private void label1_MouseUp(object sender, MouseEventArgs e)
-        {
-            mDragForm = false;
-            mMousePosition = Point.Empty;
-        }
-        #endregion 상단바 드래그
-
-
         // 파일 데이터 처리
         private void addFileBtn_Click(object sender, EventArgs e)
         {
@@ -411,6 +370,7 @@ namespace DTBGEmulator
             {
                 udpSenderThread.Abort();
             }
+            timeController.First = true;
             FileDatatest.Instance.SelectFile();
             Thread dataLoadThread = new Thread(() => FileDatatest.Instance.LoadFile());
             dataLoadThread.Start();
@@ -438,6 +398,10 @@ namespace DTBGEmulator
             startTimeData.Text = formattedStartTime;
             endTimeData.Text = formattedEndTime + ":59";
 
+            lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
+            firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            immutableMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+
             timeController.StartFileTime = timeControllerStartTime;
             timeController.EndFileTime = timeControllerEndTime;
 
@@ -451,6 +415,9 @@ namespace DTBGEmulator
             {
                 fullTimeData.Text = $"{hours}시간 {minutes}분";
             }
+
+            firstSeconds = 0;
+            lastSeconds = 59;
 
             // 버튼 설정
             UpdateButtonState("stop");
@@ -560,9 +527,90 @@ namespace DTBGEmulator
             int minutes = (totalSeconds % 3600) / 60;
             int seconds = totalSeconds % 60;
 
-            string timeString = $"{hours:D2}:{minutes:D2}:{seconds:D2}";
+            string timeString = $"{hours:D2} : {minutes:D2} : {seconds:D2}";
 
             return timeString;
+        }
+
+        public void updateCurrTime(string currTime)
+        {
+            int updatecurrTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime)) + Convert.ToInt32(currTime);
+
+            currTimeText.Text = ChangeSecToTime(updatecurrTime);
+        }
+
+        
+
+
+        // 타이머_프로그래스바 GUI 업데이트
+        //private void timer_update_Tick(object sender, EventArgs e)
+        //{
+        //    // 변환 시도
+        //    // currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
+        //}
+
+        // 타이머_1초마다 프로그래스바 업데이트
+
+        // 속도 설정
+        private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // 각 인덱스에 대응하는 데이터 속도 배열
+            int[] speedValues = { 1 / 10, 1 / 4, 1 / 2, 1, 2, 4, 10, 20, 800 };
+            int[] dustTimeValues = { 1 / 10, 1 / 4, 1 / 2, 10, 10, 10, 10, 10, 0 };
+
+            // 선택된 인덱스를 이용하여 데이터 속도 설정
+            if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
+            {
+                dataSpeed = speedValues[speedComboBox.SelectedIndex];
+                dustTime = dustTimeValues[speedComboBox.SelectedIndex];
+            }
+
+            if (speedComboBox.SelectedIndex >= 4)
+            {
+                dataViewCheckBox.Visible = false;
+                dataViewTextBox.Visible = false;
+                this.Size = new Size(570, 400);
+            }
+            else
+            {
+                dataViewCheckBox.Visible = true;
+            }
+        }
+
+        int seconds = 0;
+        private void timer_progress_Tick(object sender, EventArgs e)
+        {
+
+            seconds++;
+
+            // TimeSpan을 사용하여 초를 시:분:초 형태의 문자열로 변환
+            TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
+            string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
+
+            // 변환된 문자열을 UI에 표시
+            // realTime.Text = formattedTime;
+
+        }
+
+        public void changeTimeControllerValue()
+        {
+
+        }
+
+        private void dataViewCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dataViewCheckBox.Checked)
+            {
+                // 체크되었을 때의 폼 크기 설정
+                dataViewTextBox.Visible = true;
+                this.Size = new Size(570, 800);
+            }
+            else
+            {
+                // 체크가 해제되었을 때의 폼 크기 설정
+                dataViewTextBox.Visible = false;
+                this.Size = new Size(570, 400);
+            }
         }
 
         #region 동작 버튼 이벤트 (시작, 일시정지, 정지)
@@ -590,6 +638,7 @@ namespace DTBGEmulator
                     pauseEnabled = true;
                     stopEnabled = true;
                     selectEnabled = false;
+                    timeController.UseController = false;
                     break;
                 case "pause":
                     runImageKey = "run_n";
@@ -608,6 +657,7 @@ namespace DTBGEmulator
                     pauseEnabled = false;
                     stopEnabled = false;
                     selectEnabled = true;
+                    timeController.UseController = true;
                     break;
                 default:
                     return;
@@ -670,10 +720,8 @@ namespace DTBGEmulator
                 if (udpSenderThread != null && udpSenderThread.IsAlive)
                 {
                     udpSenderThread.Abort();
-                    TotalTime = "01 : 00 : 00";
-                    currTime = "00 : 00 : 00";
-                    timeController.CurrTime = ChangeTimeToStrSec(currTime);
-                    timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
+                    timeController.CurrTime = "0";
+                    currTimeText.Text = timeControllerStartTime;
                     stopRequested = true;
                     UpdateButtonState("stop");
                 }
@@ -682,71 +730,68 @@ namespace DTBGEmulator
 
         #endregion 동작 버튼 이벤트 (시작, 일시정지, 정지)
 
-
-        // 타이머_프로그래스바 GUI 업데이트
-        //private void timer_update_Tick(object sender, EventArgs e)
-        //{
-        //    // 변환 시도
-        //    // currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
-        //}
-
-        // 타이머_1초마다 프로그래스바 업데이트
-
-        // 속도 설정
-        private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        #region 상단바 드래그
+        private void panelTop_MouseDown(object sender, MouseEventArgs e)
         {
-            // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1 / 10, 1 / 4, 1 / 2, 1, 2, 4, 10, 20, 800 };
-            int[] dustTimeValues = { 1 / 10, 1 / 4, 1 / 2, 10, 10, 10, 10, 10, 0 };
+            mDragForm = true;
 
-            // 선택된 인덱스를 이용하여 데이터 속도 설정
-            if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
-            {
-                dataSpeed = speedValues[speedComboBox.SelectedIndex];
-                dustTime = dustTimeValues[speedComboBox.SelectedIndex];
-            }
+            Control control = sender as Control;
 
-            if (speedComboBox.SelectedIndex >= 4)
+            if (control.GetType() == typeof(Panel))
             {
-                dataViewCheckBox.Visible = false;
-                dataViewTextBox.Visible = false;
-                this.Size = new Size(570, 400);
+                mMousePosition = e.Location;
             }
             else
             {
-                dataViewCheckBox.Visible = true;
+                Point point = new Point(e.Location.X + control.Location.X, e.Location.Y + control.Location.Y);
+                mMousePosition = point;
             }
         }
 
-        int seconds = 0;
-        private void timer_progress_Tick(object sender, EventArgs e)
+        private void panelTop_MouseMove(object sender, MouseEventArgs e)
         {
-
-            seconds++;
-
-            // TimeSpan을 사용하여 초를 시:분:초 형태의 문자열로 변환
-            TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
-            string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
-
-            // 변환된 문자열을 UI에 표시
-            // realTime.Text = formattedTime;
-
+            if (mDragForm)
+            {
+                this.SetDesktopLocation(MousePosition.X - mMousePosition.X, MousePosition.Y - mMousePosition.Y);
+            }
         }
 
-        private void dataViewCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void panelTop_MouseUp(object sender, MouseEventArgs e)
         {
-            if (dataViewCheckBox.Checked)
+            mDragForm = false;
+            mMousePosition = Point.Empty;
+        }
+
+        private void label1_MouseDown(object sender, MouseEventArgs e)
+        {
+            mDragForm = true;
+
+            Control control = sender as Control;
+
+            if (control.GetType() == typeof(Panel))
             {
-                // 체크되었을 때의 폼 크기 설정
-                dataViewTextBox.Visible = true;
-                this.Size = new Size(570, 800);
+                mMousePosition = e.Location;
             }
             else
             {
-                // 체크가 해제되었을 때의 폼 크기 설정
-                dataViewTextBox.Visible = false;
-                this.Size = new Size(570, 400);
+                Point point = new Point(e.Location.X + control.Location.X, e.Location.Y + control.Location.Y);
+                mMousePosition = point;
             }
         }
+
+        private void label1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mDragForm)
+            {
+                this.SetDesktopLocation(MousePosition.X - mMousePosition.X, MousePosition.Y - mMousePosition.Y);
+            }
+        }
+
+        private void label1_MouseUp(object sender, MouseEventArgs e)
+        {
+            mDragForm = false;
+            mMousePosition = Point.Empty;
+        }
+        #endregion 상단바 드래그
     }
 }

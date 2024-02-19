@@ -43,6 +43,7 @@
             this.label_StartTime_Colon1 = new System.Windows.Forms.Label();
             this.label_StartTime_Colon2 = new System.Windows.Forms.Label();
             this.panel_Left = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.panel_Middle.SuspendLayout();
             this.panel_Right.SuspendLayout();
             this.panel_Left.SuspendLayout();
@@ -55,7 +56,7 @@
             this.panel_Middle.Controls.Add(this.label_Time_Zero);
             this.panel_Middle.Location = new System.Drawing.Point(109, 0);
             this.panel_Middle.Name = "panel_Middle";
-            this.panel_Middle.Size = new System.Drawing.Size(546, 44);
+            this.panel_Middle.Size = new System.Drawing.Size(306, 44);
             this.panel_Middle.TabIndex = 0;
             this.panel_Middle.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Middle_Paint);
             this.panel_Middle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel_Middle_MouseDown);
@@ -67,7 +68,7 @@
             this.label_Time_Total.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label_Time_Total.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_Time_Total.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(118)))), ((int)(((byte)(118)))), ((int)(((byte)(118)))));
-            this.label_Time_Total.Location = new System.Drawing.Point(478, 30);
+            this.label_Time_Total.Location = new System.Drawing.Point(238, 30);
             this.label_Time_Total.Name = "label_Time_Total";
             this.label_Time_Total.Size = new System.Drawing.Size(67, 11);
             this.label_Time_Total.TabIndex = 8;
@@ -163,7 +164,7 @@
             this.panel_Right.Controls.Add(this.txtBox_EndTime_mm);
             this.panel_Right.Controls.Add(this.txtBox_EndTime_HH);
             this.panel_Right.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel_Right.Location = new System.Drawing.Point(661, 14);
+            this.panel_Right.Location = new System.Drawing.Point(421, 14);
             this.panel_Right.Name = "panel_Right";
             this.panel_Right.Size = new System.Drawing.Size(86, 20);
             this.panel_Right.TabIndex = 8;
@@ -252,16 +253,26 @@
             this.panel_Left.Size = new System.Drawing.Size(86, 20);
             this.panel_Left.TabIndex = 2;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(218, 47);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 14);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "label1";
+            // 
             // TimeController
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.panel_Right);
             this.Controls.Add(this.panel_Left);
             this.Controls.Add(this.panel_Middle);
             this.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "TimeController";
-            this.Size = new System.Drawing.Size(750, 44);
+            this.Size = new System.Drawing.Size(510, 63);
             this.Load += new System.EventHandler(this.UC_TimeController_Load);
             this.SizeChanged += new System.EventHandler(this.UC_TimeController_SizeChanged);
             this.panel_Middle.ResumeLayout(false);
@@ -270,6 +281,7 @@
             this.panel_Left.ResumeLayout(false);
             this.panel_Left.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -290,5 +302,6 @@
         private System.Windows.Forms.Label label_StartTime_Colon1;
         private System.Windows.Forms.Label label_StartTime_Colon2;
         private System.Windows.Forms.Panel panel_Left;
+        private System.Windows.Forms.Label label1;
     }
 }
