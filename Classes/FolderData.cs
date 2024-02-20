@@ -12,9 +12,17 @@ namespace DTBGEmulator.Classes
 {
     public class FolderData
     {
-        private string[] filePaths;
-        private string filePath;
+        private static FolderData instance = null;
+
+        private string[] filePaths = null;
+        private string firstFileName;
+        private string lastFileName;
+        private int takenTime;
+        private SortedDictionary<string, List<string>> folderDataDictionary;
         private string folderPath;
+
+        private string filePath;
+       
         private List<string> filePackets;
         private string startDateStr;
         private string endDateStr;
@@ -24,9 +32,58 @@ namespace DTBGEmulator.Classes
         private List<string> allFilePackets;
         private int selectedFileCount;
         private int totalPacketCount;
-        Dictionary<string, List<string>> dictPackets = new Dictionary<string, List<string>>();
 
-        private Dictionary<string, string> folderContents = new Dictionary<string, string>(); // 폴더 이름과 내용을 저장하는 Dictionary
+        #region 프로퍼티 정의
+        public string FirstFileName
+        {
+            get { return firstFileName; }
+            set { firstFileName = value; }
+        }
+
+        public string LastFileName
+        {
+            get { return lastFileName; }
+            set { lastFileName = value; }
+        }
+
+        public string FolderPath
+        {
+            get { return folderPath; }
+            set { folderPath = value; }
+        }
+
+        public int TakenTime
+        {
+            get { return takenTime; }
+            set { takenTime = value; }
+        }
+
+        public int SelectedFileCount
+        {
+            get { return selectedFileCount; }
+            set { selectedFileCount = value; }
+        }
+
+        public SortedDictionary<string, List<string>> FolderDataDictionary
+        {
+            get { return folderDataDictionary; }
+            set { folderDataDictionary = value; }
+        }
+
+        #endregion 프로퍼티 정의
+        private FolderData() { }
+
+        public static FolderData Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new FolderData();
+                }
+                return instance;
+            }
+        }
 
         public void SelectFolder()
         {
@@ -37,91 +94,134 @@ namespace DTBGEmulator.Classes
 
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
+                    folderPath = folderBrowserDialog.SelectedPath;
+                    Console.WriteLine(folderPath);
+                    // 폴더 내의 모든 텍스트 파일 경로를 filePaths 배열에 저장
+                    filePaths = Directory.GetFiles(folderPath, "*.txt");
+                    // 폴더 안의 파일 갯수를 selectedFileCount 변수에 할당
+                    selectedFileCount = filePaths.Length;
+
+                    firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
+                    lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
+
+                    // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
+                    takenTime = CalculateTimeDifference(firstFileName, lastFileName);
 
                     // 모든 파일의 패킷을 담을 리스트 초기화
                     allFilePackets = new List<string>();
 
                     folderPath = folderBrowserDialog.SelectedPath;
-                    // 폴더 내의 모든 텍스트 파일 경로를 filePaths 배열에 저장
-                    filePaths = Directory.GetFiles(folderPath, "*.txt");
 
-                    // 폴더 안의 파일 갯수를 selectedFileCount 변수에 할당
-                    selectedFileCount = filePaths.Length;
-
-                    foreach (var filePath in Directory.GetFiles(folderPath, "*.txt"))
-                    {
-                        // filePath를 현재 선택한 파일로 변경
-                        this.filePath = filePath;
-
-                        // 기존 코드 유지
-                        SplitIntoPackets();
-
-                        // 현재 파일의 패킷을 전체 리스트에 추가
-                        allFilePackets.AddRange(filePackets);
-
-                        CalculateFileSize();
-                    }
                     // 추가: List에 담긴 변수 갯수 (전체) 설정
                     totalPacketCount = allFilePackets.Count;
-
-                    Console.WriteLine(selectedFileCount);
-                    Console.WriteLine("패킷 파일" + totalPacketCount);
-
-                    // Get the first packet's Start value
-                    string startDate = ExtractStartEndDate(allFilePackets[0], "Start");
-
-                    // Get the last packet's End value
-                    string endDate = ExtractStartEndDate(allFilePackets[allFilePackets.Count - 1], "End");
-
-                    startDateStr = ConvertToLocalTime(startDate).ToString("yyyy.MM.dd. HH:mm:ss");
-                    endDateStr = ConvertToLocalTime(endDate).ToString("yyyy.MM.dd. HH:mm:ss");
-                    startTimeStr = ConvertToLocalTime(startDate).ToString("HH:mm:ss");
-                    endTimeStr = ConvertToLocalTime(endDate).ToString("HH:mm:ss");
-
-                    Console.WriteLine(startDateStr);
-                    Console.WriteLine(endDateStr);
                 }
             }
         }
-        // 패키지 별로 리스트에 저장
-        private void SplitIntoPackets()
+
+        private int CalculateTimeDifference(string firstFileName, string lastFileName)
+        {
+            // 파일 이름에서 시간 부분을 추출하여 분 단위로 변환
+            int firstTimeInMinutes = ExtractTimeInMinutes(firstFileName);
+            int lastTimeInMinutes = ExtractTimeInMinutes(lastFileName);
+
+            // 시간 차이를 절대값으로 반환
+            return Math.Abs(lastTimeInMinutes - firstTimeInMinutes) + 1;
+        }
+
+        private int ExtractTimeInMinutes(string fileName)
+        {
+            // 파일 이름에서 숫자 부분을 추출하여 시간과 분으로 나누고 분 단위로 계산
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
+            int hour = int.Parse(fileNameParts[1].Substring(0, 2));
+            int minute = int.Parse(fileNameParts[1].Substring(2, 2));
+
+            return hour * 60 + minute;
+        }
+
+        /// <summary>
+        /// 데이터 메모리 저장
+        /// </summary>
+        /// <returns></returns>
+        public bool LoadFile()
+        {
+            folderDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
+            // 각 파일에 대한 처리를 위해 반복
+            try
+            {
+                foreach (string filePath in filePaths)
+                {
+                    ProcessFile(filePath);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        private void ProcessFile(string filePath)
+        {
+
+            string fileContent = ReadFile(filePath);
+            List<string> filePackets = SplitIntoPackets(fileContent);
+
+            // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(filePath).Split(' ');
+            string fileName = new string(fileNameParts[1].Where(char.IsDigit).ToArray());
+
+            // 현재 파일의 패킷을 전체 리스트에 추가
+            folderDataDictionary.Add(fileName, filePackets);
+            Console.WriteLine(fileName + filePackets[0]);
+        }
+
+        private string ReadFile(string filePath)
         {
             try
             {
-                // 선택한 파일의 내용을 읽어와서 fileContent에 저장
-                string fileContent = File.ReadAllText(filePath);
-
-                // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
-                filePackets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{" }, StringSplitOptions.None));
-
-                // Iterate through each packet and process it
-                for (int i = 0; i < filePackets.Count; i++)
+                using (StreamReader reader = new StreamReader(filePath))
                 {
-                    // Trim leading and trailing whitespaces
-                    filePackets[i] = filePackets[i].Trim();
-
-                    // Add opening brace to the first packet
-                    if (i == 0)
-                    {
-                        filePackets[i] = filePackets[i] + "\r\n}";
-                    }
-                    else
-                    {
-                        filePackets[i] = "{\r\n  " + filePackets[i] + "\r\n}";
-                    }
-
-                    // Add closing brace to the last packet
-                    if (i == filePackets.Count - 1)
-                    {
-                        filePackets[i] = filePackets[i].TrimEnd('}');
-                    }
-
+                    string content = reader.ReadToEnd();
+                    return content;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing file: {ex.Message}");
+                Console.WriteLine($"Error reading file asynchronously: {ex.Message}");
+                return string.Empty;
             }
+        }
+
+
+        private List<string> SplitIntoPackets(string fileContent)
+        {
+            // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
+            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{" }, StringSplitOptions.None));
+
+            // Iterate through each packet and process it
+            for (int i = 0; i < packets.Count; i++)
+            {
+                // Trim leading and trailing whitespaces
+                packets[i] = packets[i].Trim();
+
+                // Add opening brace to the first packet
+                if (i == 0)
+                {
+                    packets[i] = packets[i] + "\r\n}";
+                }
+                else
+                {
+                    packets[i] = "{\r\n  " + packets[i] + "\r\n}";
+                }
+
+                // Add closing brace to the last packet
+                if (i == packets.Count - 1)
+                {
+                    packets[i] = packets[i].TrimEnd('}');
+                }
+            }
+
+            return packets;
         }
 
         // 파일 크기 저장
@@ -194,25 +294,7 @@ namespace DTBGEmulator.Classes
                 return string.Empty;
             }
         }
-        public DataDTO GenerateDataDTO()
-        {
-            // 파일을 선택하지 않았거나 null인 경우 null을 반환
-            if (string.IsNullOrEmpty(filePath) || filePaths == null || filePaths.Length == 0)
-            {
-                // 여기에 처리를 추가할 수 있습니다.
-                Console.WriteLine("파일을 선택해주세요.");
-                return null;
-            }
-
-            DataDTO dto = new DataDTO
-            {
-                //FilePackets = allFilePackets,
-                FileCount = selectedFileCount,
-                PacketCount = totalPacketCount
-            };
-
-            return dto;
-        }
+        
 
     }
 }

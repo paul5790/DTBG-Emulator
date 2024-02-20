@@ -32,7 +32,6 @@ namespace DTBGEmulator
         private SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
 
         private FileData fileData = new FileData(); // FileData 인스턴스
-        private FolderData folderData = new FolderData(); // FolderData 인스턴스
 
         private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
 
@@ -52,6 +51,7 @@ namespace DTBGEmulator
         // 속도
         private int dataSpeed;
         private int dustTime;
+        private int filecontrol;
         int invokeControl = 1;
 
         // timecotroller 데이터   // "00 : 00 : 00"
@@ -62,14 +62,19 @@ namespace DTBGEmulator
         private string timeControllerCurrText;
 
         // timecontroller와 데이터와 파일 데이터 연동
+        public int lastHours; // 8
+        public int firstHours; // 4
         public int lastMinutes; // 8
         public int firstMinutes; // 4
         public int lastSeconds; // 59
         public int firstSeconds; // 0
+        public int currentHours; // 0
         public int currentMinutes; // 0
         public int currentSeconds; // 0
         private int immutablefirstMinutes; // 4
         private int immutablelastMinutes; // 4
+        private int immutablefirstHours; // 4
+        private int immutablelastHours; // 4
 
         // timecontroller 사용제어
         private bool available = false;
@@ -195,13 +200,13 @@ namespace DTBGEmulator
                 int loopI;
                 if (currEvent)
                 {
-                    defingI = currentMinutes - immutablefirstMinutes;
-                    loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutablefirstMinutes);
+                    defingI = (currentMinutes + (currentHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60));
+                    loopI = (lastMinutes + (lastHours * 60)) - (firstMinutes + (firstHours * 60)) + 1 + ((firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60)));
                 }
                 else
                 {
-                    defingI = firstMinutes - immutablefirstMinutes;
-                    loopI = lastMinutes - firstMinutes + 1 + (firstMinutes - immutablefirstMinutes);
+                    defingI = (firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60));
+                    loopI = (lastMinutes + (lastHours * 60)) - (firstMinutes + (firstHours * 60)) + 1 + ((firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60)));
                 }
                 for (int i = defingI; i < loopI; i++)
                     {
@@ -209,6 +214,7 @@ namespace DTBGEmulator
                     Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
 
                     int count = 0;
+                    int count1 = 0;
                     int loopJ = sixty;
                     int defingK = 0;
                     int loopK = kvp.Value.Count / 60 + 1;
@@ -250,19 +256,26 @@ namespace DTBGEmulator
                         stopwatch.Reset();
                         stopwatch.Start();
 
-                        int getStart = timeController.StartTime;
-                        int getEnd = timeController.EndTime;
-                        int getCurr = Convert.ToInt32(timeController.CurrTime);
-                        getCurr = getCurr += 1;
-                        if (getCurr > getEnd)
-                        {
-                            timeController.CurrTime = getStart.ToString();
-                            // 여기~~~~~
-                            break; // 루프를 중지하고 다음 while 루프로 이동
-                        }
-                        timeController.CurrTime = getCurr.ToString();
 
-                        for (int k = defingK; k < loopK; k++)
+                        count1++;
+                        if (filecontrol == count1)
+                        {
+                            int getStart = timeController.StartTime;
+                            int getEnd = timeController.EndTime;
+                            int getCurr = Convert.ToInt32(timeController.CurrTime);
+                            getCurr = getCurr += 1;
+                            if (getCurr > getEnd)
+                            {
+                                timeController.CurrTime = getStart.ToString();
+                                // 여기~~~~~
+                                break; // 루프를 중지하고 다음 while 루프로 이동
+                            }
+                            timeController.CurrTime = getCurr.ToString();
+                            count1 = count1 - filecontrol;
+                        }
+
+                        int sendFileNumber = (kvp.Value.Count / 60 + 1) / filecontrol;
+                        for (int k = defingK; k < sendFileNumber; k++)
                         {
                             try
                             {
@@ -348,6 +361,7 @@ namespace DTBGEmulator
             // TimeSpan을 다시 문자열로 변환
             string incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
 
+            currentMinutes = Convert.ToInt32(currentTime.ToString(@"hh"));
             currentMinutes = Convert.ToInt32(currentTime.ToString(@"mm"));
             currentSeconds = Convert.ToInt32(currentTime.ToString(@"ss"));
 
@@ -424,8 +438,12 @@ namespace DTBGEmulator
 
             lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
             firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            lastHours = Convert.ToInt32(dateEndTime.ToString("HH"));
+            firstHours = Convert.ToInt32(dateStartTime.ToString("HH"));
             immutablefirstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
             immutablelastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
+            immutablefirstHours = Convert.ToInt32(dateStartTime.ToString("HH"));
+            immutablelastHours = Convert.ToInt32(dateEndTime.ToString("HH"));
 
             timeController.StartFileTime = timeControllerStartTime;
             timeController.EndFileTime = timeControllerEndTime;
@@ -472,63 +490,90 @@ namespace DTBGEmulator
             currTimeText.Text = timeControllerCurrText;
         }
 
-        private async void addFolderBtn_Click(object sender, EventArgs e)
+        private void addFolderBtn_Click(object sender, EventArgs e)
         {
             // 쓰레드 실행중이면 정지
-            //if (udpSenderThread != null && udpSenderThread.IsAlive)
-            //{
-            //    udpSenderThread.Abort();
-            //}
-            //// addFileBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
-            //fileDatatest.SelectFile();
-            //// 선택된 파일의 데이터를 읽어와서 사용하거나 저장할 수 있음
-            ////dto = fileDatatest.GenerateDataDTO();
-            //takenTime = dto.takenTime;
+            if (udpSenderThread != null && udpSenderThread.IsAlive)
+            {
+                udpSenderThread.Abort();
+            }
+            timeController.First = true;
+            FolderData.Instance.SelectFolder();
+            Thread dataLoadThread = new Thread(() => FolderData.Instance.LoadFile());
+            dataLoadThread.Start();
+            startTime = FolderData.Instance.FirstFileName;
+            endTime = FolderData.Instance.LastFileName;
+            firstFileName.Text = $"{startTime}";
+            lastFileName.Text = $"{endTime}";
+            fileLocation.Text = FolderData.Instance.FolderPath;
+            // fileCount = dto.FileCount;
+            takenTime = FolderData.Instance.TakenTime;
+
+            // "yyyyMMdd HHmm" 형식으로 변환
+            string formattedStartDateTime = startTime.Substring(0, 4) + startTime.Substring(5, 2) + startTime.Substring(8, 2) + " " + startTime.Substring(11, 4);
+            string formattedEndDateTime = endTime.Substring(0, 4) + endTime.Substring(5, 2) + endTime.Substring(8, 2) + " " + endTime.Substring(11, 4);
+
+            // 주어진 형식의 문자열을 DateTime으로 파싱
+            DateTime dateStartTime = DateTime.ParseExact(formattedStartDateTime, "yyyyMMdd HHmm", null);
+            DateTime dateEndTime = DateTime.ParseExact(formattedEndDateTime, "yyyyMMdd HHmm", null);
+
+            // 새로운 형식의 문자열로 변환
+            string formattedStartTime = dateStartTime.ToString("yyyy.MM.dd. HH:mm:ss");
+            string formattedEndTime = dateEndTime.ToString("yyyy.MM.dd. HH:mm");
+            timeControllerStartTime = dateStartTime.ToString("HH : mm : ss");
+            timeControllerEndTime = dateEndTime.ToString("HH : mm ") + ": 59";
+
+            startTimeData.Text = formattedStartTime;
+            endTimeData.Text = formattedEndTime + ":59";
+
+            lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
+            firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            immutablefirstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
+            immutablelastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
+
+            timeController.StartFileTime = timeControllerStartTime;
+            timeController.EndFileTime = timeControllerEndTime;
+
+            int hours = takenTime / 60;
+            int minutes = takenTime % 60;
+            if (hours <= 0)
+            {
+                fullTimeData.Text = $"{minutes}분";
+            }
+            else
+            {
+                fullTimeData.Text = $"{hours}시간 {minutes}분";
+            }
+
+            firstSeconds = 0;
+            lastSeconds = 59;
+
+            // 버튼 설정
+            UpdateButtonState("stop");
+
+            // 비동기 로드 후
+            filePackets = FolderData.Instance.FolderDataDictionary;
+            packetCount = filePackets.Count;
+            Console.WriteLine("패킷메인" + packetCount);
+
+            int fileNum = FolderData.Instance.SelectedFileCount;
+            currTime = "00 : 00 : 00";
+            string totalTimeNum = $"{fileNum * 60 - 1}";
+
+            timeController.TotalTime = totalTimeNum;
+
+            timeController.CurrTime = ChangeTimeToStrSec(currTime);
+
+            timeController.StartRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime));
+            timeController.EndRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerEndTime));
 
 
-            //await fileDatatest.LoadFile();
-            ////dto = fileDatatest.GenerateDataDTO();
-            //filePackets = fileDatatest.FileDataDictionary;
-            //// 버튼 설정
-            //UpdateButtonState("stop");
+            Console.WriteLine(ChangeTimeToStrSec(currTime));
+            Console.WriteLine(ChangeTimeToStrSec(timeControllerStartTime));
+            Console.WriteLine(ChangeTimeToStrSec(timeControllerEndTime));
 
-            //packetCount = filePackets.Count;
-            //Console.WriteLine("패킷메인" + packetCount);
-
-            //// 쓰레드 실행중이면 정지
-            //if (udpSenderThread != null && udpSenderThread.IsAlive)
-            //{
-            //    udpSenderThread.Abort();
-            //}
-            //// addFolderBtn 클릭 시 FileData 클래스의 SelectFile 메서드 호출
-            //folderData.SelectFolder();
-
-            //dto = folderData.GenerateDataDTO();
-            //if (dto != null)
-            //{
-            //    filePackets = dto.FilePackets;
-            //    packetCount = filePackets.Count;
-
-            //    startTime = dto.FirstFileName;
-            //    endTime = dto.LastFileName;
-            //    fileLocation.Text = $"데이터 정보\r\n시작 시간 : {startTime}\r\n종료시간 : {endTime}\r\n용량 : {storageSize}";
-
-
-            //    int fileNum = dto.FileCount;
-            //    currTime = "00:00:00";
-            //    string totalTimeNum = $"{fileNum * 60}";
-
-            //    timeController.TotalTime = totalTimeNum;
-            //    timeController.CurrTime = ChangeTimeToStrSec(currTime);
-
-            //    // 버튼 설정
-            //    UpdateButtonState("stop");
-            //}
-            //else
-            //{
-            //    // null일 때의 처리
-            //    Console.WriteLine("파일을 선택해주세요.");
-            //}
+            timeControllerCurrText = timeControllerStartTime;
+            currTimeText.Text = timeControllerCurrText;
 
         }
 
@@ -552,6 +597,7 @@ namespace DTBGEmulator
             int minutes = (totalSeconds % 3600) / 60;
             int seconds = totalSeconds % 60;
 
+            currentHours = hours;
             currentMinutes = minutes;
             currentSeconds = seconds;
             string timeString = $"{hours:D2} : {minutes:D2} : {seconds:D2}";
@@ -564,8 +610,6 @@ namespace DTBGEmulator
             int updatecurrTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime)) + Convert.ToInt32(currTime);
 
             currTimeText.Text = ChangeSecToTime(updatecurrTime);
-
-
         }
 
         
@@ -584,14 +628,16 @@ namespace DTBGEmulator
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1 / 10, 1 / 4, 1 / 2, 1, 2, 4, 10, 20, 800 };
-            int[] dustTimeValues = { 1 / 10, 1 / 4, 1 / 2, 10, 10, 10, 10, 10, 0 };
+            int[] speedValues = { 1, 1, 1, 1, 2, 4, 10, 20, 800 };
+            int[] fileValues = { 10, 4, 2, 1, 1, 1, 1, 1, 1 };
+            int[] dustTimeValues = { 10, 10, 10, 10, 10, 10, 10, 10, 0 };
 
             // 선택된 인덱스를 이용하여 데이터 속도 설정
             if (speedComboBox.SelectedIndex >= 0 && speedComboBox.SelectedIndex < speedValues.Length)
             {
                 dataSpeed = speedValues[speedComboBox.SelectedIndex];
                 dustTime = dustTimeValues[speedComboBox.SelectedIndex];
+                filecontrol = fileValues[speedComboBox.SelectedIndex];
             }
 
             if (speedComboBox.SelectedIndex >= 4)

@@ -65,6 +65,7 @@
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label15 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -77,7 +78,6 @@
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
-            this.label15 = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -223,9 +223,9 @@
             "속도 (1.0x)",
             "속도 (2.0x)",
             "속도 (4.0x)",
-            "속도 (8.0x)",
-            "속도 (16.0x)",
-            "속도 (32.0x)"});
+            "속도 (10.0x)",
+            "속도 (20.0x)",
+            "속도 (max)"});
             this.speedComboBox.Location = new System.Drawing.Point(7, 11);
             this.speedComboBox.Name = "speedComboBox";
             this.speedComboBox.Size = new System.Drawing.Size(93, 20);
@@ -491,6 +491,16 @@
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
             // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.ForeColor = System.Drawing.Color.Black;
+            this.label15.Location = new System.Drawing.Point(83, 82);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(44, 12);
+            this.label15.TabIndex = 28;
+            this.label15.Text = "label15";
+            // 
             // label14
             // 
             this.label14.AutoSize = true;
@@ -579,6 +589,7 @@
             this.timeController.StartFileTime = "00 : 00 : 00";
             this.timeController.StartRepeatTime = 0;
             this.timeController.TabIndex = 18;
+            this.timeController.UseController = false;
             // 
             // timer_progress
             // 
@@ -595,16 +606,6 @@
             this.dataViewTextBox.Size = new System.Drawing.Size(540, 380);
             this.dataViewTextBox.TabIndex = 7;
             this.dataViewTextBox.Visible = false;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.ForeColor = System.Drawing.Color.Black;
-            this.label15.Location = new System.Drawing.Point(83, 82);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(44, 12);
-            this.label15.TabIndex = 28;
-            this.label15.Text = "label15";
             // 
             // MainForm
             // 
