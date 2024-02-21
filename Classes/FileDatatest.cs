@@ -23,12 +23,18 @@ namespace DTBGEmulator.Classes
         private string lastFileName;
         private int takenTime;
         private SortedDictionary<string, List<string>> fileDataDictionary;
+        private SortedDictionary<string, List<string>> fileDataDictionaryVirtual;
 
 
         string formattedStartTime;
         string formattedEndTime;
         string timeControllerStartTime;
         string timeControllerEndTime;
+
+        // virtual
+        private string firstFileTime;
+        private string lastFileTime;
+        private List<string> fileTimes;
 
         #endregion 변수 정의
         #region 프로퍼티 정의
@@ -62,6 +68,12 @@ namespace DTBGEmulator.Classes
             set { fileDataDictionary = value; }
         }
 
+        public SortedDictionary<string, List<string>> FileDataDictionaryVirtual
+        {
+            get { return fileDataDictionaryVirtual; }
+            set { fileDataDictionaryVirtual = value; }
+        }
+
         #endregion 프로퍼티 정의
         private FileDatatest() { }
 
@@ -76,10 +88,31 @@ namespace DTBGEmulator.Classes
                 return instance;
             }
         }
+
+        public void PopulateVirtualDictionary()
+        {
+            // 새로운 SortedDictionary 생성
+            fileDataDictionaryVirtual = new SortedDictionary<string, List<string>>(fileDataDictionary);
+
+            // fileTimes 리스트값 중에 fileDataDictionary의 key값이 아닌 값을 찾아서 처리
+            foreach (string time in fileTimes)
+            {
+                if (!fileDataDictionary.ContainsKey(time))
+                {
+                    // fileDataDictionary에 포함되지 않은 키를 가진 경우 빈 리스트를 값으로 설정
+                    //fileDataDictionaryVirtual[time] = new List<string>(Enumerable.Repeat("", 60));
+                    fileDataDictionaryVirtual[time] = new List<string>();
+                }
+            }
+            Console.WriteLine(fileDataDictionaryVirtual);
+        }
+
+
+
         /// <summary>
         /// 파일 열고 메타데이터 추출
         /// </summary>
-        public void SelectFile()
+        public bool SelectFile()
         {
             using (var openFileDialog = new OpenFileDialog())
             {
@@ -98,6 +131,15 @@ namespace DTBGEmulator.Classes
 
                     // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
                     takenTime = CalculateTimeDifference(firstFileName, lastFileName);
+
+                    // 사이 시간 계산
+                    CalculateFileTimes();
+
+                    return true; // 파일이 선택되었음을 알림
+                }
+                else
+                {
+                    return false; // 파일이 선택되지 않았음을 알림
                 }
             }
         }
@@ -107,6 +149,8 @@ namespace DTBGEmulator.Classes
             // 파일 이름에서 시간 부분을 추출하여 분 단위로 변환
             int firstTimeInMinutes = ExtractTimeInMinutes(firstFileName);
             int lastTimeInMinutes = ExtractTimeInMinutes(lastFileName);
+            firstFileTime = ExtractHourMinute(firstFileName);
+            lastFileTime = ExtractHourMinute(lastFileName);
 
             // 시간 차이를 절대값으로 반환
             return Math.Abs(lastTimeInMinutes - firstTimeInMinutes) + 1;
@@ -122,6 +166,36 @@ namespace DTBGEmulator.Classes
             return hour * 60 + minute;
         }
 
+        private string ExtractHourMinute(string fileName)
+        {
+            // 파일 이름에서 숫자 부분을 추출하여 시간과 분으로 나누고 분 단위로 계산
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
+            string keyStr = new string(fileNameParts[1].Where(char.IsDigit).ToArray());
+            int key = int.Parse(keyStr);
+
+            return keyStr;
+        }
+
+        private void CalculateFileTimes()
+        {
+            fileTimes = new List<string>();
+
+            // 처음 선택된 파일의 시간부터 마지막 선택된 파일의 시간까지 순회하며 시간을 추가
+            int firstTime = int.Parse(firstFileTime);
+            int lastTime = int.Parse(lastFileTime);
+            for (int time = firstTime; time <= lastTime; time++)
+            {
+                // 시간 포맷에 맞게 변환하여 리스트에 추가
+                string timeString = time.ToString().PadLeft(4, '0');
+                if (timeString.EndsWith("60")) // 60분이면 다음 시간으로 넘어가야 함
+                {
+                    time += 40; // 60분이면 00으로 가기 위해 40을 더함 (다음 시간인 00분까지 40분)
+                    timeString = time.ToString().PadLeft(4, '0');
+                }
+                fileTimes.Add(timeString);
+            }
+        }
+
         /// <summary>
         /// 데이터 메모리 저장
         /// </summary>
@@ -129,6 +203,7 @@ namespace DTBGEmulator.Classes
         public bool LoadFile()
         {
             fileDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
+            fileDataDictionaryVirtual = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             // 각 파일에 대한 처리를 위해 반복
             try
             {
@@ -136,6 +211,8 @@ namespace DTBGEmulator.Classes
                 {
                     ProcessFile(filePath);
                 }
+                PopulateVirtualDictionary();
+
                 return true;
             }
             catch (Exception e)
@@ -205,5 +282,6 @@ namespace DTBGEmulator.Classes
 
             return packets;
         }
+
     }
 }

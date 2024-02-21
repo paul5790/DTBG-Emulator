@@ -83,12 +83,14 @@ namespace DTBGEmulator
 
         // 파일, 폴더 데이터
         private SortedDictionary<string, List<string>> filePackets;
+        private SortedDictionary<string, List<string>> fullFilePackets;
         private Dictionary<string, List<List<string>>> filePacketsData;
         private int fileCount;
         private int takenTime;
         private int packetCount;
         private string startTime;
         private string endTime;
+        private int fileNum;
 
 
         // 데이터 재생
@@ -192,7 +194,9 @@ namespace DTBGEmulator
             {
                 // 코드 실행 시작 시간 기록
                 int sixty = 60;
-                int keyCount = filePackets.Count;
+                // int keyCount = fullFilePackets.Count; // dict의 key갯수
+                int keyCount = filePackets.Count; // dict의 key갯수
+
                 int keyIndex = 1; // 첫 번째 키부터 시작
                 //foreach (var kvp in filePackets)
                 //for (int i = 0; i < takenTime; i++)
@@ -210,6 +214,7 @@ namespace DTBGEmulator
                 }
                 for (int i = defingI; i < loopI; i++)
                     {
+                    // var kvp = fullFilePackets.ElementAt(i);
                     var kvp = filePackets.ElementAt(i);
                     Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
 
@@ -400,25 +405,21 @@ namespace DTBGEmulator
             setting.ShowDialog();
         }
 
-        // 파일 데이터 처리
-        private void addFileBtn_Click(object sender, EventArgs e)
-        {
-            // 쓰레드 실행중이면 정지
-            if (udpSenderThread != null && udpSenderThread.IsAlive)
-            {
-                udpSenderThread.Abort();
-            }
-            timeController.First = true;
-            FileDatatest.Instance.SelectFile();
-            Thread dataLoadThread = new Thread(() => FileDatatest.Instance.LoadFile());
-            dataLoadThread.Start();
-            startTime = FileDatatest.Instance.FirstFileName;
-            endTime = FileDatatest.Instance.LastFileName;
-            firstFileName.Text = $"{startTime}";
-            lastFileName.Text = $"{endTime}";
-            // fileCount = dto.FileCount;
-            takenTime = FileDatatest.Instance.TakenTime;
 
+        private void SetTimeControllerData(DateTime dateStartTime, DateTime dateEndTime)
+        {
+            lastMinutes = dateEndTime.Minute;
+            firstMinutes = dateStartTime.Minute;
+            immutablefirstMinutes = dateStartTime.Minute;
+            immutablelastMinutes = dateEndTime.Minute;
+            lastHours = dateEndTime.Hour;
+            firstHours = dateStartTime.Hour;
+            immutablefirstHours = dateStartTime.Hour;
+            immutablelastHours = dateEndTime.Hour;
+        }
+
+        private void SetTimeFormatSetting()
+        {
             // "yyyyMMdd HHmm" 형식으로 변환
             string formattedStartDateTime = startTime.Substring(0, 4) + startTime.Substring(5, 2) + startTime.Substring(8, 2) + " " + startTime.Substring(11, 4);
             string formattedEndDateTime = endTime.Substring(0, 4) + endTime.Substring(5, 2) + endTime.Substring(8, 2) + " " + endTime.Substring(11, 4);
@@ -436,18 +437,11 @@ namespace DTBGEmulator
             startTimeData.Text = formattedStartTime;
             endTimeData.Text = formattedEndTime + ":59";
 
-            lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
-            firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
-            lastHours = Convert.ToInt32(dateEndTime.ToString("HH"));
-            firstHours = Convert.ToInt32(dateStartTime.ToString("HH"));
-            immutablefirstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
-            immutablelastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
-            immutablefirstHours = Convert.ToInt32(dateStartTime.ToString("HH"));
-            immutablelastHours = Convert.ToInt32(dateEndTime.ToString("HH"));
+            SetTimeControllerData(dateStartTime, dateEndTime);
+        }
 
-            timeController.StartFileTime = timeControllerStartTime;
-            timeController.EndFileTime = timeControllerEndTime;
-
+        private void SetFullTimeData()
+        {
             int hours = takenTime / 60;
             int minutes = takenTime % 60;
             if (hours <= 0)
@@ -461,33 +455,64 @@ namespace DTBGEmulator
 
             firstSeconds = 0;
             lastSeconds = 59;
+        }
 
-            // 버튼 설정
-            UpdateButtonState("stop");
-
-            // 비동기 로드 후
-            filePackets = FileDatatest.Instance.FileDataDictionary;
+        private void SetTimeControllerValue()
+        {
             packetCount = filePackets.Count;
-            Console.WriteLine("패킷메인" + packetCount);
-
-            int fileNum = FileDatatest.Instance.SelectedFileCount;
             currTime = "00 : 00 : 00";
             string totalTimeNum = $"{fileNum * 60 - 1}";
 
             timeController.TotalTime = totalTimeNum;
-
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
 
             timeController.StartRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime));
             timeController.EndRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerEndTime));
 
-
-            Console.WriteLine(ChangeTimeToStrSec(currTime));
-            Console.WriteLine(ChangeTimeToStrSec(timeControllerStartTime));
-            Console.WriteLine(ChangeTimeToStrSec(timeControllerEndTime));
-
             timeControllerCurrText = timeControllerStartTime;
             currTimeText.Text = timeControllerCurrText;
+        }
+
+
+        // 파일 데이터 처리
+        private void addFileBtn_Click(object sender, EventArgs e)
+        {
+
+            bool fileSelected = FileDatatest.Instance.SelectFile();
+            // 파일이 선택되었을 때만 쓰레드를 생성하고 시작
+            if (fileSelected)
+            {
+                // 쓰레드 실행중이면 정지
+                if (udpSenderThread != null && udpSenderThread.IsAlive)
+                {
+                    udpSenderThread.Abort();
+                }
+                timeController.First = true;
+
+                Thread dataLoadThread = new Thread(() => FileDatatest.Instance.LoadFile());
+                dataLoadThread.Start();
+            }
+
+            startTime = FileDatatest.Instance.FirstFileName;
+            endTime = FileDatatest.Instance.LastFileName;
+            takenTime = FileDatatest.Instance.TakenTime;
+
+            SetTimeFormatSetting();
+
+            firstFileName.Text = $"{startTime}";
+            lastFileName.Text = $"{endTime}";
+            timeController.StartFileTime = timeControllerStartTime;
+            timeController.EndFileTime = timeControllerEndTime;
+
+            SetFullTimeData();
+
+            // 버튼 설정
+            UpdateButtonState("stop");
+
+            filePackets = FileDatatest.Instance.FileDataDictionary;
+            fileNum = FileDatatest.Instance.SelectedFileCount;
+
+            SetTimeControllerValue();
         }
 
         private void addFolderBtn_Click(object sender, EventArgs e)
@@ -501,80 +526,33 @@ namespace DTBGEmulator
             FolderData.Instance.SelectFolder();
             Thread dataLoadThread = new Thread(() => FolderData.Instance.LoadFile());
             dataLoadThread.Start();
+
             startTime = FolderData.Instance.FirstFileName;
             endTime = FolderData.Instance.LastFileName;
-            firstFileName.Text = $"{startTime}";
-            lastFileName.Text = $"{endTime}";
             fileLocation.Text = FolderData.Instance.FolderPath;
-            // fileCount = dto.FileCount;
             takenTime = FolderData.Instance.TakenTime;
 
-            // "yyyyMMdd HHmm" 형식으로 변환
-            string formattedStartDateTime = startTime.Substring(0, 4) + startTime.Substring(5, 2) + startTime.Substring(8, 2) + " " + startTime.Substring(11, 4);
-            string formattedEndDateTime = endTime.Substring(0, 4) + endTime.Substring(5, 2) + endTime.Substring(8, 2) + " " + endTime.Substring(11, 4);
+            SetTimeFormatSetting();
 
-            // 주어진 형식의 문자열을 DateTime으로 파싱
-            DateTime dateStartTime = DateTime.ParseExact(formattedStartDateTime, "yyyyMMdd HHmm", null);
-            DateTime dateEndTime = DateTime.ParseExact(formattedEndDateTime, "yyyyMMdd HHmm", null);
-
-            // 새로운 형식의 문자열로 변환
-            string formattedStartTime = dateStartTime.ToString("yyyy.MM.dd. HH:mm:ss");
-            string formattedEndTime = dateEndTime.ToString("yyyy.MM.dd. HH:mm");
-            timeControllerStartTime = dateStartTime.ToString("HH : mm : ss");
-            timeControllerEndTime = dateEndTime.ToString("HH : mm ") + ": 59";
-
-            startTimeData.Text = formattedStartTime;
-            endTimeData.Text = formattedEndTime + ":59";
-
-            lastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
-            firstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
-            immutablefirstMinutes = Convert.ToInt32(dateStartTime.ToString("mm"));
-            immutablelastMinutes = Convert.ToInt32(dateEndTime.ToString("mm"));
-
+            firstFileName.Text = $"{startTime}";
+            lastFileName.Text = $"{endTime}";
             timeController.StartFileTime = timeControllerStartTime;
             timeController.EndFileTime = timeControllerEndTime;
 
-            int hours = takenTime / 60;
-            int minutes = takenTime % 60;
-            if (hours <= 0)
-            {
-                fullTimeData.Text = $"{minutes}분";
-            }
-            else
-            {
-                fullTimeData.Text = $"{hours}시간 {minutes}분";
-            }
-
-            firstSeconds = 0;
-            lastSeconds = 59;
-
-            // 버튼 설정
+            SetFullTimeData();
             UpdateButtonState("stop");
 
-            // 비동기 로드 후
             filePackets = FolderData.Instance.FolderDataDictionary;
-            packetCount = filePackets.Count;
-            Console.WriteLine("패킷메인" + packetCount);
+            fileNum = FolderData.Instance.SelectedFileCount;
 
-            int fileNum = FolderData.Instance.SelectedFileCount;
-            currTime = "00 : 00 : 00";
-            string totalTimeNum = $"{fileNum * 60 - 1}";
+            SetTimeControllerValue();
+        }
 
-            timeController.TotalTime = totalTimeNum;
-
-            timeController.CurrTime = ChangeTimeToStrSec(currTime);
-
-            timeController.StartRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerStartTime));
-            timeController.EndRepeatTime = Convert.ToInt32(ChangeTimeToStrSec(timeControllerEndTime));
-
-
-            Console.WriteLine(ChangeTimeToStrSec(currTime));
-            Console.WriteLine(ChangeTimeToStrSec(timeControllerStartTime));
-            Console.WriteLine(ChangeTimeToStrSec(timeControllerEndTime));
-
-            timeControllerCurrText = timeControllerStartTime;
-            currTimeText.Text = timeControllerCurrText;
-
+        private string FormatDateTime(string dateTime)
+        {
+            string formattedDateTime = dateTime.Substring(0, 4) + dateTime.Substring(5, 2) + dateTime.Substring(8, 2) + " " + dateTime.Substring(11, 4);
+            DateTime date = DateTime.ParseExact(formattedDateTime, "yyyyMMdd HHmm", null);
+            return date.ToString("yyyy.MM.dd. HH:mm:ss");
         }
 
 
@@ -696,6 +674,30 @@ namespace DTBGEmulator
                 this.Size = new Size(570, 400);
             }
         }
+
+
+        private void whiteSpaceCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dataViewCheckBox.Checked)
+            {
+                string totalTimeNum = $"{fileNum * 60 - 1}";
+                timeController.TotalTime = totalTimeNum;
+            }
+            else
+            {
+                fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
+                string totalTimeNum = $"{fullFilePackets.Count * 60 - 1}";
+                timeController.TotalTime = totalTimeNum;
+                Console.WriteLine("fullFilePackets의 데이터:");
+
+                foreach (var kvp in fullFilePackets)
+                {
+                    Console.WriteLine($"{kvp.Key}: {kvp.Value.Count}");
+                }
+            }
+        }
+
+
 
         #region 동작 버튼 이벤트 (시작, 일시정지, 정지)
         private void UpdateButtonState(string newState)
@@ -877,5 +879,11 @@ namespace DTBGEmulator
             mMousePosition = Point.Empty;
         }
         #endregion 상단바 드래그
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FileDatatest.Instance.PopulateVirtualDictionary();
+        }
+
     }
 }

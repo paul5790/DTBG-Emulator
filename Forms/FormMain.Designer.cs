@@ -65,8 +65,6 @@
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -78,6 +76,8 @@
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.whiteSpaceCheckBox = new System.Windows.Forms.CheckBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -477,8 +477,8 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.label15);
-            this.panel4.Controls.Add(this.label14);
+            this.panel4.Controls.Add(this.whiteSpaceCheckBox);
+            this.panel4.Controls.Add(this.button1);
             this.panel4.Controls.Add(this.label16);
             this.panel4.Controls.Add(this.label13);
             this.panel4.Controls.Add(this.label12);
@@ -490,26 +490,6 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.ForeColor = System.Drawing.Color.Black;
-            this.label15.Location = new System.Drawing.Point(83, 82);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(44, 12);
-            this.label15.TabIndex = 28;
-            this.label15.Text = "label15";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.ForeColor = System.Drawing.Color.Black;
-            this.label14.Location = new System.Drawing.Point(24, 72);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(44, 12);
-            this.label14.TabIndex = 27;
-            this.label14.Text = "label14";
             // 
             // label16
             // 
@@ -559,7 +539,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.label2.Location = new System.Drawing.Point(376, 82);
+            this.label2.Location = new System.Drawing.Point(182, 78);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 12);
             this.label2.TabIndex = 20;
@@ -569,7 +549,7 @@
             // 
             this.currTimeText.AutoSize = true;
             this.currTimeText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
-            this.currTimeText.Location = new System.Drawing.Point(470, 83);
+            this.currTimeText.Location = new System.Drawing.Point(276, 79);
             this.currTimeText.Name = "currTimeText";
             this.currTimeText.Size = new System.Drawing.Size(65, 12);
             this.currTimeText.TabIndex = 19;
@@ -606,6 +586,30 @@
             this.dataViewTextBox.Size = new System.Drawing.Size(540, 380);
             this.dataViewTextBox.TabIndex = 7;
             this.dataViewTextBox.Visible = false;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(10, 65);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 27;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // whiteSpaceCheckBox
+            // 
+            this.whiteSpaceCheckBox.AutoSize = true;
+            this.whiteSpaceCheckBox.Checked = true;
+            this.whiteSpaceCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.whiteSpaceCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.whiteSpaceCheckBox.Location = new System.Drawing.Point(443, 77);
+            this.whiteSpaceCheckBox.Name = "whiteSpaceCheckBox";
+            this.whiteSpaceCheckBox.Size = new System.Drawing.Size(76, 16);
+            this.whiteSpaceCheckBox.TabIndex = 28;
+            this.whiteSpaceCheckBox.Text = "공백 제거";
+            this.whiteSpaceCheckBox.UseVisualStyleBackColor = true;
+            this.whiteSpaceCheckBox.CheckedChanged += new System.EventHandler(this.whiteSpaceCheckBox_CheckedChanged);
             // 
             // MainForm
             // 
@@ -694,8 +698,8 @@
         private System.Windows.Forms.CheckBox dataViewCheckBox;
         private System.Windows.Forms.TextBox dataViewTextBox;
         private UserControls.TimeController timeController;
-        public System.Windows.Forms.Label label14;
-        public System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox whiteSpaceCheckBox;
     }
 }
 

@@ -446,7 +446,6 @@ namespace DTBGEmulator.UserControls
                         int seconds = startAction % 60;
                         mainForm.firstMinutes = minutes;
                         mainForm.firstSeconds = seconds;
-                        mainForm.label14.Text = minutes.ToString();
 
                         panel_Middle.Invalidate();
 
@@ -498,7 +497,6 @@ namespace DTBGEmulator.UserControls
                         int seconds = endAction % 60;
                         mainForm.lastSeconds = seconds;
                         mainForm.lastMinutes = minutes;
-                        mainForm.label15.Text = minutes.ToString();
                         panel_Middle.Invalidate();
                     }
                 }
