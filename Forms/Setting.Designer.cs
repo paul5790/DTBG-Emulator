@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.settings = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.shipPort = new System.Windows.Forms.TextBox();
@@ -49,20 +48,6 @@
             this.panelTop_Setting.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.SuspendLayout();
-            // 
-            // settings
-            // 
-            this.settings.AutoSize = true;
-            this.settings.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.settings.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.settings.Location = new System.Drawing.Point(139, 4);
-            this.settings.Name = "settings";
-            this.settings.Size = new System.Drawing.Size(57, 12);
-            this.settings.TabIndex = 3;
-            this.settings.Text = "settings";
-            this.settings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.settings_MouseDown);
-            this.settings.MouseMove += new System.Windows.Forms.MouseEventHandler(this.settings_MouseMove);
-            this.settings.MouseUp += new System.Windows.Forms.MouseEventHandler(this.settings_MouseUp);
             // 
             // tabControl1
             // 
@@ -178,7 +163,6 @@
             // 
             this.panelTop_Setting.BackColor = System.Drawing.Color.DimGray;
             this.panelTop_Setting.Controls.Add(this.pictureBox_Close);
-            this.panelTop_Setting.Controls.Add(this.settings);
             this.panelTop_Setting.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop_Setting.Location = new System.Drawing.Point(0, 0);
             this.panelTop_Setting.Name = "panelTop_Setting";
@@ -232,7 +216,6 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.panelTop_Setting.ResumeLayout(false);
-            this.panelTop_Setting.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).EndInit();
             this.ResumeLayout(false);
 
@@ -240,7 +223,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Label settings;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox shipIP;

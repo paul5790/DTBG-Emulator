@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+	<Values>
+		<UpdateInterval>100.00</UpdateInterval>
+		<FileSavedInterval>60.00</FileSavedInterval>
+
+		<CommunicationType>UDP</CommunicationType>
+
+		<MqttBorkerIP>112.217.163.10</MqttBorkerIP>
+		<MqttBorkerPortNum>1883</MqttBorkerPortNum>
+		<MqttUserName>MTIE4.XINNOS_STAS</MqttUserName>
+		<MqttPassword></MqttPassword>
+
+		<UdpTargetIP>192.168.0.55</UdpTargetIP>
+		<UdpTargetPortNum>12345</UdpTargetPortNum>
+		<UdpStasPortNum>9999</UdpStasPortNum>
+		<UdpTimeout>1000</UdpTimeout>
+	</Values>
+</Settings>

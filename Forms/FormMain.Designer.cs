@@ -31,19 +31,12 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panelTop = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_Close = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.settingBtn = new System.Windows.Forms.Button();
             this.dataInfoText = new System.Windows.Forms.Label();
             this.dataInfo = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel7 = new System.Windows.Forms.Panel();
             this.speedComboBox = new System.Windows.Forms.ComboBox();
-            this.runBtn = new System.Windows.Forms.Button();
-            this.pauseBtn = new System.Windows.Forms.Button();
-            this.stopBtn = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.panel6 = new System.Windows.Forms.Panel();
             this.fullTimeData = new System.Windows.Forms.TextBox();
@@ -65,29 +58,33 @@
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.whiteSpaceCheckBox = new System.Windows.Forms.CheckBox();
             this.label16 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.currTimeText = new System.Windows.Forms.Label();
-            this.timeController = new DTBGEmulator.UserControls.TimeController();
             this.timer_update = new System.Windows.Forms.Timer(this.components);
             this.timer_progress = new System.Windows.Forms.Timer(this.components);
             this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.whiteSpaceCheckBox = new System.Windows.Forms.CheckBox();
+            this.runBtn = new System.Windows.Forms.Button();
+            this.pauseBtn = new System.Windows.Forms.Button();
+            this.stopBtn = new System.Windows.Forms.Button();
+            this.settingBtn = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_Close = new System.Windows.Forms.PictureBox();
+            this.timeController = new DTBGEmulator.UserControls.TimeController();
             this.panelTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
-            this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel7.SuspendLayout();
             this.panel6.SuspendLayout();
             this.panel5.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.SuspendLayout();
             // 
             // panelTop
@@ -105,28 +102,6 @@
             this.panelTop.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panelTop_MouseMove);
             this.panelTop.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panelTop_MouseUp);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::DTBGEmulator.Properties.Resources.KrisoLogo;
-            this.pictureBox1.Location = new System.Drawing.Point(10, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(70, 30);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 6;
-            this.pictureBox1.TabStop = false;
-            // 
-            // pictureBox_Close
-            // 
-            this.pictureBox_Close.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pictureBox_Close.Image = global::DTBGEmulator.Properties.Resources.close;
-            this.pictureBox_Close.Location = new System.Drawing.Point(535, 0);
-            this.pictureBox_Close.Name = "pictureBox_Close";
-            this.pictureBox_Close.Size = new System.Drawing.Size(35, 30);
-            this.pictureBox_Close.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox_Close.TabIndex = 5;
-            this.pictureBox_Close.TabStop = false;
-            this.pictureBox_Close.Click += new System.EventHandler(this.pictureBox_Close_Click);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -141,35 +116,11 @@
             this.label1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.label1_MouseMove);
             this.label1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.label1_MouseUp);
             // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.panel2.Controls.Add(this.settingBtn);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 30);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(570, 35);
-            this.panel2.TabIndex = 1;
-            // 
-            // settingBtn
-            // 
-            this.settingBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.cog;
-            this.settingBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.settingBtn.FlatAppearance.BorderSize = 0;
-            this.settingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.settingBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.settingBtn.Location = new System.Drawing.Point(535, 5);
-            this.settingBtn.Name = "settingBtn";
-            this.settingBtn.Size = new System.Drawing.Size(30, 30);
-            this.settingBtn.TabIndex = 12;
-            this.settingBtn.UseVisualStyleBackColor = true;
-            this.settingBtn.Click += new System.EventHandler(this.settingBtn_Click);
-            // 
             // dataInfoText
             // 
             this.dataInfoText.AutoSize = true;
             this.dataInfoText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.dataInfoText.Location = new System.Drawing.Point(298, 0);
+            this.dataInfoText.Location = new System.Drawing.Point(298, 30);
             this.dataInfoText.Name = "dataInfoText";
             this.dataInfoText.Size = new System.Drawing.Size(69, 12);
             this.dataInfoText.TabIndex = 2;
@@ -187,6 +138,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.settingBtn);
             this.panel1.Controls.Add(this.panel7);
             this.panel1.Controls.Add(this.label9);
             this.panel1.Controls.Add(this.panel6);
@@ -194,9 +146,9 @@
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.dataInfoText);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 65);
+            this.panel1.Location = new System.Drawing.Point(0, 30);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(570, 191);
+            this.panel1.Size = new System.Drawing.Size(570, 225);
             this.panel1.TabIndex = 5;
             // 
             // panel7
@@ -207,7 +159,7 @@
             this.panel7.Controls.Add(this.runBtn);
             this.panel7.Controls.Add(this.pauseBtn);
             this.panel7.Controls.Add(this.stopBtn);
-            this.panel7.Location = new System.Drawing.Point(300, 142);
+            this.panel7.Location = new System.Drawing.Point(295, 172);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(260, 44);
             this.panel7.TabIndex = 19;
@@ -232,57 +184,15 @@
             this.speedComboBox.TabIndex = 21;
             this.speedComboBox.SelectedIndexChanged += new System.EventHandler(this.speedComboBox_SelectedIndexChanged);
             // 
-            // runBtn
-            // 
-            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.run_c;
-            this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.runBtn.FlatAppearance.BorderSize = 0;
-            this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.runBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runBtn.Location = new System.Drawing.Point(108, -1);
-            this.runBtn.Name = "runBtn";
-            this.runBtn.Size = new System.Drawing.Size(45, 45);
-            this.runBtn.TabIndex = 15;
-            this.runBtn.UseVisualStyleBackColor = true;
-            this.runBtn.Click += new System.EventHandler(this.runBtn_Click);
-            // 
-            // pauseBtn
-            // 
-            this.pauseBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause_c;
-            this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pauseBtn.FlatAppearance.BorderSize = 0;
-            this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.pauseBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pauseBtn.Location = new System.Drawing.Point(159, -1);
-            this.pauseBtn.Name = "pauseBtn";
-            this.pauseBtn.Size = new System.Drawing.Size(45, 45);
-            this.pauseBtn.TabIndex = 16;
-            this.pauseBtn.UseVisualStyleBackColor = true;
-            this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
-            // 
-            // stopBtn
-            // 
-            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop_c;
-            this.stopBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.stopBtn.FlatAppearance.BorderSize = 0;
-            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stopBtn.Location = new System.Drawing.Point(210, -1);
-            this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(45, 45);
-            this.stopBtn.TabIndex = 17;
-            this.stopBtn.UseVisualStyleBackColor = true;
-            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label9.Location = new System.Drawing.Point(298, 126);
+            this.label9.Location = new System.Drawing.Point(298, 157);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(69, 12);
+            this.label9.Size = new System.Drawing.Size(93, 12);
             this.label9.TabIndex = 9;
-            this.label9.Text = "데이터 정보";
+            this.label9.Text = "에뮬레이터 제어";
             // 
             // panel6
             // 
@@ -294,7 +204,7 @@
             this.panel6.Controls.Add(this.startTimeData);
             this.panel6.Controls.Add(this.label7);
             this.panel6.Controls.Add(this.label8);
-            this.panel6.Location = new System.Drawing.Point(300, 16);
+            this.panel6.Location = new System.Drawing.Point(295, 46);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(260, 100);
             this.panel6.TabIndex = 8;
@@ -362,9 +272,9 @@
             this.panel5.Controls.Add(this.label4);
             this.panel5.Controls.Add(this.addFolderBtn);
             this.panel5.Controls.Add(this.addFileBtn);
-            this.panel5.Location = new System.Drawing.Point(15, 16);
+            this.panel5.Location = new System.Drawing.Point(15, 46);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(270, 170);
+            this.panel5.Size = new System.Drawing.Size(265, 170);
             this.panel5.TabIndex = 7;
             // 
             // fileLocation
@@ -444,7 +354,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label3.Location = new System.Drawing.Point(15, 0);
+            this.label3.Location = new System.Drawing.Point(15, 30);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(69, 12);
             this.label3.TabIndex = 4;
@@ -468,7 +378,7 @@
             this.panel3.Controls.Add(this.panel4);
             this.panel3.Controls.Add(this.dataInfo);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel3.Location = new System.Drawing.Point(0, 256);
+            this.panel3.Location = new System.Drawing.Point(0, 255);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(570, 145);
             this.panel3.TabIndex = 6;
@@ -478,7 +388,6 @@
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel4.Controls.Add(this.whiteSpaceCheckBox);
-            this.panel4.Controls.Add(this.button1);
             this.panel4.Controls.Add(this.label16);
             this.panel4.Controls.Add(this.label13);
             this.panel4.Controls.Add(this.label12);
@@ -490,6 +399,19 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
+            // 
+            // whiteSpaceCheckBox
+            // 
+            this.whiteSpaceCheckBox.AutoSize = true;
+            this.whiteSpaceCheckBox.Enabled = false;
+            this.whiteSpaceCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.whiteSpaceCheckBox.Location = new System.Drawing.Point(443, 77);
+            this.whiteSpaceCheckBox.Name = "whiteSpaceCheckBox";
+            this.whiteSpaceCheckBox.Size = new System.Drawing.Size(76, 16);
+            this.whiteSpaceCheckBox.TabIndex = 28;
+            this.whiteSpaceCheckBox.Text = "공백 제거";
+            this.whiteSpaceCheckBox.UseVisualStyleBackColor = true;
+            this.whiteSpaceCheckBox.CheckedChanged += new System.EventHandler(this.whiteSpaceCheckBox_CheckedChanged);
             // 
             // label16
             // 
@@ -555,22 +477,6 @@
             this.currTimeText.TabIndex = 19;
             this.currTimeText.Text = "88 : 88 : 88";
             // 
-            // timeController
-            // 
-            this.timeController.BackColor = System.Drawing.Color.White;
-            this.timeController.CurrTime = "0";
-            this.timeController.EndFileTime = "00 : 00 : 00";
-            this.timeController.EndRepeatTime = 0;
-            this.timeController.First = false;
-            this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.timeController.Location = new System.Drawing.Point(10, 15);
-            this.timeController.Name = "timeController";
-            this.timeController.Size = new System.Drawing.Size(510, 44);
-            this.timeController.StartFileTime = "00 : 00 : 00";
-            this.timeController.StartRepeatTime = 0;
-            this.timeController.TabIndex = 18;
-            this.timeController.UseController = false;
-            // 
             // timer_progress
             // 
             this.timer_progress.Interval = 1000;
@@ -583,33 +489,106 @@
             this.dataViewTextBox.Multiline = true;
             this.dataViewTextBox.Name = "dataViewTextBox";
             this.dataViewTextBox.ReadOnly = true;
+            this.dataViewTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.dataViewTextBox.Size = new System.Drawing.Size(540, 380);
             this.dataViewTextBox.TabIndex = 7;
             this.dataViewTextBox.Visible = false;
             // 
-            // button1
+            // runBtn
             // 
-            this.button1.Location = new System.Drawing.Point(10, 65);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 27;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.runBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.run_c;
+            this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.runBtn.FlatAppearance.BorderSize = 0;
+            this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.runBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runBtn.Location = new System.Drawing.Point(108, -1);
+            this.runBtn.Name = "runBtn";
+            this.runBtn.Size = new System.Drawing.Size(45, 45);
+            this.runBtn.TabIndex = 15;
+            this.runBtn.UseVisualStyleBackColor = true;
+            this.runBtn.Click += new System.EventHandler(this.runBtn_Click);
             // 
-            // whiteSpaceCheckBox
+            // pauseBtn
             // 
-            this.whiteSpaceCheckBox.AutoSize = true;
-            this.whiteSpaceCheckBox.Checked = true;
-            this.whiteSpaceCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.whiteSpaceCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.whiteSpaceCheckBox.Location = new System.Drawing.Point(443, 77);
-            this.whiteSpaceCheckBox.Name = "whiteSpaceCheckBox";
-            this.whiteSpaceCheckBox.Size = new System.Drawing.Size(76, 16);
-            this.whiteSpaceCheckBox.TabIndex = 28;
-            this.whiteSpaceCheckBox.Text = "공백 제거";
-            this.whiteSpaceCheckBox.UseVisualStyleBackColor = true;
-            this.whiteSpaceCheckBox.CheckedChanged += new System.EventHandler(this.whiteSpaceCheckBox_CheckedChanged);
+            this.pauseBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.pause_c;
+            this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pauseBtn.FlatAppearance.BorderSize = 0;
+            this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.pauseBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.pauseBtn.Location = new System.Drawing.Point(159, -1);
+            this.pauseBtn.Name = "pauseBtn";
+            this.pauseBtn.Size = new System.Drawing.Size(45, 45);
+            this.pauseBtn.TabIndex = 16;
+            this.pauseBtn.UseVisualStyleBackColor = true;
+            this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
+            // 
+            // stopBtn
+            // 
+            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop_c;
+            this.stopBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.stopBtn.FlatAppearance.BorderSize = 0;
+            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.stopBtn.Location = new System.Drawing.Point(210, -1);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(45, 45);
+            this.stopBtn.TabIndex = 17;
+            this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
+            // 
+            // settingBtn
+            // 
+            this.settingBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.settings_nn;
+            this.settingBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.settingBtn.FlatAppearance.BorderSize = 0;
+            this.settingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.settingBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.settingBtn.Location = new System.Drawing.Point(525, 8);
+            this.settingBtn.Name = "settingBtn";
+            this.settingBtn.Size = new System.Drawing.Size(30, 30);
+            this.settingBtn.TabIndex = 12;
+            this.settingBtn.UseVisualStyleBackColor = true;
+            this.settingBtn.Click += new System.EventHandler(this.settingBtn_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::DTBGEmulator.Properties.Resources.KrisoLogo;
+            this.pictureBox1.Location = new System.Drawing.Point(10, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(70, 30);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 6;
+            this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox_Close
+            // 
+            this.pictureBox_Close.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pictureBox_Close.Image = global::DTBGEmulator.Properties.Resources.close;
+            this.pictureBox_Close.Location = new System.Drawing.Point(535, 0);
+            this.pictureBox_Close.Name = "pictureBox_Close";
+            this.pictureBox_Close.Size = new System.Drawing.Size(35, 30);
+            this.pictureBox_Close.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox_Close.TabIndex = 5;
+            this.pictureBox_Close.TabStop = false;
+            this.pictureBox_Close.Click += new System.EventHandler(this.pictureBox_Close_Click);
+            // 
+            // timeController
+            // 
+            this.timeController.availableControl = false;
+            this.timeController.BackColor = System.Drawing.Color.White;
+            this.timeController.CurrTime = "0";
+            this.timeController.EndFileTime = "00 : 00 : 00";
+            this.timeController.EndRepeatTime = 0;
+            this.timeController.FileCount = 0;
+            this.timeController.First = false;
+            this.timeController.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeController.Location = new System.Drawing.Point(10, 15);
+            this.timeController.Name = "timeController";
+            this.timeController.Size = new System.Drawing.Size(510, 44);
+            this.timeController.StartFileTime = "00 : 00 : 00";
+            this.timeController.StartRepeatTime = 0;
+            this.timeController.TabIndex = 18;
+            this.timeController.UseController = false;
             // 
             // MainForm
             // 
@@ -621,7 +600,6 @@
             this.Controls.Add(this.dataViewTextBox);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.panel2);
             this.Controls.Add(this.panelTop);
             this.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -631,9 +609,6 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).EndInit();
-            this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel7.ResumeLayout(false);
@@ -645,6 +620,8 @@
             this.panel3.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -653,7 +630,6 @@
         #endregion
         private System.Windows.Forms.Panel panelTop;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button settingBtn;
         private System.Windows.Forms.Label dataInfoText;
         private System.Windows.Forms.Label dataInfo;
@@ -698,7 +674,6 @@
         private System.Windows.Forms.CheckBox dataViewCheckBox;
         private System.Windows.Forms.TextBox dataViewTextBox;
         private UserControls.TimeController timeController;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox whiteSpaceCheckBox;
     }
 }

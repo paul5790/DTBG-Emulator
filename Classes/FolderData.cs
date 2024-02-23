@@ -152,6 +152,7 @@ namespace DTBGEmulator.Classes
                 {
                     ProcessFile(filePath);
                 }
+
                 return true;
             }
             catch (Exception e)

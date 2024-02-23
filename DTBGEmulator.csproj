@@ -54,6 +54,7 @@
     <Compile Include="Classes\FileDatatest.cs" />
     <Compile Include="Classes\FolderData.cs" />
     <Compile Include="Classes\DTO\SettingDTO.cs" />
+    <Compile Include="Classes\SettingClass.cs" />
     <Compile Include="Forms\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +69,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\TimeController.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -82,14 +88,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="UserControls\TimeController.resx">
       <DependentUpon>TimeController.cs</DependentUpon>
     </EmbeddedResource>
@@ -157,6 +158,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\KrisoLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\Settings.xml" />
+    <None Include="Resources\settings_nn.png" />
+    <None Include="Resources\settings_n.png" />
+    <None Include="Resources\setting.png" />
+    <None Include="Resources\setting_c.png" />
+    <None Include="Resources\setting_n.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

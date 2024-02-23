@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DTBGEmulator.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,6 +15,12 @@ namespace DTBGEmulator.UserControls
     public partial class TimeController : UserControl
     {
         #region 변수 정의
+
+        // skipBar 제작
+        float skipBar = 0.0f;
+        int fileCount = 0;
+        public bool skipState = false;
+
         // 전체 시뮬레이션 시간 [sec]
         int startAction;
         int endAction;
@@ -22,8 +29,15 @@ namespace DTBGEmulator.UserControls
 
         public bool UseController { get; set; } = false;
         public bool First { get; set; } = true;
+        public bool availableControl { get; set; } = false;
         private string startFileTime = "00 : 00 : 00";
         private string endFileTime = "00 : 00 : 00";
+
+        public int FileCount
+        {
+            get { return fileCount; }
+            set { fileCount = value; }
+        }
 
         public string StartFileTime
         {
@@ -169,6 +183,11 @@ namespace DTBGEmulator.UserControls
             }
         }
 
+        public void InvalidatePanel()
+        {
+            panel_Middle.Invalidate();
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 초기화 함수
         private void DoInitialize()
@@ -178,8 +197,8 @@ namespace DTBGEmulator.UserControls
             mStartTime = 0;
             mEndTime = Convert.ToInt32(mTotalTime);
             mProgress = 0.0f;
-            PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
-            PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
+            PutTimeToTxtbox(mStartTime + Convert.ToInt32(StartRepeatTime), "StartTimeTxtbox");
+            PutTimeToTxtbox(mEndTime + Convert.ToInt32(StartRepeatTime), "EndTimeTxtbox");
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +230,6 @@ namespace DTBGEmulator.UserControls
                 label_Time_Total.Text = endFileTime;
                 PutTimeToTxtbox(startRepeatTime, "StartTimeTxtbox");
                 PutTimeToTxtbox(endRepeatTime, "EndTimeTxtbox");
-                First = false;
             }
 
             mRectCircle = new RectangleF(mHorizontalMargin + (panel_Middle.Width - 2 * mHorizontalMargin) * mProgress - mRadius, mTopMargin + mBarThickness / 2.0f - mRadius, 2 * mRadius, 2 * mRadius);
@@ -246,6 +264,35 @@ namespace DTBGEmulator.UserControls
                 graphics.FillEllipse(brushForeBar, mRectCircle);
                 graphics.SmoothingMode = SmoothingMode.Default;
             }
+            
+            if (First)
+            {
+                // rectRightOfCircle을 8등분하여 각 부분에 대한 너비 계산
+                skipBar = (mPointsEndTimeSelector[0].X - mHorizontalMargin) / fileCount;
+                First = false;
+            }
+
+            List<int> skipFile = new List<int>();
+            skipFile = FileDatatest.Instance.SkipFile;
+
+            foreach (int index in skipFile)
+            {
+                if (index > 0) // 인덱스가 범위 내에 있는지 확인합니다.
+                {
+                    RectangleF rectBlue = new RectangleF(mHorizontalMargin + (index) * skipBar, mTopMargin, skipBar, mBarThickness);
+                    using (SolidBrush brushBlue = new SolidBrush(Color.FromArgb(177, 177, 177)))
+                    {
+                        graphics.FillRectangle(brushBlue, rectBlue);
+                    }
+                }
+            }
+            
+            foreach (int fileTime in skipFile)
+            {
+                Console.WriteLine("빈파일" + fileTime);
+            }
+
+
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -396,8 +443,9 @@ namespace DTBGEmulator.UserControls
                         {
                             mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                         }
-                        threadRestart = true;
+                        mainForm.pauseMethod();
                         mainForm.currEvent = true;
+                        threadRestart = true;
                         panel_Middle.Invalidate();
                     }
 
@@ -440,6 +488,7 @@ namespace DTBGEmulator.UserControls
                                 mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                             }
                             threadRestart = true;
+                            mainForm.currEvent = true;
                         }
                         // MainForm의 test 변수를 TextBox에 표시
                         int minutes = (startAction % 3600) / 60;
@@ -492,6 +541,7 @@ namespace DTBGEmulator.UserControls
                                 mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                             }
                             threadRestart = true;
+                            mainForm.currEvent = true;
                         }
                         int minutes = (endAction % 3600) / 60;
                         int seconds = endAction % 60;
@@ -537,6 +587,7 @@ namespace DTBGEmulator.UserControls
         // StartTime 텍스트 박스 키 입력시 처리
         private void txtBox_StartTime_KeyPress(object sender, KeyPressEventArgs e)
         {
+            MainForm mainForm = this.FindForm() as MainForm;
             // StartTime 텍스트 박스의 입력 문자 제한 =============================================================================
             if (!(char.IsDigit(e.KeyChar) || e.KeyChar == Convert.ToChar(Keys.Back)))
             {
@@ -545,7 +596,7 @@ namespace DTBGEmulator.UserControls
                 {
                     try
                     {
-                        mStartTime = Convert.ToInt16(txtBox_StartTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_StartTime_mm.Text) * 60 + Convert.ToInt16(txtBox_StartTime_ss.Text);
+                        mStartTime = Convert.ToInt16(txtBox_StartTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_StartTime_mm.Text) * 60 + Convert.ToInt16(txtBox_StartTime_ss.Text) - startRepeatTime;
                     }
                     catch
                     {
@@ -568,11 +619,16 @@ namespace DTBGEmulator.UserControls
                         if (mTotalTime != string.Empty)
                             mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                        int realStartTime = startRepeatTime + mStartTime;
                         // StartTime 텍스트 박스 업데이트
-                        PutTimeToTxtbox(mStartTime, "StartTimeTxtbox");
+                        PutTimeToTxtbox(realStartTime, "StartTimeTxtbox");
 
                         // Circle 뒤로 밀고 가기 
                         mStartTimeRatio = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+
+                        mainForm.updateCurrTime(CurrTime);
+                        mainForm.currEvent = true;
+                        threadRestart = true;
 
                         if (mStartTimeRatio > mProgress)
                         {

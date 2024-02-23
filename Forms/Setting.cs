@@ -1,11 +1,13 @@
 ﻿using DTBGEmulator.Classes;
 using DTBGEmulator.Classes.DTO;
+using DTBGEmulator.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,8 +16,7 @@ namespace DTBGEmulator.Forms
 {
     public partial class Setting : Form
     {
-        SettingDTO dto = new SettingDTO();
-        SettingDTO settingDTO = new SettingDTO(); // SettingDTO 인스턴스
+        
         private string ipAddress = "192.168.0.11";
 
         // ip 설정 주소
@@ -34,8 +35,31 @@ namespace DTBGEmulator.Forms
 
         private void Setting_Load(object sender, EventArgs e)
         {
-            shipIP.Text = dto.shipIPAddress;
-            shipPort.Text = dto.shipPort;
+            GetValuesForControls();
+        }
+
+        private void GetValuesForControls()
+        {
+            SettingClass settings = SettingClass.GetInstance();
+
+            // UDP setting values ---------------------------------------------------------------------------------------------------------
+            // Get UDP IP address of Target
+            shipIP.Text = settings.UdpTargetIPAddress;
+            // Get port number of Target
+            shipPort.Text = settings.UdpTargetPortNum.ToString();
+
+        }
+
+        private void SetValuesFromControls()
+        {
+            SettingClass settings = SettingClass.GetInstance();
+
+            // UDP setting values ---------------------------------------------------------------------------------------------------------
+            // Set target IP address 
+            settings.UdpTargetIPAddress = shipIP.Text;
+            // Set target port numbers
+            settings.UdpTargetPortNum = int.Parse(shipPort.Text);
+            settings.SaveSettings();
         }
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
@@ -110,19 +134,17 @@ namespace DTBGEmulator.Forms
 
         private void button_Ok_Click(object sender, EventArgs e)
         {
-            dto.shipIPAddress = shipIP.Text;
-            controlIPAddress = controlIP.Text;
-            dto.shipPort = shipPort.Text;
-            controlPortAddress = controlPort.Text;
-            MessageBox.Show("설정이 완료되었습니다.");
-            shipIP.Text = dto.shipIPAddress;
-            shipPort.Text = dto.shipPort;
+            SetValuesFromControls();
+
+            // Close this form
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
-        public SettingDTO GenerateSettingDTO()
-        {
-            return dto;
-        }
+        //public SettingDTO GenerateSettingDTO()
+        //{
+        //    return dto;
+        //}
 
     }
 }
