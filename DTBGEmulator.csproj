@@ -161,6 +161,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Settings.xml" />
+    <None Include="Resources\settings_ccc.png" />
+    <None Include="Resources\settings_cc.png" />
+    <None Include="Resources\stopc_c.png" />
+    <None Include="Resources\stopc_n.png" />
+    <None Include="Resources\pausec_c.png" />
+    <None Include="Resources\pausec_n.png" />
+    <None Include="Resources\runc_c.png" />
+    <None Include="Resources\runc_n.png" />
     <None Include="Resources\settings_nn.png" />
     <None Include="Resources\settings_n.png" />
     <None Include="Resources\setting.png" />

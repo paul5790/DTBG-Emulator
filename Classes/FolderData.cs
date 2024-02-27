@@ -18,11 +18,19 @@ namespace DTBGEmulator.Classes
         private string firstFileName;
         private string lastFileName;
         private int takenTime;
+        private List<int> skipFile = new List<int>();
         private SortedDictionary<string, List<string>> folderDataDictionary;
+        private SortedDictionary<string, List<string>> folderDataDictionaryVirtual;
         private string folderPath;
 
         private string filePath;
-       
+
+        // virtual
+        private string firstFileTime;
+        private string lastFileTime;
+        private List<string> fileTimes;
+
+
         private List<string> filePackets;
         private string startDateStr;
         private string endDateStr;
@@ -70,6 +78,12 @@ namespace DTBGEmulator.Classes
             set { folderDataDictionary = value; }
         }
 
+        public SortedDictionary<string, List<string>> FolderDataDictionaryVirtual
+        {
+            get { return folderDataDictionaryVirtual; }
+            set { folderDataDictionaryVirtual = value; }
+        }
+
         #endregion 프로퍼티 정의
         private FolderData() { }
 
@@ -85,8 +99,15 @@ namespace DTBGEmulator.Classes
             }
         }
 
-        public void SelectFolder()
+        public bool SelectFolder()
         {
+            if (folderDataDictionaryVirtual != null && folderDataDictionaryVirtual.Count > 0)
+            {
+                filePaths = null;
+                firstFileName = "";
+                lastFileName = "";
+                folderDataDictionaryVirtual.Clear();
+            }
             // FolderBrowserDialog를 사용하여 폴더 선택
             using (var folderBrowserDialog = new FolderBrowserDialog())
             {
@@ -114,6 +135,15 @@ namespace DTBGEmulator.Classes
 
                     // 추가: List에 담긴 변수 갯수 (전체) 설정
                     totalPacketCount = allFilePackets.Count;
+
+                    // 사이 시간 계산
+                    CalculateFileTimes();
+
+                    return true; // 파일이 선택되었음을 알림
+                }
+                else
+                {
+                    return false; // 파일이 선택되지 않았음을 알림
                 }
             }
         }
@@ -123,6 +153,8 @@ namespace DTBGEmulator.Classes
             // 파일 이름에서 시간 부분을 추출하여 분 단위로 변환
             int firstTimeInMinutes = ExtractTimeInMinutes(firstFileName);
             int lastTimeInMinutes = ExtractTimeInMinutes(lastFileName);
+            firstFileTime = ExtractHourMinute(firstFileName);
+            lastFileTime = ExtractHourMinute(lastFileName);
 
             // 시간 차이를 절대값으로 반환
             return Math.Abs(lastTimeInMinutes - firstTimeInMinutes) + 1;
@@ -138,19 +170,62 @@ namespace DTBGEmulator.Classes
             return hour * 60 + minute;
         }
 
+        private string ExtractHourMinute(string fileName)
+        {
+            // 파일 이름에서 숫자 부분을 추출하여 시간과 분으로 나누고 분 단위로 계산
+            string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
+            string keyStr = new string(fileNameParts[1].Where(char.IsDigit).ToArray());
+            int key = int.Parse(keyStr);
+
+            return keyStr;
+        }
+
+        private void CalculateFileTimes()
+        {
+            fileTimes = new List<string>();
+
+            // 처음 선택된 파일의 시간부터 마지막 선택된 파일의 시간까지 순회하며 시간을 추가
+            int firstTime = int.Parse(firstFileTime);
+            int lastTime = int.Parse(lastFileTime);
+            for (int time = firstTime; time <= lastTime; time++)
+            {
+                // 시간 포맷에 맞게 변환하여 리스트에 추가
+                string timeString = time.ToString().PadLeft(4, '0');
+                if (timeString.EndsWith("60")) // 60분이면 다음 시간으로 넘어가야 함
+                {
+                    time += 40; // 60분이면 00으로 가기 위해 40을 더함 (다음 시간인 00분까지 40분)
+                    timeString = time.ToString().PadLeft(4, '0');
+                }
+                fileTimes.Add(timeString);
+            }
+        }
+
         /// <summary>
         /// 데이터 메모리 저장
         /// </summary>
         /// <returns></returns>
         public bool LoadFile()
         {
+            folderDataDictionaryVirtual = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             folderDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
+            skipFile.Clear();
             // 각 파일에 대한 처리를 위해 반복
             try
             {
                 foreach (string filePath in filePaths)
                 {
                     ProcessFile(filePath);
+                }
+                // fileTimes에는 있지만 filePaths의 fileName에 없는 경우에 대해 처리
+                int check = 0;
+                foreach (string fileTime in fileTimes)
+                {
+                    if (!folderDataDictionaryVirtual.ContainsKey(fileTime))
+                    {
+                        folderDataDictionaryVirtual.Add(fileTime, new List<string>()); // 빈 리스트 추가
+                        skipFile.Add(check);
+                    }
+                    check++;
                 }
 
                 return true;

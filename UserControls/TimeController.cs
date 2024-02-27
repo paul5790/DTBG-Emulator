@@ -16,6 +16,8 @@ namespace DTBGEmulator.UserControls
     {
         #region 변수 정의
 
+        
+
         // skipBar 제작
         float skipBar = 0.0f;
         int fileCount = 0;
@@ -251,9 +253,10 @@ namespace DTBGEmulator.UserControls
 
             
             using (SolidBrush brushGreen = new SolidBrush(Color.FromArgb(146, 208, 80)))
-            using (SolidBrush brushAftBar = new SolidBrush(Color.FromArgb(127, 127, 127)))
-            using (SolidBrush brushForeBar = new SolidBrush(Color.LightGray))
-            using (SolidBrush brushBackBar = new SolidBrush(Color.LightGray))
+            using (SolidBrush brushAftBar = new SolidBrush(Color.FromArgb(70, 146, 208, 80)))
+            using (SolidBrush brushcircle = new SolidBrush(Color.LightGray))
+            using (SolidBrush brushForeBar = new SolidBrush(Color.FromArgb(180, 180, 180)))
+            using (SolidBrush brushBackBar = new SolidBrush(Color.FromArgb(180, 180, 180)))
             {
                 graphics.FillRectangle(brushGreen, rectFore);
                 graphics.FillRectangle(brushForeBar, rectLeftOfCircle);
@@ -261,7 +264,7 @@ namespace DTBGEmulator.UserControls
                 graphics.FillRectangle(brushBackBar, rectBackBar);
 
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.FillEllipse(brushForeBar, mRectCircle);
+                graphics.FillEllipse(brushcircle, mRectCircle);
                 graphics.SmoothingMode = SmoothingMode.Default;
             }
             
@@ -280,7 +283,7 @@ namespace DTBGEmulator.UserControls
                 if (index > 0) // 인덱스가 범위 내에 있는지 확인합니다.
                 {
                     RectangleF rectBlue = new RectangleF(mHorizontalMargin + (index) * skipBar, mTopMargin, skipBar, mBarThickness);
-                    using (SolidBrush brushBlue = new SolidBrush(Color.FromArgb(177, 177, 177)))
+                    using (SolidBrush brushBlue = new SolidBrush(Color.FromArgb(70, 177, 177, 177)))
                     {
                         graphics.FillRectangle(brushBlue, rectBlue);
                     }
@@ -398,23 +401,25 @@ namespace DTBGEmulator.UserControls
         // panel_Middle 마우스 다운 이벤트 발생시 처리
         private void panel_Middle_MouseDown(object sender, MouseEventArgs e)
         {
-            // Mainbar - StartTime Selector 마우스 다운시 처리 ===================================================================
-            if (mRegionStartTimeSelector.IsVisible(new PointF(e.X, e.Y)))
-            {
-                mIsStartTimeSelectorClicking = true;
-            }
 
-            // Mainbar - EndTime Selector 마우스 다운시 처리 =====================================================================
-            if (mRegionEndTimeSelector.IsVisible(new PointF(e.X, e.Y)))
-            {
-                mIsEndTimeSelectorClicking = true;
-            }
+                // Mainbar - StartTime Selector 마우스 다운시 처리 ===================================================================
+                if (mRegionStartTimeSelector.IsVisible(new PointF(e.X, e.Y)))
+                {
+                    mIsStartTimeSelectorClicking = true;
+                }
 
-            // Mainbar - Circle 마우스 다운시 처리 ===============================================================================
-            if (mRectCircle.Contains(new PointF(e.X, e.Y)) && !mIsStartTimeSelectorClicking && !mIsEndTimeSelectorClicking)
-            {
-                mIsCircleClicking = true;
-            }
+                // Mainbar - EndTime Selector 마우스 다운시 처리 =====================================================================
+                if (mRegionEndTimeSelector.IsVisible(new PointF(e.X, e.Y)))
+                {
+                    mIsEndTimeSelectorClicking = true;
+                }
+
+                // Mainbar - Circle 마우스 다운시 처리 ===============================================================================
+                if (mRectCircle.Contains(new PointF(e.X, e.Y)) && !mIsStartTimeSelectorClicking && !mIsEndTimeSelectorClicking)
+                {
+                    mIsCircleClicking = true;
+                }
+            
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,7 +427,7 @@ namespace DTBGEmulator.UserControls
 
         private void panel_Middle_MouseMove(object sender, MouseEventArgs e)
         {
-            if (true)
+            if (UseController)
             {
                 MainForm mainForm = this.FindForm() as MainForm;
                 if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
@@ -443,9 +448,10 @@ namespace DTBGEmulator.UserControls
                         {
                             mProgress = (e.X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
                         }
-                        mainForm.pauseMethod();
+                        // mainForm.pauseMethod();
                         mainForm.currEvent = true;
                         threadRestart = true;
+
                         panel_Middle.Invalidate();
                     }
 
@@ -543,6 +549,7 @@ namespace DTBGEmulator.UserControls
                             threadRestart = true;
                             mainForm.currEvent = true;
                         }
+
                         int minutes = (endAction % 3600) / 60;
                         int seconds = endAction % 60;
                         mainForm.lastSeconds = seconds;
