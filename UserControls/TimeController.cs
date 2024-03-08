@@ -30,6 +30,7 @@ namespace DTBGEmulator.UserControls
         private bool threadRestart = false;
 
         public bool UseController { get; set; } = false;
+        public bool TrueFile { get; set; } = false;
         public bool First { get; set; } = true;
         public bool availableControl { get; set; } = false;
         private string startFileTime = "00 : 00 : 00";
@@ -39,6 +40,12 @@ namespace DTBGEmulator.UserControls
         {
             get { return fileCount; }
             set { fileCount = value; }
+        }
+
+        public int StartAction
+        {
+            get { return startAction; }
+            set { startAction = value; }
         }
 
         public string StartFileTime
@@ -134,6 +141,7 @@ namespace DTBGEmulator.UserControls
         // 각종 크기 및 초기 설정
         private float mHorizontalMargin = 9.0f;
         private float mTopMargin = 18.0f;
+        private float mBarThickness1f = 2.0f;
         private float mBarThickness = 2.0f;
         private float mProgress = 0.0f; // Progress Rate [0.0 ~ 1.0]
         private float mRadius = 4.0f;
@@ -170,7 +178,7 @@ namespace DTBGEmulator.UserControls
 
             // Time Label 초기 텍스트 설정
             label_Time_Zero.Text = "00 : 00 : 00";
-            label_Time_Total.Text = "00 : 00 : 00";
+            label_Time_Total.Text = "01 : 00 : 00";
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,24 +255,14 @@ namespace DTBGEmulator.UserControls
             // 원 기준의 왼쪽 부분
             RectangleF rectLeftOfCircle = new RectangleF(mHorizontalMargin, mTopMargin, distanceBetweenSelectorAndCircle, mBarThickness); ;
             // 원을 기준으로 오른쪽 부분
-            RectangleF rectRightOfCircle = new RectangleF(mHorizontalMargin + foreBarLength, mTopMargin, aftBarLength, mBarThickness);
+            RectangleF rectRightOfCircle = new RectangleF(mHorizontalMargin + foreBarLength, mTopMargin, aftBarLength, mBarThickness1f);
             RectangleF rectAft = new RectangleF(mHorizontalMargin + foreBarLength, mTopMargin, aftBarLength, mBarThickness);
             RectangleF rectBackBar = new RectangleF(mHorizontalMargin + foreBarLength + aftBarLength, mTopMargin, backBarLength, mBarThickness);
 
-            
-            using (SolidBrush brushGreen = new SolidBrush(Color.FromArgb(146, 208, 80)))
-            using (SolidBrush brushAftBar = new SolidBrush(Color.FromArgb(70, 146, 208, 80)))
-            using (SolidBrush brushcircle = new SolidBrush(Color.LightGray))
-            using (SolidBrush brushForeBar = new SolidBrush(Color.FromArgb(180, 180, 180)))
-            using (SolidBrush brushBackBar = new SolidBrush(Color.FromArgb(180, 180, 180)))
+            using (SolidBrush brushGreen = new SolidBrush(Color.FromArgb(09, 215, 64)))
             {
                 graphics.FillRectangle(brushGreen, rectFore);
-                graphics.FillRectangle(brushForeBar, rectLeftOfCircle);
-                graphics.FillRectangle(brushAftBar, rectRightOfCircle);
-                graphics.FillRectangle(brushBackBar, rectBackBar);
-
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.FillEllipse(brushcircle, mRectCircle);
                 graphics.SmoothingMode = SmoothingMode.Default;
             }
             
@@ -276,25 +274,66 @@ namespace DTBGEmulator.UserControls
             }
 
             List<int> skipFile = new List<int>();
-            skipFile = FileDatatest.Instance.SkipFile;
-
-            foreach (int index in skipFile)
+            List<int> isFile = new List<int>();
+            if (TrueFile)
             {
-                if (index > 0) // 인덱스가 범위 내에 있는지 확인합니다.
+                skipFile = FileDatatest.Instance.SkipFile;
+                isFile = FileDatatest.Instance.IsFile;
+            }
+            else
+            {
+                skipFile = FolderData.Instance.SkipFile;
+                isFile = FolderData.Instance.IsFile;
+            }
+
+            if (skipFile != null && skipFile.Count > 0)
+            {
+                using (SolidBrush brushClear = new SolidBrush(Color.FromArgb(0, 255, 255, 255)))
                 {
-                    RectangleF rectBlue = new RectangleF(mHorizontalMargin + (index) * skipBar, mTopMargin, skipBar, mBarThickness);
-                    using (SolidBrush brushBlue = new SolidBrush(Color.FromArgb(70, 177, 177, 177)))
+                    graphics.FillRectangle(brushClear, rectRightOfCircle);
+                }
+                // 파일에 데이터가 있는 시간
+                foreach (int index in isFile)
+                {
+                    if (index >= 0) // 인덱스가 범위 내에 있는지 확인합니다.
                     {
-                        graphics.FillRectangle(brushBlue, rectBlue);
+                        RectangleF rectBlue = new RectangleF(mHorizontalMargin + (index) * skipBar, mTopMargin, skipBar, mBarThickness);
+                        using (SolidBrush brushAlphaGreen = new SolidBrush(Color.FromArgb(80, 18, 215, 69)))
+                        {
+                            graphics.FillRectangle(brushAlphaGreen, rectBlue);
+                        }
+                    }
+                }
+                // 파일에 데이터가 없는 시간
+                foreach (int index in skipFile)
+                {
+                    if (index > 0) // 인덱스가 범위 내에 있는지 확인합니다.
+                    {
+                        RectangleF rectBlue = new RectangleF(mHorizontalMargin + (index) * skipBar, mTopMargin, skipBar, mBarThickness);
+                        using (SolidBrush brushAlphaOrange = new SolidBrush(Color.FromArgb(231, 178, 0)))
+                        {
+                            graphics.FillRectangle(brushAlphaOrange, rectBlue);
+                        }
                     }
                 }
             }
-            
-            foreach (int fileTime in skipFile)
+            else
             {
-                Console.WriteLine("빈파일" + fileTime);
+                using (SolidBrush brushAftBar = new SolidBrush(Color.FromArgb(80, 18, 215, 69)))
+                {
+                    graphics.FillRectangle(brushAftBar, rectRightOfCircle);
+                }
             }
-
+            using (SolidBrush brushcircle = new SolidBrush(Color.FromArgb(09, 215, 64)))
+            //using (SolidBrush brushForeBar = new SolidBrush(Color.FromArgb(110, 118, 121)))
+            using (SolidBrush brushForeBar = new SolidBrush(Color.FromArgb(20, 20, 20)))
+            //using (SolidBrush brushBackBar = new SolidBrush(Color.FromArgb(110, 118, 121)))
+            using (SolidBrush brushBackBar = new SolidBrush(Color.FromArgb(20, 20, 20)))
+            {
+                graphics.FillRectangle(brushForeBar, rectLeftOfCircle);
+                graphics.FillRectangle(brushBackBar, rectBackBar);
+                graphics.FillEllipse(brushcircle, mRectCircle);
+            }
 
         }
 
@@ -312,7 +351,7 @@ namespace DTBGEmulator.UserControls
 
             mRegionStartTimeSelector = new Region(path);
 
-            using (SolidBrush brushSelector = new SolidBrush(Color.LightGray))
+            using (SolidBrush brushSelector = new SolidBrush(Color.FromArgb(09, 215, 64)))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.FillPolygon(brushSelector, mPointsStartTimeSelector);
@@ -334,7 +373,7 @@ namespace DTBGEmulator.UserControls
 
             mRegionEndTimeSelector = new Region(path);
 
-            using (SolidBrush brushSelector = new SolidBrush(Color.LightGray))
+            using (SolidBrush brushSelector = new SolidBrush(Color.FromArgb(09, 215, 64)))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.FillPolygon(brushSelector, mPointsEndTimeSelector);
@@ -497,8 +536,10 @@ namespace DTBGEmulator.UserControls
                             mainForm.currEvent = true;
                         }
                         // MainForm의 test 변수를 TextBox에 표시
+                        int hours = startAction / 3600;
                         int minutes = (startAction % 3600) / 60;
                         int seconds = startAction % 60;
+                        mainForm.firstHours = hours;
                         mainForm.firstMinutes = minutes;
                         mainForm.firstSeconds = seconds;
 
@@ -594,64 +635,85 @@ namespace DTBGEmulator.UserControls
         // StartTime 텍스트 박스 키 입력시 처리
         private void txtBox_StartTime_KeyPress(object sender, KeyPressEventArgs e)
         {
-            MainForm mainForm = this.FindForm() as MainForm;
-            // StartTime 텍스트 박스의 입력 문자 제한 =============================================================================
-            if (!(char.IsDigit(e.KeyChar) || e.KeyChar == Convert.ToChar(Keys.Back)))
+            if (UseController)
             {
-                // 엔터 입력시 처리 ==============================================================================================
-                if (e.KeyChar == Convert.ToChar(Keys.Enter))
+                MainForm mainForm = this.FindForm() as MainForm;
+                // StartTime 텍스트 박스의 입력 문자 제한 =============================================================================
+                if (!(char.IsDigit(e.KeyChar) || e.KeyChar == Convert.ToChar(Keys.Back)))
                 {
-                    try
+                    // 엔터 입력시 처리 ==============================================================================================
+                    if (e.KeyChar == Convert.ToChar(Keys.Enter))
                     {
-                        mStartTime = Convert.ToInt16(txtBox_StartTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_StartTime_mm.Text) * 60 + Convert.ToInt16(txtBox_StartTime_ss.Text) - startRepeatTime;
-                    }
-                    catch
-                    {
-                        return;
-                    }
-
-                    if (mTotalTime != string.Empty)
-                    {
-                        // StartTime Selector X 좌표 변경
-                        if ((float)(mEndTime - mStartTime) / Convert.ToInt32(mTotalTime) < mSelectorGap / (float)(panel_Middle.Width - 2 * mHorizontalMargin))
+                        try
                         {
-                            mPointsStartTimeSelector[0].X = mPointsEndTimeSelector[0].X - mSelectorGap;
+                            mStartTime = Convert.ToInt16(txtBox_StartTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_StartTime_mm.Text) * 60 + Convert.ToInt16(txtBox_StartTime_ss.Text) - startRepeatTime;
                         }
-                        else
+                        catch
                         {
-                            mPointsStartTimeSelector[0].X = (mStartTime / (float)Convert.ToInt32(mTotalTime)) * (panel_Middle.Width - 2 * mHorizontalMargin) + mHorizontalMargin;
+                            return;
                         }
 
-                        // StartTimeSelector의 X좌표로부터 mStartTime 계산
+                        // End Selector가 TotalTime을 초과하지 못하도록 제한
+                        if (mTotalTime != string.Empty && mStartTime < 0)
+                        {
+                            mStartTime = 0;
+                        }
+
                         if (mTotalTime != string.Empty)
-                            mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
-
-                        int realStartTime = startRepeatTime + mStartTime;
-                        // StartTime 텍스트 박스 업데이트
-                        PutTimeToTxtbox(realStartTime, "StartTimeTxtbox");
-
-                        // Circle 뒤로 밀고 가기 
-                        mStartTimeRatio = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
-
-                        mainForm.updateCurrTime(CurrTime);
-                        mainForm.currEvent = true;
-                        threadRestart = true;
-
-                        if (mStartTimeRatio > mProgress)
                         {
-                            mProgress = mStartTimeRatio;
+                            // StartTime Selector X 좌표 변경
+                            if ((float)(mEndTime - mStartTime) / Convert.ToInt32(mTotalTime) < mSelectorGap / (float)(panel_Middle.Width - 2 * mHorizontalMargin))
+                            {
+                                mPointsStartTimeSelector[0].X = mPointsEndTimeSelector[0].X - mSelectorGap;
+                            }
+                            else
+                            {
+                                mPointsStartTimeSelector[0].X = (mStartTime / (float)Convert.ToInt32(mTotalTime)) * (panel_Middle.Width - 2 * mHorizontalMargin) + mHorizontalMargin;
+                            }
+
+                            // StartTimeSelector의 X좌표로부터 mStartTime 계산
+                            if (mTotalTime != string.Empty)
+                                mStartTime = (int)Math.Round((mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
+
+                           
+                            startAction = startRepeatTime + mStartTime;
+                            // StartTime 텍스트 박스 업데이트
+                            PutTimeToTxtbox(startAction, "StartTimeTxtbox");
+
+                            int hours = startAction / 3600;
+                            int minutes = (startAction % 3600) / 60;
+                            int seconds = startAction % 60;
+                            mainForm.firstHours = hours;
+                            mainForm.firstMinutes = minutes;
+                            mainForm.firstSeconds = seconds;
+
+                            // Circle 뒤로 밀고 가기 
+                            mStartTimeRatio = (mPointsStartTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+
+                            mainForm.updateCurrTime(CurrTime);
+                            mainForm.currEvent = true;
+                            mainForm.threadRestart();
+
+                            if (mStartTimeRatio > mProgress)
+                            {
+                                mProgress = mStartTimeRatio;
+                            }
+
+                            panel_Middle.Invalidate();
+
+                            // 텍스트 박스의 Focus 제거
+                            this.ActiveControl = label_Time_Zero;
                         }
-
-                        panel_Middle.Invalidate();
-
-                        // 텍스트 박스의 Focus 제거
-                        this.ActiveControl = label_Time_Zero;
+                    }
+                    else
+                    {
+                        e.Handled = true;
                     }
                 }
-                else
-                {
-                    e.Handled = true;
-                }
+            }
+            else
+            {
+
             }
         }
 
@@ -659,6 +721,8 @@ namespace DTBGEmulator.UserControls
         // EndTime 텍스트 박스 키 입력시 처리
         private void txtBox_EndTime_KeyPress(object sender, KeyPressEventArgs e)
         {
+            MainForm mainForm = this.FindForm() as MainForm;
+            mainForm.currEvent = true;
             // StartTime 텍스트 박스의 입력 문자 제한 =============================================================================
             if (!(char.IsDigit(e.KeyChar) || e.KeyChar == Convert.ToChar(Keys.Back)))
             {
@@ -667,7 +731,7 @@ namespace DTBGEmulator.UserControls
                 {
                     try
                     {
-                        mEndTime = Convert.ToInt16(txtBox_EndTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_EndTime_mm.Text) * 60 + Convert.ToInt16(txtBox_EndTime_ss.Text);
+                        mEndTime = Convert.ToInt16(txtBox_EndTime_HH.Text) * 3600 + Convert.ToInt16(txtBox_EndTime_mm.Text) * 60 + Convert.ToInt16(txtBox_EndTime_ss.Text) - startRepeatTime;
                     }
                     catch
                     {
@@ -683,24 +747,34 @@ namespace DTBGEmulator.UserControls
                     if (mTotalTime != string.Empty)
                     {
                         // EndTime Selector X 좌표 변경
-                        if ((float)(mEndTime - mStartTime) / Convert.ToInt32(mTotalTime) < mSelectorGap / (float)(panel_Middle.Width - 2 * mHorizontalMargin))
+                        if ((float)(mEndTime- mStartTime) / Convert.ToInt32(mTotalTime) < mSelectorGap / (float)(panel_Middle.Width - 2 * mHorizontalMargin))
                         {
                             mPointsEndTimeSelector[0].X = mPointsStartTimeSelector[0].X + mSelectorGap;
                         }
                         else
                         {
-                            mPointsEndTimeSelector[0].X = (mEndTime / (float)Convert.ToInt32(mTotalTime)) * (panel_Middle.Width - 2 * mHorizontalMargin) + mHorizontalMargin;
+                            mPointsEndTimeSelector[0].X = (mEndTime/ (float)Convert.ToInt32(mTotalTime)) * (panel_Middle.Width - 2 * mHorizontalMargin) + mHorizontalMargin;
                         }
 
                         // EndTimeSelector의 X좌표로부터 mEndTime 계산
                         if (mTotalTime != string.Empty)
                             mEndTime = (int)Math.Round((mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin) * Convert.ToInt32(mTotalTime), 0);
 
+                        endAction = startRepeatTime + mEndTime;
                         // StartTime 텍스트 박스 업데이트
-                        PutTimeToTxtbox(mEndTime, "EndTimeTxtbox");
+                        PutTimeToTxtbox(endAction, "EndTimeTxtbox");
+
+                        int minutes = (endAction % 3600) / 60;
+                        int seconds = endAction % 60;
+                        mainForm.lastSeconds = seconds;
+                        mainForm.lastMinutes = minutes;
 
                         // Circle 앞으로 밀고 가기 
                         mEndTimeRatio = (mPointsEndTimeSelector[0].X - mHorizontalMargin) / (panel_Middle.Width - 2 * mHorizontalMargin);
+
+                        mainForm.updateCurrTime(CurrTime);
+                        mainForm.currEvent = true;
+                        mainForm.threadRestart();
 
                         if (mEndTimeRatio < mProgress)
                         {

@@ -121,8 +121,14 @@
   <data name="runc_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\runc_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="c_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\c_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fn_run" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fn_run.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="folderplus-outline" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\folderplus-outline.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -130,8 +136,11 @@
   <data name="play" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="run_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\run_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="n_run" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\n_run.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="closed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\closed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="fileplus-outline" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\fileplus-outline.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -139,8 +148,17 @@
   <data name="play-speed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\play-speed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="setting_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\setting_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="runc_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\runc_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="KrisoLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\KrisoLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fn_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fn_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="settings_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\settings_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -148,20 +166,35 @@
   <data name="run_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\run_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="settings_ccc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\settings_ccc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="settings_cc" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\settings_cc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="stop_nn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\stop_nn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="close" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="pause_nn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pause_nn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="run_nn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\run_nn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="stop_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stop_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="fc_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fc_pause.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="run_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\run_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="stopc_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stopc_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="n_stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\n_stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pausec_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pausec_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -169,20 +202,35 @@
   <data name="settings_nn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\settings_nn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="closed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\closed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="n_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\n_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="setting_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\setting_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="c_stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\c_stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="c_run" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\c_run.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="c_pause2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\c_pause2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pause_cc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pause_cc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="close" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pausec_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pausec_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="settings_cc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\settings_cc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="pause_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pause_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="runc_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\runc_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="stop_cc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\stop_cc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="closed_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\closed_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -190,8 +238,14 @@
   <data name="pause_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pause_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="square_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\square_n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="cog" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cog.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="run_cc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\run_cc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="stop_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stop_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -199,7 +253,7 @@
   <data name="stopc_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stopc_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="settings_ccc" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\settings_ccc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="square_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\square_c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

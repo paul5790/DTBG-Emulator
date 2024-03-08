@@ -35,6 +35,7 @@ namespace DTBGEmulator.Forms
 
         private void Setting_Load(object sender, EventArgs e)
         {
+
             GetValuesForControls();
         }
 
@@ -64,7 +65,7 @@ namespace DTBGEmulator.Forms
 
         private void pictureBox_Close_Click(object sender, EventArgs e)
         {
-            // Setting 폼을 닫음
+
             this.Close();
         }
 

@@ -27,25 +27,22 @@ namespace DTBGEmulator
     {
         #region 변수 정의
 
-        public int test = 0;
-
         private Setting setting = new Setting();
         SettingClass settingClass = SettingClass.GetInstance();
-
-        private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
 
         // 쓰레드 관련
         private Thread udpSenderThread;
 
+        // UI 관련
         private bool mDragForm = false;                     // 폼 이동 플래그
         private Point mMousePosition = Point.Empty;         // 마우스 위치
 
 
-        // 속도
+        // 데이터 속도
         private int dataSpeed;
         private int dustTime;
         private int filecontrol;
-        int invokeControl = 1;
+        int invokeControl = 1; // invoke 횟수제한
 
         // timecotroller 데이터   // "00 : 00 : 00"
         private string currTime;  
@@ -70,27 +67,27 @@ namespace DTBGEmulator
         private int immutablelastHours; // 4
 
         // timecontroller 사용제어
-        private bool available = false;
         public bool currEvent = false;
 
 
         // 파일, 폴더 데이터
         private bool trueFile;
-        private SortedDictionary<string, List<string>> filePackets;
-        private SortedDictionary<string, List<string>> fullFilePackets;
-        private SortedDictionary<string, List<string>> SendDictionary;
+        private SortedDictionary<string, List<string>> fullFilePackets; // 보낼 dictionary 데이터
         private int takenTime;
         private string startTime;
         private string endTime;
         private int fileNum;
 
         // skip 상태
-
         bool skipState = false;
         int skipTime = 0;
 
         // 데이터 재생
         private string runState = "stop";
+        private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
+
+        // 데이터 로딩
+        private int progressValue;
 
         #endregion 변수 정의
         public MainForm()
@@ -101,11 +98,10 @@ namespace DTBGEmulator
         private void MainForm_Load(object sender, EventArgs e)
         {
             currTime = "00 : 00 : 00";
-            TotalTime = "00 : 01 : 00";
+            TotalTime = "01 : 00 : 00";
 
             timeController.TotalTime = ChangeTimeToStrSec(TotalTime);
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
-            timer_update.Start();
 
             speedComboBox.SelectedIndex = 3;
 
@@ -115,20 +111,32 @@ namespace DTBGEmulator
 
         private void UpdateDataViewTextBox(string data)
         {
-            try
+            Console.WriteLine("데이터 길이 : " + data.Length);
+            if (data.Length > 10000)
             {
-                if (dataViewTextBox.InvokeRequired)
-                {
-                    dataViewTextBox.BeginInvoke((MethodInvoker)(() => { UpdateDataViewTextBox(data); }));
-                }
-                else
-                {
-                    dataViewTextBox.Text = data;
-                }
+                data = data.Substring(0, 5000);
             }
-            catch (Exception ex)
+            if (dataViewTextBox.InvokeRequired)
             {
-                Console.WriteLine($"Error updating dataViewTextBox: {ex.Message}");
+                dataViewTextBox.BeginInvoke((MethodInvoker)(() => { UpdateDataViewTextBox(data); }));
+            }
+            else
+            {
+                dataViewTextBox.Text = data;
+            }
+        }
+
+        private void UpdateLoadStateText(string text)
+        {
+            if (loadStateText.InvokeRequired)
+            {
+                loadStateText.Invoke((MethodInvoker)delegate {
+                    loadStateText.Text = text;
+                });
+            }
+            else
+            {
+                loadStateText.Text = text;
             }
         }
 
@@ -181,7 +189,6 @@ namespace DTBGEmulator
             if (trueFile) fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
             else fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
 
-            SendDictionary = fullFilePackets;
             int sleepTime = 1000;
             bool firstTime = true;
             // Stopwatch 객체 생성
@@ -212,164 +219,217 @@ namespace DTBGEmulator
                     defingI = (firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60));
                 }
 
-                if (skipState)
-                {
-                    // loopI = fileNum;
-                    loopI = (lastMinutes + (lastHours * 60)) - (firstMinutes + (firstHours * 60)) + 1 + ((firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60)));
-                }
-                else
-                {
-                    loopI = (lastMinutes + (lastHours * 60)) - (firstMinutes + (firstHours * 60)) + 1 + ((firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60)));
-                }
+
+                loopI = (lastMinutes + (lastHours * 60)) - (firstMinutes + (firstHours * 60)) + 1 + ((firstMinutes + (firstHours * 60)) - (immutablefirstMinutes + (immutablefirstHours * 60)));
 
 
-                // 파일단위 (defingI번째 파일부터 loopI번째 파일까지 loop)
-                for (int i = defingI; i < loopI; i++)
+                try
+                {
+                    // 파일단위 (defingI번째 파일부터 loopI번째 파일까지 loop)
+                    for (int i = defingI; i < loopI; i++)
                     {
-                    // var kvp = fullFilePackets.ElementAt(i);
-                    var kvp = fullFilePackets.ElementAt(i);
-                    Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
-                    // 만약 skip 상태면
-                    if(skipState == true)
-                    {
-                        // 만약 스킵된 곳에 진행바를 놓으면
-                        if (kvp.Value.Count == 0)
+                        // var kvp = fullFilePackets.ElementAt(i);
+                        var kvp = fullFilePackets.ElementAt(i);
+                        Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
+                        // 만약 skip 상태면
+                        if (skipState == true)
                         {
-                            if(keyFirst == 1 && !currEvent)
+                            // 만약 스킵된 곳에 진행바를 놓으면
+                            if (kvp.Value.Count == 0)
                             {
-                                currentSeconds = firstSeconds;
+                                if (keyFirst == 1 && !currEvent)
+                                {
+                                    timeController.CurrTime = (Convert.ToInt32(timeController.CurrTime) + 60 - currentSeconds).ToString();
+                                    currentSeconds = firstSeconds;
+                                    keyFirst++;
+                                }
+                                else if (currEvent)
+                                {
+                                    timeController.CurrTime = (Convert.ToInt32(timeController.CurrTime) + 60 - currentSeconds).ToString();
+                                    currentSeconds = 0;
+                                }
+                                else
+                                {
+                                    timeController.CurrTime = (Convert.ToInt32(timeController.CurrTime) + 60).ToString();
+                                    if(timeController.CurrTime == timeController.EndTime.ToString())
+                                    {
+                                        currEvent = true;
+                                        firstTime = true;
+                                        break;
+                                    }
+                                }
+
+                                // 파일값이 존재하는 index까지 계속 스킵
+                                keyIndex++;
+                                if (i == loopI - 1)
+                                {
+                                    timeController.CurrTime = "0";
+                                    currentMinutes = 0;
+                                }
+                                continue;
+                            }
+                            else
+                            {
                                 keyFirst++;
                             }
+                        }
 
-                            if (currEvent)
+                        int count = 0; // dictionary List의 index값
+                        int count1 = 0; // 저배속을 위한 타임 조절
+                        int loopJ = 60;
+                        int defingK = 0;
+                        int loopK;
+                        int slowSpeed;
+                        int oneSecond = 1000;
+                        if (kvp.Value.Count < 60) { 
+                            slowSpeed = 1;
+                            oneSecond = 1000 * filecontrol;
+                        }
+                        else { slowSpeed = filecontrol; }
+
+                        if (kvp.Value.Count % 60 == 0)
+                        {
+                            loopK = (kvp.Value.Count / 60) / slowSpeed;
+                        }
+                        else
+                        {
+                            loopK = (kvp.Value.Count / 60 + 1) / slowSpeed;
+                        }
+                        if (currEvent)
+                        {
+                            loopJ = 60 - currentSeconds;
+                            count = currentSeconds * loopK;
+                            currEvent = false;
+                        }
+                        else
+                        {
+                            if (keyIndex == 1) // 첫번째 루프인지
                             {
-                                timeController.CurrTime = (Convert.ToInt32(timeController.CurrTime) + 60 - currentSeconds).ToString();
-                                currentSeconds = 0;
+                                count = firstSeconds * loopK; // 초 * 1초당 보낼 갯수 = 시작 count 계산
+                                if (keyCount == keyIndex) // 총 파일 갯수 == 현재 진행중인 파일 순번 (마지막 파일인지)
+                                {
+                                    loopJ = lastSeconds - firstSeconds + 1; // 왜있는지 의문 까먹음.
+                                }
+                                else
+                                {                              // firstSeconds는 구간반복의 처음 Second(초)임
+                                    loopJ = 60 - firstSeconds; // 구간반복시간이 34초일때, 반복문을 60 - 34 번만 하기 위해.
+                                }
+                            }
+                            else if (i == keyCount - 1)
+                            {
+                                // 마지막 루프일때
+                                loopJ = lastSeconds + 1;
                             }
                             else
                             {
-                                timeController.CurrTime = (Convert.ToInt32(timeController.CurrTime) + 60).ToString();
+                                // 중간 루프일때
                             }
-
-                            // 파일값이 존재하는 index까지 계속 스킵
-                            keyIndex++;
-                            if(i == loopI - 1)
-                            {
-                                timeController.CurrTime = "0";
-                                currentMinutes = 0;
-                            }
-                            continue;
                         }
-                        else
+                        loopJ = loopJ * slowSpeed;
+                        for (int j = 0; j < loopJ; j++)
                         {
-                            keyFirst++;
-                        }
-                    }
+                            stopwatch.Reset();
+                            stopwatch.Start();
 
-                    int count = 0; // dictionary List의 index값
-                    int count1 = 0; // 저배속을 위한 타임 조절
-                    int loopJ = 60;
-                    int defingK = 0;
-                    int loopK = kvp.Value.Count / 60 + 1;
-                    if (currEvent)
-                    {
-                        loopJ = 60 - currentSeconds;
-                        count = currentSeconds * loopK;
-                        currEvent = false;
-                    }
-                    else
-                    {
-                        if (keyIndex == 1) // 첫번째 루프인지
-                        {
-                            count = firstSeconds * loopK; // 초 * 1초당 보낼 갯수 = 시작 count 계산
-                            if (keyCount == keyIndex) // 총 파일 갯수 == 현재 진행중인 파일 순번 (마지막 파일인지)
+                            stopwatch1.Reset();
+                            stopwatch1.Start();
+
+                            if (kvp.Value.Count > 0)
                             {
-                                loopJ = lastSeconds - firstSeconds + 1; // 왜있는지 의문 까먹음.
+                                int sendFileNumber;
+
+                                if (kvp.Value.Count % 60 == 0)
+                                {
+                                    sendFileNumber = (kvp.Value.Count / 60) / slowSpeed;
+                                }
+                                else
+                                {
+                                    sendFileNumber = (kvp.Value.Count / 60 + 1) / slowSpeed;
+                                }
+                                for (int k = defingK; k < sendFileNumber; k++)
+                                {
+                                    try
+                                    {
+                                        // Console.WriteLine(kvp.Value[count].ToString());
+                                        udpSender(kvp.Value[count].ToString(), setip, setport);
+
+                                        count++;
+                                    }
+                                    catch (ArgumentOutOfRangeException)
+                                    {
+                                        // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
+                                        Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
+                                        break; // for 루프를 중지하고 다음 키로 이동
+                                    }
+                                }
+                                Console.WriteLine(timeController.CurrTime);
+                                UpdateDataViewTextBox(kvp.Value[count - sendFileNumber].ToString());
                             }
                             else
-                            {                              // firstSeconds는 구간반복의 처음 Second(초)임
-                                loopJ = 60 - firstSeconds; // 구간반복시간이 34초일때, 반복문을 60 - 34 번만 하기 위해.
-                            }
-                        }
-                        else if (keyCount == keyIndex)
-                        {
-                            // 마지막 루프일때
-                            loopJ = lastSeconds + 1;
-                        }
-                        else
-                        {
-                            // 중간 루프일때
-                        }
-                    }
-                    for (int j = 0; j < loopJ; j++)
-                    {
-                        stopwatch1.Reset();
-                        stopwatch1.Start();
-                        stopwatch.Reset();
-                        stopwatch.Start();
-
-                        if (kvp.Value.Count > 0)
-                        {
-                            int sendFileNumber = (kvp.Value.Count / 60 + 1) / filecontrol;
-                            for (int k = defingK; k < sendFileNumber; k++)
                             {
-                                try
-                                {
-                                    // Console.WriteLine(kvp.Value[count].ToString());
-                                    udpSender(kvp.Value[count].ToString(), setip, setport);
-
-                                    count++;
-                                }
-                                catch (ArgumentOutOfRangeException)
-                                {
-                                    // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
-                                    Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
-                                    break; // for 루프를 중지하고 다음 키로 이동
-                                }
+                                UpdateDataViewTextBox("데이터 없음");
                             }
-                            Console.WriteLine(timeController.CurrTime);
-                            UpdateDataViewTextBox(kvp.Value[count - 1].ToString());
-                        }
-                        else
-                        {
-                            UpdateDataViewTextBox("");
-                        }
 
-                        if(!firstTime)
-                        {
+
+
                             count1++;
-                            if (filecontrol == count1)
+                            if (slowSpeed == count1)
                             {
                                 int getStart = timeController.StartTime;
                                 int getEnd = timeController.EndTime;
                                 int getCurr = Convert.ToInt32(timeController.CurrTime);
+                            if (!firstTime)
+                            {
                                 getCurr++;
-                                if (getCurr > getEnd)
+                            }
+                            else firstTime = false;
+                            if (getCurr > getEnd)
                                 {
                                     timeController.CurrTime = getStart.ToString();
-                                    break; // 루프를 중지하고 다음 while 루프로 이동
+                                    if (lastSeconds != 59 || lastMinutes != immutablelastMinutes)
+                                    {
+                                        firstTime = true;
+                                        break;
+                                    }
                                 }
-                                timeController.CurrTime = getCurr.ToString();
-                                count1 = count1 - filecontrol;
+                                else
+                                {
+                                    timeController.CurrTime = getCurr.ToString();
+                                }
+                                count1 = count1 - slowSpeed;
                             }
+
+
                             UpdateCurrTimeText();
+
+
+                            stopwatch.Stop();
+                            sleepTime = (oneSecond / dataSpeed - dustTime) - Convert.ToInt32(stopwatch.ElapsedMilliseconds);
+                            if (sleepTime <= 0) sleepTime = 0;
+                            Thread.Sleep(sleepTime);
+
+                            // 일시정지 여부 확인
+                            pauseEvent.WaitOne();
+                            stopwatch1.Stop();
+                            Console.WriteLine($"Code execution time: {stopwatch1.ElapsedMilliseconds} ms");
                         }
-                        else firstTime = false;
-
-                        stopwatch.Stop();
-                        sleepTime = (1000 / dataSpeed - dustTime) - Convert.ToInt32(stopwatch.ElapsedMilliseconds);
-                        if (sleepTime <= 0) sleepTime = 0;
-                        Thread.Sleep(sleepTime);
-
-
-                        // 일시정지 여부 확인
-                        pauseEvent.WaitOne();
-                        stopwatch1.Stop();
-                        //Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
-                        Console.WriteLine($"Code execution time: {stopwatch1.ElapsedMilliseconds} ms");
+                        if (firstTime) break;
+                        keyIndex++;
+                        if (keyIndex > keyCount) keyIndex = 1;
                     }
-                    keyIndex++;
-                    if (keyIndex > keyCount) keyIndex = 1;
+                }
+                catch(Exception ex) 
+                {
+                    if (ex is ThreadAbortException)
+                    {
+                        Console.WriteLine("Abort");
+                    }
+                    else
+                    {
+                        Console.WriteLine(ex.Message);
+                        MessageBox.Show(ex.Message);
+                        break;
+                    }
                 }
             }
         }
@@ -404,18 +464,10 @@ namespace DTBGEmulator
         private bool ShouldInvokeUpdate(int speed)
         {
             // dataSpeed에 따라서 조건에 따른 Invoke 호출 빈도 결정
-            if (speed >= 20)
-            {
-                return invokeControl % 4 == 0;
-            }
-            else if (speed >= 10 && speed < 20)
-            {
-                return invokeControl % 2 == 0;
-            }
-            else
-            {
-                return true;
-            }
+            if (speed > 20) return invokeControl % 15 == 0;
+            else if (speed == 20) return invokeControl % 5 == 0;
+            else if (speed >= 10 && speed < 20) return invokeControl % 2 == 0;
+            else return true;
         }
 
         /// <summary>
@@ -435,7 +487,7 @@ namespace DTBGEmulator
             // TimeSpan을 다시 문자열로 변환
             string incrementedTime = currentTime.ToString(@"hh' : 'mm' : 'ss");
 
-            currentMinutes = Convert.ToInt32(currentTime.ToString(@"hh"));
+            currentHours = Convert.ToInt32(currentTime.ToString(@"hh"));
             currentMinutes = Convert.ToInt32(currentTime.ToString(@"mm"));
             currentSeconds = Convert.ToInt32(currentTime.ToString(@"ss"));
 
@@ -551,6 +603,7 @@ namespace DTBGEmulator
             currTime = "00 : 00 : 00";
             string totalTimeNum = $"{takenTime * 60 - 1}";
             timeController.FileCount = takenTime;
+            timeController.First = true;
 
             timeController.TotalTime = totalTimeNum;
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
@@ -564,24 +617,42 @@ namespace DTBGEmulator
             whiteSpaceCheckBox.Enabled = true;
         }
 
-        private void LoadData()
+        private async void LoadFileData()
         {
+            timeController.UseController = false;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Reset();
             stopwatch.Start();
 
-            FileDatatest.Instance.LoadFile();
-
+            await FileDatatest.Instance.LoadFile();
 
             stopwatch.Stop();
             Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
-            int waitTime = FileDatatest.Instance.TakenTime * 250;
-            Thread.Sleep(waitTime);
             timeController.UseController = true;
-            filePackets = FileDatatest.Instance.FileDataDictionary;
-            if (trueFile) fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
-            else fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+            fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
             timeController.InvalidatePanel();
+            UpdateLoadStateText("로딩완료");
+            Console.WriteLine("파일 갯수 카운트" + fullFilePackets.Count);
+        }
+
+
+        private async void LoadFolderData()
+        {
+            timeController.UseController = false;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Reset();
+            stopwatch.Start();
+
+            await FolderData.Instance.LoadFile();
+
+            
+            stopwatch.Stop();
+            Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
+            timeController.UseController = true;
+            fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+            timeController.InvalidatePanel();
+            UpdateLoadStateText("로딩완료");
+            Console.WriteLine("파일 갯수 카운트" + fullFilePackets.Count);
         }
 
         /// <summary>
@@ -591,19 +662,22 @@ namespace DTBGEmulator
         /// <param name="e"></param>
         private void addFileBtn_Click(object sender, EventArgs e)
         {
-            trueFile = true;
+            fileLocation.Text = "";
             bool fileSelected = FileDatatest.Instance.SelectFile();
             // 파일이 선택되었을 때만 쓰레드를 생성하고 시작
             if (fileSelected)
             {
+                trueFile = true;
+                timeController.TrueFile = true;
+                loadStateText.Text = "로딩 중";
+
                 // 쓰레드 실행중이면 정지
                 if (udpSenderThread != null && udpSenderThread.IsAlive)
                 {
                     udpSenderThread.Abort();
                 }
-                timeController.First = true;
 
-                Thread dataLoadThread = new Thread(LoadData);
+                Thread dataLoadThread = new Thread(LoadFileData);
                 dataLoadThread.Start();
 
 
@@ -626,19 +700,32 @@ namespace DTBGEmulator
                 // 버튼 설정
                 UpdateButtonState("stop");
 
-                filePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
+                fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
                 fileNum = FileDatatest.Instance.SelectedFileCount;
 
                 SetTimeControllerValue();
+
+                // 데이터 로딩 확인
+
+                loadingProgressBar.Maximum = fileNum;
+                timer.Start();
+            }
+            else
+            {
+                MessageBox.Show("올바르지 않은 형식의 파일 선택입니다.");
+                UpdateButtonState("default");
             }
         }
 
         private void addFolderBtn_Click(object sender, EventArgs e)
         {
-            trueFile = false;
             bool folderSelected = FolderData.Instance.SelectFolder();
             if (folderSelected)
             {
+                timeController.TrueFile = false;
+                trueFile = false;
+                loadStateText.Text = "로딩 중";
+
                 // 쓰레드 실행중이면 정지
                 if (udpSenderThread != null && udpSenderThread.IsAlive)
                 {
@@ -646,8 +733,7 @@ namespace DTBGEmulator
                 }
                 timeController.First = true;
 
-                udpSenderThread = new Thread(UdpSenderThread);
-                Thread dataLoadThread = new Thread(() => FolderData.Instance.LoadFile());
+                Thread dataLoadThread = new Thread(LoadFolderData);
                 dataLoadThread.Start();
 
                 startTime = FolderData.Instance.FirstFileName;
@@ -669,10 +755,20 @@ namespace DTBGEmulator
 
                 UpdateButtonState("stop");
 
-                filePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+                fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
                 fileNum = FolderData.Instance.SelectedFileCount;
 
                 SetTimeControllerValue();
+
+                // 데이터 로딩 확인
+
+                loadingProgressBar.Maximum = fileNum;
+                timer.Start();
+            }
+            else
+            {
+                MessageBox.Show("올바르지 않은 형식의 파일 선택입니다.");
+                UpdateButtonState("default");
             }
         }
 
@@ -719,18 +815,6 @@ namespace DTBGEmulator
             currTimeText.Text = ChangeSecToTime(updatecurrTime);
         }
 
-        
-
-
-        // 타이머_프로그래스바 GUI 업데이트
-        //private void timer_update_Tick(object sender, EventArgs e)
-        //{
-        //    // 변환 시도
-        //    // currTimeText.Text = ChangeSecToTime(Convert.ToInt32(timeController.CurrTime));
-        //}
-
-        // 타이머_1초마다 프로그래스바 업데이트
-
         /// <summary>
         /// 속도 설정
         /// </summary>
@@ -739,7 +823,7 @@ namespace DTBGEmulator
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 각 인덱스에 대응하는 데이터 속도 배열
-            int[] speedValues = { 1, 1, 1, 1, 2, 4, 10, 20, 800 };
+            int[] speedValues = { 1, 1, 1, 1, 2, 4, 10, 20, 1000 };
             int[] fileValues = { 10, 4, 2, 1, 1, 1, 1, 1, 1 };
             int[] dustTimeValues = { 10, 10, 10, 10, 10, 10, 10, 10, 0 };
 
@@ -749,6 +833,12 @@ namespace DTBGEmulator
                 dataSpeed = speedValues[speedComboBox.SelectedIndex];
                 dustTime = dustTimeValues[speedComboBox.SelectedIndex];
                 filecontrol = fileValues[speedComboBox.SelectedIndex];
+                if (runState == "run")
+                {
+                    currEvent = true;
+                    updateCurrTime(timeController.CurrTime);
+                    threadRestart();
+                }
             }
 
             if (speedComboBox.SelectedIndex >= 4)
@@ -764,24 +854,9 @@ namespace DTBGEmulator
             }
         }
 
-        int seconds = 0;
-        private void timer_progress_Tick(object sender, EventArgs e)
-        {
-
-            seconds++;
-
-            // TimeSpan을 사용하여 초를 시:분:초 형태의 문자열로 변환
-            TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
-            string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
-
-            // 변환된 문자열을 UI에 표시
-            // realTime.Text = formattedTime;
-
-        }
-
         public void threadRestart()
         {
-            if (runState == "run")
+            if (udpSenderThread != null || udpSenderThread.IsAlive)
             {
                 udpSenderThread.Abort();
                 udpSenderThread.Join(); // 이전 스레드가 완전히 종료될 때까지 기다림
@@ -817,26 +892,15 @@ namespace DTBGEmulator
         {
             if (whiteSpaceCheckBox.Checked)
             {
-                // filePackets = FileDatatest.Instance.FileDataDictionary;
                 skipState = true;
                 timeController.skipState = true;
-                string totalTimeNum = $"{takenTime * 60 - 1}";
-                timeController.TotalTime = totalTimeNum;
                 SetFullTimeData(fileNum);
             }
             else
             {
                 skipState = false;
-                // fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
                 timeController.skipState = false;
-                string totalTimeNum = $"{takenTime * 60 - 1}";
-                timeController.TotalTime = totalTimeNum;
-                Console.WriteLine("fullFilePackets의 데이터:");
                 SetFullTimeData(takenTime);
-                //foreach (var kvp in fullFilePackets)
-                //{
-                //    Console.WriteLine($"{kvp.Key}: {kvp.Value.Count}");
-                //}
             }
             threadRestart();
         }
@@ -853,9 +917,9 @@ namespace DTBGEmulator
             {
                 case "default":
                     settingImageKey = "settings_nn";
-                    runImageKey = "runc_c";
-                    pauseImageKey = "pausec_c";
-                    stopImageKey = "stopc_c";
+                    runImageKey = "run_c";
+                    pauseImageKey = "pause_c";
+                    stopImageKey = "square_c";
                     settingEnabled = true;
                     runEnabled = false;
                     pauseEnabled = false;
@@ -864,9 +928,9 @@ namespace DTBGEmulator
                     break;
                 case "run":
                     settingImageKey = "settings_ccc";
-                    runImageKey = "runc_c";
-                    pauseImageKey = "pausec_n";
-                    stopImageKey = "stopc_n";
+                    runImageKey = "run_c";
+                    pauseImageKey = "pause_n";
+                    stopImageKey = "square_n";
                     settingEnabled = false;
                     runEnabled = false;
                     pauseEnabled = true;
@@ -875,9 +939,9 @@ namespace DTBGEmulator
                     break;
                 case "pause":
                     settingImageKey = "settings_ccc";
-                    runImageKey = "runc_n";
-                    pauseImageKey = "pausec_c";
-                    stopImageKey = "stopc_n";
+                    runImageKey = "run_n";
+                    pauseImageKey = "pause_c";
+                    stopImageKey = "square_n";
                     settingEnabled = false;
                     runEnabled = true;
                     pauseEnabled = false;
@@ -886,10 +950,10 @@ namespace DTBGEmulator
                     break;
                 case "stop":
                     settingImageKey = "settings_nn";
-                    runImageKey = "runc_n";
-                    pauseImageKey = "pausec_c";
-                    stopImageKey = "stopc_c";
-                    settingEnabled = false;
+                    runImageKey = "run_n";
+                    pauseImageKey = "pause_c";
+                    stopImageKey = "square_c";
+                    settingEnabled = true;
                     runEnabled = true;
                     pauseEnabled = false;
                     stopEnabled = false;
@@ -919,7 +983,6 @@ namespace DTBGEmulator
         {
             if (takenTime > 0)
             {
-                timer_progress.Start();
                 // 쓰레드가 실행 중이 아니라면 시작
                 if (udpSenderThread == null || !udpSenderThread.IsAlive)
                 {
@@ -945,7 +1008,6 @@ namespace DTBGEmulator
 
             if (runState == "run")
             {
-                timer_progress.Stop();
                 pauseMethod();
             }
         }
@@ -959,11 +1021,12 @@ namespace DTBGEmulator
                 {
                     udpSenderThread.Abort();
                     udpSenderThread.Join();
-                    timeController.CurrTime = "0";
-                    currTimeText.Text = timeControllerStartTime;
+                    timeController.CurrTime = timeController.StartTime.ToString();
+                    string newCurrTime = ChangeSecToTime(timeController.StartAction);
+                    currTimeText.Text = newCurrTime;
                     pauseEvent.Set();
                     UpdateButtonState("stop");
-                    firstSeconds = 0;
+                    speedComboBox.SelectedIndex = 3;
                 }
                 whiteSpaceCheckBox.Enabled = true;
             }
@@ -1044,5 +1107,15 @@ namespace DTBGEmulator
         }
         #endregion 상단바 드래그
 
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (trueFile) { loadingProgressBar.Value = FileDatatest.Instance.LoadingValue; }
+            else { loadingProgressBar.Value = FolderData.Instance.LoadingValue; }
+            
+            if (progressValue >= loadingProgressBar.Maximum)
+            {
+                timer.Stop();
+            }
+        }
     }
 }

@@ -1,0 +1,16 @@
+C:\windowApp\DTBGEmulator\DTBGEmulator\bin\Release\DTBGEmulator.exe.config
+C:\windowApp\DTBGEmulator\DTBGEmulator\bin\Release\DTBGEmulator.exe
+C:\windowApp\DTBGEmulator\DTBGEmulator\bin\Release\DTBGEmulator.pdb
+C:\windowApp\DTBGEmulator\DTBGEmulator\bin\Release\Newtonsoft.Json.dll
+C:\windowApp\DTBGEmulator\DTBGEmulator\bin\Release\Newtonsoft.Json.xml
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.csproj.AssemblyReference.cache
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.csproj.SuggestedBindingRedirects.cache
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.MainForm.resources
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.Forms.Setting.resources
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.Properties.Resources.resources
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.UserControls.TimeController.resources
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.csproj.GenerateResource.cache
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.csproj.CoreCompileInputs.cache
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.csproj.CopyComplete
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.exe
+C:\windowApp\DTBGEmulator\DTBGEmulator\obj\Release\DTBGEmulator.pdb

@@ -12,6 +12,7 @@ namespace DTBGEmulator.Classes
 {
     public class FolderData
     {
+        #region 변수 정의
         private static FolderData instance = null;
 
         private string[] filePaths = null;
@@ -19,9 +20,11 @@ namespace DTBGEmulator.Classes
         private string lastFileName;
         private int takenTime;
         private List<int> skipFile = new List<int>();
+        private List<int> isFile = new List<int>();
         private SortedDictionary<string, List<string>> folderDataDictionary;
         private SortedDictionary<string, List<string>> folderDataDictionaryVirtual;
         private string folderPath;
+        private int loadingValue;
 
         private string filePath;
 
@@ -29,18 +32,10 @@ namespace DTBGEmulator.Classes
         private string firstFileTime;
         private string lastFileTime;
         private List<string> fileTimes;
-
-
-        private List<string> filePackets;
-        private string startDateStr;
-        private string endDateStr;
-        private string startTimeStr;
-        private string endTimeStr;
-        private string storage;
         private List<string> allFilePackets;
         private int selectedFileCount;
         private int totalPacketCount;
-
+        #endregion 변수 정의
         #region 프로퍼티 정의
         public string FirstFileName
         {
@@ -72,6 +67,18 @@ namespace DTBGEmulator.Classes
             set { selectedFileCount = value; }
         }
 
+        public List<int> SkipFile
+        {
+            get { return skipFile; }
+            set { skipFile = value; }
+        }
+
+        public List<int> IsFile
+        {
+            get { return isFile; }
+            set { isFile = value; }
+        }
+
         public SortedDictionary<string, List<string>> FolderDataDictionary
         {
             get { return folderDataDictionary; }
@@ -82,6 +89,12 @@ namespace DTBGEmulator.Classes
         {
             get { return folderDataDictionaryVirtual; }
             set { folderDataDictionaryVirtual = value; }
+        }
+
+        public int LoadingValue
+        {
+            get { return loadingValue; }
+            set { loadingValue = value; }
         }
 
         #endregion 프로퍼티 정의
@@ -99,6 +112,9 @@ namespace DTBGEmulator.Classes
             }
         }
 
+        /// <summary>
+        /// 폴더안의 파일 열고 메타데이터 추출
+        /// </summary>
         public bool SelectFolder()
         {
             if (folderDataDictionaryVirtual != null && folderDataDictionaryVirtual.Count > 0)
@@ -113,37 +129,48 @@ namespace DTBGEmulator.Classes
             {
                 folderBrowserDialog.Description = "Select a folder containing text files.";
 
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    folderPath = folderBrowserDialog.SelectedPath;
-                    Console.WriteLine(folderPath);
-                    // 폴더 내의 모든 텍스트 파일 경로를 filePaths 배열에 저장
-                    filePaths = Directory.GetFiles(folderPath, "*.txt");
-                    // 폴더 안의 파일 갯수를 selectedFileCount 변수에 할당
-                    selectedFileCount = filePaths.Length;
+                    if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        folderPath = folderBrowserDialog.SelectedPath;
+                        Console.WriteLine(folderPath);
+                        // 폴더 내의 모든 텍스트 파일 경로를 filePaths 배열에 저장
+                        filePaths = Directory.GetFiles(folderPath, "*.txt");
+                        // 폴더 안의 파일 갯수를 selectedFileCount 변수에 할당
+                        selectedFileCount = filePaths.Length;
 
-                    firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
-                    lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
+                        firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
+                        lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
 
-                    // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
-                    takenTime = CalculateTimeDifference(firstFileName, lastFileName);
+                        // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
+                        takenTime = CalculateTimeDifference(firstFileName, lastFileName);
 
-                    // 모든 파일의 패킷을 담을 리스트 초기화
-                    allFilePackets = new List<string>();
+                        // 모든 파일의 패킷을 담을 리스트 초기화
+                        allFilePackets = new List<string>();
 
-                    folderPath = folderBrowserDialog.SelectedPath;
+                        folderPath = folderBrowserDialog.SelectedPath;
 
-                    // 추가: List에 담긴 변수 갯수 (전체) 설정
-                    totalPacketCount = allFilePackets.Count;
+                        // 추가: List에 담긴 변수 갯수 (전체) 설정
+                        totalPacketCount = allFilePackets.Count;
 
-                    // 사이 시간 계산
-                    CalculateFileTimes();
+                        // 사이 시간 계산
+                        CalculateFileTimes();
 
-                    return true; // 파일이 선택되었음을 알림
+                        loadingValue = 0;
+
+                        return true; // 파일이 선택되었음을 알림
+                    }
+                    else
+                    {
+                        return false; // 파일이 선택되지 않았음을 알림
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    return false; // 파일이 선택되지 않았음을 알림
+                    // 예외 처리
+                    Console.WriteLine("Error occurred while selecting folder: " + ex.Message);
+                    return false; // 예외 발생 시 false 반환
                 }
             }
         }
@@ -204,17 +231,18 @@ namespace DTBGEmulator.Classes
         /// 데이터 메모리 저장
         /// </summary>
         /// <returns></returns>
-        public bool LoadFile()
+        public async Task LoadFile()
         {
             folderDataDictionaryVirtual = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
-            folderDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             skipFile.Clear();
+            isFile.Clear();
             // 각 파일에 대한 처리를 위해 반복
             try
             {
                 foreach (string filePath in filePaths)
                 {
                     ProcessFile(filePath);
+                    loadingValue++;
                 }
                 // fileTimes에는 있지만 filePaths의 fileName에 없는 경우에 대해 처리
                 int check = 0;
@@ -225,14 +253,16 @@ namespace DTBGEmulator.Classes
                         folderDataDictionaryVirtual.Add(fileTime, new List<string>()); // 빈 리스트 추가
                         skipFile.Add(check);
                     }
+                    else
+                    {
+                        isFile.Add(check);
+                    }
                     check++;
                 }
-
-                return true;
             }
             catch (Exception e)
             {
-                return false;
+
             }
         }
 
@@ -247,8 +277,7 @@ namespace DTBGEmulator.Classes
             string fileName = new string(fileNameParts[1].Where(char.IsDigit).ToArray());
 
             // 현재 파일의 패킷을 전체 리스트에 추가
-            folderDataDictionary.Add(fileName, filePackets);
-            Console.WriteLine(fileName + filePackets[0]);
+            folderDataDictionaryVirtual.Add(fileName, filePackets);
         }
 
         private string ReadFile(string filePath)
@@ -272,7 +301,7 @@ namespace DTBGEmulator.Classes
         private List<string> SplitIntoPackets(string fileContent)
         {
             // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
-            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{" }, StringSplitOptions.None));
+            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{", "},\r\n{", "}\r\n,{", "}\r\n,\r\n{" }, StringSplitOptions.None));
 
             // Iterate through each packet and process it
             for (int i = 0; i < packets.Count; i++)
@@ -299,78 +328,5 @@ namespace DTBGEmulator.Classes
 
             return packets;
         }
-
-        // 파일 크기 저장
-        private void CalculateFileSize()
-        {
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                try
-                {
-                    long totalFileSizeInBytes = 0;
-
-                    foreach (string selectedFile in filePaths)
-                    {
-                        FileInfo fileInfo = new FileInfo(selectedFile);
-                        totalFileSizeInBytes += fileInfo.Length;
-                    }
-
-                    storage = FormatFileSize(totalFileSizeInBytes);
-                }
-                catch (Exception ex)
-                {
-                    // 파일 크기를 가져오는 도중에 예외가 발생한 경우 처리
-                    Console.WriteLine("Error calculating file size: " + ex.Message);
-                }
-            }
-        }
-
-        private string FormatFileSize(long bytes)
-        {
-            string[] sizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-            const int byteConversion = 1024;
-
-            if (bytes == 0)
-                return "0 " + sizeSuffixes[0];
-
-            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, byteConversion)));
-            double fileSize = bytes / Math.Pow(byteConversion, place);
-
-            return $"{fileSize:F2} {sizeSuffixes[place]}";
-        }
-
-        // 포맷 변환
-        private DateTime ConvertToLocalTime(string utcDateTime)
-        {
-            try
-            {
-                // UTC 형식의 문자열을 DateTime으로 파싱하고 로컬 시간으로 변환
-                DateTime utcTime = DateTime.Parse(utcDateTime);
-                DateTime localTime = utcTime.ToLocalTime();
-                return localTime;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"UTC 시간을 로컬 시간으로 변환하는 중 오류 발생: {ex.Message}");
-                return DateTime.MinValue;
-            }
-        }
-
-        // Json 변환, Time 찾기
-        private string ExtractStartEndDate(string packet, string key)
-        {
-            try
-            {
-                JObject jsonPacket = JObject.Parse(packet);
-                return jsonPacket["Package"]["Header"]["TimeSpan"][key].ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error extracting {key} from packet: {ex.Message}");
-                return string.Empty;
-            }
-        }
-        
-
     }
 }

@@ -64,6 +64,8 @@
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.loadingProgressBar = new System.Windows.Forms.ProgressBar();
+            this.loadStateText = new System.Windows.Forms.Label();
             this.whiteSpaceCheckBox = new System.Windows.Forms.CheckBox();
             this.label16 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -72,11 +74,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.currTimeText = new System.Windows.Forms.Label();
             this.timeController = new DTBGEmulator.UserControls.TimeController();
-            this.timer_update = new System.Windows.Forms.Timer(this.components);
-            this.timer_progress = new System.Windows.Forms.Timer(this.components);
-            this.timer_udp = new System.Windows.Forms.Timer(this.components);
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
             this.dataViewText = new System.Windows.Forms.Label();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
@@ -128,7 +128,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.label1.Location = new System.Drawing.Point(156, 9);
             this.label1.Name = "label1";
@@ -142,22 +142,22 @@
             // dataInfoText
             // 
             this.dataInfoText.AutoSize = true;
-            this.dataInfoText.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dataInfoText.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataInfoText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.dataInfoText.Location = new System.Drawing.Point(296, 24);
+            this.dataInfoText.Location = new System.Drawing.Point(296, 28);
             this.dataInfoText.Name = "dataInfoText";
-            this.dataInfoText.Size = new System.Drawing.Size(73, 19);
+            this.dataInfoText.Size = new System.Drawing.Size(69, 12);
             this.dataInfoText.TabIndex = 2;
             this.dataInfoText.Text = "데이터 정보";
             // 
             // dataInfo
             // 
             this.dataInfo.AutoSize = true;
-            this.dataInfo.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dataInfo.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataInfo.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.dataInfo.Location = new System.Drawing.Point(16, 8);
+            this.dataInfo.Location = new System.Drawing.Point(16, 12);
             this.dataInfo.Name = "dataInfo";
-            this.dataInfo.Size = new System.Drawing.Size(101, 19);
+            this.dataInfo.Size = new System.Drawing.Size(97, 12);
             this.dataInfo.TabIndex = 4;
             this.dataInfo.Text = "데이터 재생 현황";
             // 
@@ -205,6 +205,7 @@
             // 
             // speedComboBox
             // 
+            this.speedComboBox.BackColor = System.Drawing.SystemColors.Window;
             this.speedComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.speedComboBox.FormattingEnabled = true;
             this.speedComboBox.Items.AddRange(new object[] {
@@ -229,10 +230,10 @@
             this.runBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.runBtn.FlatAppearance.BorderSize = 0;
             this.runBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.runBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runBtn.Location = new System.Drawing.Point(108, -1);
+            this.runBtn.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runBtn.Location = new System.Drawing.Point(120, 4);
             this.runBtn.Name = "runBtn";
-            this.runBtn.Size = new System.Drawing.Size(45, 45);
+            this.runBtn.Size = new System.Drawing.Size(33, 33);
             this.runBtn.TabIndex = 15;
             this.runBtn.UseVisualStyleBackColor = true;
             this.runBtn.Click += new System.EventHandler(this.runBtn_Click);
@@ -243,24 +244,24 @@
             this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pauseBtn.FlatAppearance.BorderSize = 0;
             this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.pauseBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pauseBtn.Location = new System.Drawing.Point(159, -1);
+            this.pauseBtn.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.pauseBtn.Location = new System.Drawing.Point(162, 4);
             this.pauseBtn.Name = "pauseBtn";
-            this.pauseBtn.Size = new System.Drawing.Size(45, 45);
+            this.pauseBtn.Size = new System.Drawing.Size(33, 33);
             this.pauseBtn.TabIndex = 16;
             this.pauseBtn.UseVisualStyleBackColor = true;
             this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
             // 
             // stopBtn
             // 
-            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.stop_c;
+            this.stopBtn.BackgroundImage = global::DTBGEmulator.Properties.Resources.square_c;
             this.stopBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.stopBtn.FlatAppearance.BorderSize = 0;
             this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopBtn.Font = new System.Drawing.Font("Roboto", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stopBtn.Location = new System.Drawing.Point(210, -1);
+            this.stopBtn.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.stopBtn.Location = new System.Drawing.Point(210, 4);
             this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(45, 45);
+            this.stopBtn.Size = new System.Drawing.Size(33, 33);
             this.stopBtn.TabIndex = 17;
             this.stopBtn.UseVisualStyleBackColor = true;
             this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
@@ -268,11 +269,11 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label9.Location = new System.Drawing.Point(296, 150);
+            this.label9.Location = new System.Drawing.Point(296, 156);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(97, 19);
+            this.label9.Size = new System.Drawing.Size(93, 12);
             this.label9.TabIndex = 9;
             this.label9.Text = "에뮬레이터 제어";
             // 
@@ -293,6 +294,7 @@
             // 
             // fullTimeData
             // 
+            this.fullTimeData.BackColor = System.Drawing.SystemColors.Window;
             this.fullTimeData.Location = new System.Drawing.Point(84, 69);
             this.fullTimeData.Name = "fullTimeData";
             this.fullTimeData.ReadOnly = true;
@@ -311,6 +313,7 @@
             // 
             // endTimeData
             // 
+            this.endTimeData.BackColor = System.Drawing.SystemColors.Window;
             this.endTimeData.Location = new System.Drawing.Point(84, 40);
             this.endTimeData.Name = "endTimeData";
             this.endTimeData.ReadOnly = true;
@@ -319,6 +322,7 @@
             // 
             // startTimeData
             // 
+            this.startTimeData.BackColor = System.Drawing.SystemColors.Window;
             this.startTimeData.Location = new System.Drawing.Point(84, 11);
             this.startTimeData.Name = "startTimeData";
             this.startTimeData.ReadOnly = true;
@@ -364,6 +368,7 @@
             // 
             // fileLocation
             // 
+            this.fileLocation.BackColor = System.Drawing.SystemColors.Window;
             this.fileLocation.Location = new System.Drawing.Point(85, 137);
             this.fileLocation.Name = "fileLocation";
             this.fileLocation.ReadOnly = true;
@@ -382,6 +387,7 @@
             // 
             // lastFileName
             // 
+            this.lastFileName.BackColor = System.Drawing.SystemColors.Window;
             this.lastFileName.Location = new System.Drawing.Point(85, 70);
             this.lastFileName.Name = "lastFileName";
             this.lastFileName.ReadOnly = true;
@@ -390,6 +396,7 @@
             // 
             // firstFileName
             // 
+            this.firstFileName.BackColor = System.Drawing.SystemColors.Window;
             this.firstFileName.Location = new System.Drawing.Point(85, 42);
             this.firstFileName.Name = "firstFileName";
             this.firstFileName.ReadOnly = true;
@@ -441,18 +448,18 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label3.Location = new System.Drawing.Point(16, 24);
+            this.label3.Location = new System.Drawing.Point(16, 28);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 19);
+            this.label3.Size = new System.Drawing.Size(69, 12);
             this.label3.TabIndex = 4;
             this.label3.Text = "데이터 선택";
             // 
             // dataViewCheckBox
             // 
             this.dataViewCheckBox.AutoSize = true;
-            this.dataViewCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.dataViewCheckBox.ForeColor = System.Drawing.Color.Black;
             this.dataViewCheckBox.Location = new System.Drawing.Point(474, 6);
             this.dataViewCheckBox.Name = "dataViewCheckBox";
             this.dataViewCheckBox.Size = new System.Drawing.Size(88, 16);
@@ -476,6 +483,8 @@
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.Window;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.loadingProgressBar);
+            this.panel4.Controls.Add(this.loadStateText);
             this.panel4.Controls.Add(this.whiteSpaceCheckBox);
             this.panel4.Controls.Add(this.label16);
             this.panel4.Controls.Add(this.label13);
@@ -489,11 +498,28 @@
             this.panel4.Size = new System.Drawing.Size(540, 100);
             this.panel4.TabIndex = 5;
             // 
+            // loadingProgressBar
+            // 
+            this.loadingProgressBar.Location = new System.Drawing.Point(13, 60);
+            this.loadingProgressBar.Name = "loadingProgressBar";
+            this.loadingProgressBar.Size = new System.Drawing.Size(88, 16);
+            this.loadingProgressBar.TabIndex = 30;
+            // 
+            // loadStateText
+            // 
+            this.loadStateText.AutoSize = true;
+            this.loadStateText.ForeColor = System.Drawing.Color.Black;
+            this.loadStateText.Location = new System.Drawing.Point(34, 79);
+            this.loadStateText.Name = "loadStateText";
+            this.loadStateText.Size = new System.Drawing.Size(45, 12);
+            this.loadStateText.TabIndex = 29;
+            this.loadStateText.Text = "대기 중";
+            // 
             // whiteSpaceCheckBox
             // 
             this.whiteSpaceCheckBox.AutoSize = true;
             this.whiteSpaceCheckBox.Enabled = false;
-            this.whiteSpaceCheckBox.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.whiteSpaceCheckBox.ForeColor = System.Drawing.Color.Black;
             this.whiteSpaceCheckBox.Location = new System.Drawing.Point(443, 77);
             this.whiteSpaceCheckBox.Name = "whiteSpaceCheckBox";
             this.whiteSpaceCheckBox.Size = new System.Drawing.Size(76, 16);
@@ -504,9 +530,9 @@
             // 
             // label16
             // 
-            this.label16.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Font = new System.Drawing.Font("굴림", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.label16.Location = new System.Drawing.Point(423, 9);
+            this.label16.Location = new System.Drawing.Point(426, 11);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(100, 13);
             this.label16.TabIndex = 26;
@@ -515,9 +541,9 @@
             // 
             // label13
             // 
-            this.label13.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Font = new System.Drawing.Font("굴림", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.label13.Location = new System.Drawing.Point(6, 9);
+            this.label13.Location = new System.Drawing.Point(9, 11);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(100, 13);
             this.label13.TabIndex = 24;
@@ -526,9 +552,9 @@
             // 
             // label12
             // 
-            this.label12.Font = new System.Drawing.Font("Roboto", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.label12.Location = new System.Drawing.Point(111, 60);
+            this.label12.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.ForeColor = System.Drawing.Color.Black;
+            this.label12.Location = new System.Drawing.Point(110, 60);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(70, 15);
             this.label12.TabIndex = 23;
@@ -537,8 +563,8 @@
             // 
             // label11
             // 
-            this.label11.Font = new System.Drawing.Font("Roboto", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label11.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.ForeColor = System.Drawing.Color.Black;
             this.label11.Location = new System.Drawing.Point(349, 60);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(70, 15);
@@ -549,7 +575,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
+            this.label2.ForeColor = System.Drawing.Color.Black;
             this.label2.Location = new System.Drawing.Point(182, 78);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 12);
@@ -559,7 +585,7 @@
             // currTimeText
             // 
             this.currTimeText.AutoSize = true;
-            this.currTimeText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(88)))), ((int)(((byte)(88)))));
+            this.currTimeText.ForeColor = System.Drawing.Color.Black;
             this.currTimeText.Location = new System.Drawing.Point(276, 79);
             this.currTimeText.Name = "currTimeText";
             this.currTimeText.Size = new System.Drawing.Size(65, 12);
@@ -582,12 +608,8 @@
             this.timeController.StartFileTime = "00 : 00 : 00";
             this.timeController.StartRepeatTime = 0;
             this.timeController.TabIndex = 18;
+            this.timeController.TrueFile = false;
             this.timeController.UseController = false;
-            // 
-            // timer_progress
-            // 
-            this.timer_progress.Interval = 1000;
-            this.timer_progress.Tick += new System.EventHandler(this.timer_progress_Tick);
             // 
             // dataViewTextBox
             // 
@@ -604,14 +626,18 @@
             // dataViewText
             // 
             this.dataViewText.AutoSize = true;
-            this.dataViewText.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dataViewText.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataViewText.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.dataViewText.Location = new System.Drawing.Point(16, 398);
+            this.dataViewText.Location = new System.Drawing.Point(16, 402);
             this.dataViewText.Name = "dataViewText";
-            this.dataViewText.Size = new System.Drawing.Size(73, 19);
+            this.dataViewText.Size = new System.Drawing.Size(69, 12);
             this.dataViewText.TabIndex = 8;
             this.dataViewText.Text = "데이터 표시";
             this.dataViewText.Visible = false;
+            // 
+            // timer
+            // 
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // MainForm
             // 
@@ -663,13 +689,9 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Button stopBtn;
         private System.Windows.Forms.Button pauseBtn;
-        private System.Windows.Forms.Button runBtn;
         private UserControls.TimeController timeController1;
-        private System.Windows.Forms.Timer timer_update;
         public System.Windows.Forms.Label currTimeText;
-        private System.Windows.Forms.Timer timer_progress;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Timer timer_udp;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Button addFileBtn;
         private System.Windows.Forms.Label label3;
@@ -700,6 +722,10 @@
         private UserControls.TimeController timeController;
         private System.Windows.Forms.CheckBox whiteSpaceCheckBox;
         private System.Windows.Forms.Label dataViewText;
+        private System.Windows.Forms.Button runBtn;
+        private System.Windows.Forms.Label loadStateText;
+        private System.Windows.Forms.ProgressBar loadingProgressBar;
+        private System.Windows.Forms.Timer timer;
     }
 }
 

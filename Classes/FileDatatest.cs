@@ -24,14 +24,9 @@ namespace DTBGEmulator.Classes
         private string lastFileName;
         private int takenTime;
         private List<int> skipFile = new List<int>();
-        private SortedDictionary<string, List<string>> fileDataDictionary;
+        private List<int> isFile = new List<int>();
         private SortedDictionary<string, List<string>> fileDataDictionaryVirtual;
-
-
-        string formattedStartTime;
-        string formattedEndTime;
-        string timeControllerStartTime;
-        string timeControllerEndTime;
+        private int loadingValue;
 
         // virtual
         private string firstFileTime;
@@ -45,6 +40,12 @@ namespace DTBGEmulator.Classes
         {
             get { return skipFile; }
             set { skipFile = value; }
+        }
+
+        public List<int> IsFile
+        {
+            get { return isFile; }
+            set { isFile = value; }
         }
         public string FirstFileName
         {
@@ -70,10 +71,10 @@ namespace DTBGEmulator.Classes
             set { selectedFileCount = value; }
         }
 
-        public SortedDictionary<string, List<string>> FileDataDictionary
+        public int LoadingValue
         {
-            get { return fileDataDictionary; }
-            set { fileDataDictionary = value; }
+            get { return loadingValue; }
+            set { loadingValue = value; }
         }
 
         public SortedDictionary<string, List<string>> FileDataDictionaryVirtual
@@ -97,20 +98,16 @@ namespace DTBGEmulator.Classes
             }
         }
 
-
-
-
         /// <summary>
         /// 파일 열고 메타데이터 추출
         /// </summary>
         public bool SelectFile()
         {
-            if (fileDataDictionary != null && fileDataDictionary.Count > 0)
+            if (fileDataDictionaryVirtual != null && fileDataDictionaryVirtual.Count > 0)
             {
                 filePaths = null;
                 firstFileName = "";
                 lastFileName = "";
-                fileDataDictionary.Clear();
                 fileDataDictionaryVirtual.Clear();
             }
             using (var openFileDialog = new OpenFileDialog())
@@ -119,26 +116,37 @@ namespace DTBGEmulator.Classes
                 openFileDialog.RestoreDirectory = true;
                 openFileDialog.Multiselect = true;
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    selectedFileCount = openFileDialog.FileNames.Length;
-                    filePaths = openFileDialog.FileNames;
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        selectedFileCount = openFileDialog.FileNames.Length;
+                        filePaths = openFileDialog.FileNames;
 
-                    // 파일 이름 초기화
-                    firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
-                    lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
+                        // 파일 이름 초기화
+                        firstFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[0]) : string.Empty;
+                        lastFileName = filePaths.Length > 0 ? Path.GetFileName(filePaths[filePaths.Length - 1]) : string.Empty;
 
-                    // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
-                    takenTime = CalculateTimeDifference(firstFileName, lastFileName);
+                        // 파일 이름에서 시간을 분 단위로 계산하여 시간 차이 계산
+                        takenTime = CalculateTimeDifference(firstFileName, lastFileName);
 
-                    // 사이 시간 계산
-                    CalculateFileTimes();
+                        // 사이 시간 계산
+                        CalculateFileTimes();
 
-                    return true; // 파일이 선택되었음을 알림
+                        loadingValue = 0;
+
+                        return true; // 파일이 선택되었음을 알림
+                    }
+                    else
+                    {
+                        return false; // 파일이 선택되지 않았음을 알림
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    return false; // 파일이 선택되지 않았음을 알림
+                    // 예외 처리
+                    Console.WriteLine("Error occurred while selecting folder: " + ex.Message);
+                    return false; // 예외 발생 시 false 반환
                 }
             }
         }
@@ -201,29 +209,11 @@ namespace DTBGEmulator.Classes
         /// <returns></returns>
         /// 
 
-        //public void PopulateVirtualDictionary()
-        //{
-        //    // 새로운 SortedDictionary 생성
-        //    fileDataDictionaryVirtual = new SortedDictionary<string, List<string>>(fileDataDictionary);
-
-        //    // fileTimes 리스트값 중에 fileDataDictionary의 key값이 아닌 값을 찾아서 처리
-        //    foreach (string time in fileTimes)
-        //    {
-        //        if (!fileDataDictionary.ContainsKey(time))
-        //        {
-        //            // fileDataDictionary에 포함되지 않은 키를 가진 경우 빈 리스트를 값으로 설정
-        //            //fileDataDictionaryVirtual[time] = new List<string>(Enumerable.Repeat("", 60));
-        //            fileDataDictionaryVirtual[time] = new List<string>();
-        //        }
-        //    }
-        //    Console.WriteLine(fileDataDictionaryVirtual);
-        //}
-
-        public bool LoadFile()
+        public async Task LoadFile()
         {
             fileDataDictionaryVirtual = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
-            fileDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
             skipFile.Clear();
+            isFile.Clear();
             Stopwatch stopwatch = new Stopwatch();
             // 각 파일에 대한 처리를 위해 반복
             try
@@ -233,6 +223,7 @@ namespace DTBGEmulator.Classes
                     stopwatch.Reset();
                     stopwatch.Start();
                     ProcessFile(filePath);
+                    loadingValue++;
                     stopwatch.Stop();
                     // Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
                 }
@@ -245,14 +236,16 @@ namespace DTBGEmulator.Classes
                         fileDataDictionaryVirtual.Add(fileTime, new List<string>()); // 빈 리스트 추가
                         skipFile.Add(check);
                     }
+                    else
+                    {
+                        isFile.Add(check);
+                    }
                     check++;
                 }
-
-                return true;
             }
             catch (Exception e)
             {
-                return false;
+               
             }
         }
 
@@ -268,43 +261,7 @@ namespace DTBGEmulator.Classes
 
             // 현재 파일의 패킷을 전체 리스트에 추가
             fileDataDictionaryVirtual.Add(fileName, filePackets);
-            fileDataDictionary.Add(fileName, filePackets);
         }
-
-        //public bool LoadFile()
-        //{
-        //    fileDataDictionary = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
-        //    fileDataDictionaryVirtual = new SortedDictionary<string, List<string>>(); // 파일 데이터를 담을 Dictionary 초기화
-        //    // 각 파일에 대한 처리를 위해 반복
-        //    try
-        //    {
-        //        foreach (string filePath in filePaths)
-        //        {
-        //            ProcessFile(filePath);
-        //        }
-        //        PopulateVirtualDictionary();
-
-        //        return true;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return false;
-        //    }
-        //}
-
-        //private void ProcessFile(string filePath)
-        //{
-
-        //    string fileContent = ReadFile(filePath);
-        //    List<string> filePackets = SplitIntoPackets(fileContent);
-
-        //    // 파일 이름에서 숫자 부분만 추출 (예: "2023-11-09 1003_FleetNormalLog" -> "1003")
-        //    string[] fileNameParts = Path.GetFileNameWithoutExtension(filePath).Split(' ');
-        //    string fileName = new string(fileNameParts[1].Where(char.IsDigit).ToArray());
-
-        //    // 현재 파일의 패킷을 전체 리스트에 추가
-        //    fileDataDictionary.Add(fileName, filePackets);
-        //}
 
         private string ReadFile(string filePath)
         {
@@ -326,8 +283,8 @@ namespace DTBGEmulator.Classes
         private List<string> SplitIntoPackets(string fileContent)
         {
             // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
-            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{" }, StringSplitOptions.None));
-
+            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{", "},\r\n{", "}\r\n,{", "}\r\n,\r\n{" }, StringSplitOptions.None));
+            // "}\r\n-----\r\n{", 
             // Iterate through each packet and process it
             for (int i = 0; i < packets.Count; i++)
             {

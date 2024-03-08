@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -161,6 +162,24 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Settings.xml" />
+    <None Include="Resources\square_c.png" />
+    <None Include="Resources\square_n.png" />
+    <None Include="Resources\fc_pause.ico" />
+    <None Include="Resources\fn_pause.png" />
+    <None Include="Resources\fn_run.png" />
+    <None Include="Resources\c_pause2.png" />
+    <None Include="Resources\c_stop.png" />
+    <None Include="Resources\n_stop.png" />
+    <None Include="Resources\c_pause.png" />
+    <None Include="Resources\n_pause.png" />
+    <None Include="Resources\c_run.png" />
+    <None Include="Resources\n_run.png" />
+    <None Include="Resources\stop_cc.png" />
+    <None Include="Resources\stop_nn.png" />
+    <None Include="Resources\pause_cc.png" />
+    <None Include="Resources\pause_nn.png" />
+    <None Include="Resources\run_cc.png" />
+    <None Include="Resources\run_nn.png" />
     <None Include="Resources\settings_ccc.png" />
     <None Include="Resources\settings_cc.png" />
     <None Include="Resources\stopc_c.png" />
