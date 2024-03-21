@@ -11,8 +11,10 @@
 		<MqttUserName>MTIE4.XINNOS_STAS</MqttUserName>
 		<MqttPassword></MqttPassword>
 
-		<UdpTargetIP>192.168.0.19</UdpTargetIP>
-		<UdpTargetPortNum>12345</UdpTargetPortNum>
+		<UdpTargetIP>192.168.0.55</UdpTargetIP>
+		<UdpOnboardPortNum>12345</UdpOnboardPortNum>
+		<UdpAISPortNum>10002</UdpAISPortNum>
+		<UdpVTSPortNum>10005</UdpVTSPortNum>
 		<UdpStasPortNum>9999</UdpStasPortNum>
 		<UdpTimeout>1000</UdpTimeout>
 	</Values>

@@ -37,6 +37,16 @@
             this.dataInfoText = new System.Windows.Forms.Label();
             this.dataInfo = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label17 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.tFileCountTxt = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.wFileCountTxt = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.aFileCountTxt = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.oFileCountTxt = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.settingBtn = new System.Windows.Forms.Button();
             this.panel7 = new System.Windows.Forms.Panel();
             this.speedComboBox = new System.Windows.Forms.ComboBox();
@@ -54,12 +64,7 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.fileLocation = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.lastFileName = new System.Windows.Forms.TextBox();
-            this.firstFileName = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.addFolderBtn = new System.Windows.Forms.Button();
-            this.addFileBtn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.dataViewCheckBox = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -77,10 +82,12 @@
             this.dataViewTextBox = new System.Windows.Forms.TextBox();
             this.dataViewText = new System.Windows.Forms.Label();
             this.timer = new System.Windows.Forms.Timer(this.components);
+            this.dataViewComboBox = new System.Windows.Forms.ComboBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).BeginInit();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.panel7.SuspendLayout();
             this.panel6.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -163,6 +170,8 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label17);
+            this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.settingBtn);
             this.panel1.Controls.Add(this.panel7);
             this.panel1.Controls.Add(this.label9);
@@ -175,6 +184,115 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(570, 225);
             this.panel1.TabIndex = 5;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label17.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.label17.Location = new System.Drawing.Point(16, 126);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(57, 12);
+            this.label17.TabIndex = 21;
+            this.label17.Text = "파일 갯수";
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.SystemColors.Window;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.tFileCountTxt);
+            this.panel2.Controls.Add(this.label15);
+            this.panel2.Controls.Add(this.wFileCountTxt);
+            this.panel2.Controls.Add(this.label14);
+            this.panel2.Controls.Add(this.aFileCountTxt);
+            this.panel2.Controls.Add(this.label5);
+            this.panel2.Controls.Add(this.oFileCountTxt);
+            this.panel2.Controls.Add(this.label4);
+            this.panel2.Location = new System.Drawing.Point(15, 144);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(265, 74);
+            this.panel2.TabIndex = 20;
+            // 
+            // tFileCountTxt
+            // 
+            this.tFileCountTxt.BackColor = System.Drawing.SystemColors.Window;
+            this.tFileCountTxt.Location = new System.Drawing.Point(189, 42);
+            this.tFileCountTxt.Name = "tFileCountTxt";
+            this.tFileCountTxt.ReadOnly = true;
+            this.tFileCountTxt.Size = new System.Drawing.Size(55, 21);
+            this.tFileCountTxt.TabIndex = 19;
+            this.tFileCountTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.label15.Location = new System.Drawing.Point(142, 46);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(41, 12);
+            this.label15.TabIndex = 18;
+            this.label15.Text = "Target";
+            // 
+            // wFileCountTxt
+            // 
+            this.wFileCountTxt.BackColor = System.Drawing.SystemColors.Window;
+            this.wFileCountTxt.Location = new System.Drawing.Point(71, 42);
+            this.wFileCountTxt.Name = "wFileCountTxt";
+            this.wFileCountTxt.ReadOnly = true;
+            this.wFileCountTxt.Size = new System.Drawing.Size(55, 21);
+            this.wFileCountTxt.TabIndex = 17;
+            this.wFileCountTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.label14.Location = new System.Drawing.Point(13, 46);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(50, 12);
+            this.label14.TabIndex = 16;
+            this.label14.Text = "Weather";
+            // 
+            // aFileCountTxt
+            // 
+            this.aFileCountTxt.BackColor = System.Drawing.SystemColors.Window;
+            this.aFileCountTxt.Location = new System.Drawing.Point(189, 11);
+            this.aFileCountTxt.Name = "aFileCountTxt";
+            this.aFileCountTxt.ReadOnly = true;
+            this.aFileCountTxt.Size = new System.Drawing.Size(55, 21);
+            this.aFileCountTxt.TabIndex = 15;
+            this.aFileCountTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.label5.Location = new System.Drawing.Point(157, 15);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(24, 12);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "AIS";
+            // 
+            // oFileCountTxt
+            // 
+            this.oFileCountTxt.BackColor = System.Drawing.SystemColors.Window;
+            this.oFileCountTxt.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.oFileCountTxt.Location = new System.Drawing.Point(71, 11);
+            this.oFileCountTxt.Name = "oFileCountTxt";
+            this.oFileCountTxt.ReadOnly = true;
+            this.oFileCountTxt.Size = new System.Drawing.Size(55, 21);
+            this.oFileCountTxt.TabIndex = 13;
+            this.oFileCountTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.label4.Location = new System.Drawing.Point(12, 15);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 12);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "Onboard";
             // 
             // settingBtn
             // 
@@ -198,7 +316,7 @@
             this.panel7.Controls.Add(this.runBtn);
             this.panel7.Controls.Add(this.pauseBtn);
             this.panel7.Controls.Add(this.stopBtn);
-            this.panel7.Location = new System.Drawing.Point(295, 172);
+            this.panel7.Location = new System.Drawing.Point(295, 174);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(260, 44);
             this.panel7.TabIndex = 19;
@@ -355,21 +473,16 @@
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel5.Controls.Add(this.fileLocation);
             this.panel5.Controls.Add(this.label6);
-            this.panel5.Controls.Add(this.lastFileName);
-            this.panel5.Controls.Add(this.firstFileName);
-            this.panel5.Controls.Add(this.label5);
-            this.panel5.Controls.Add(this.label4);
             this.panel5.Controls.Add(this.addFolderBtn);
-            this.panel5.Controls.Add(this.addFileBtn);
             this.panel5.Location = new System.Drawing.Point(15, 46);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(265, 170);
+            this.panel5.Size = new System.Drawing.Size(265, 70);
             this.panel5.TabIndex = 7;
             // 
             // fileLocation
             // 
             this.fileLocation.BackColor = System.Drawing.SystemColors.Window;
-            this.fileLocation.Location = new System.Drawing.Point(85, 137);
+            this.fileLocation.Location = new System.Drawing.Point(85, 39);
             this.fileLocation.Name = "fileLocation";
             this.fileLocation.ReadOnly = true;
             this.fileLocation.Size = new System.Drawing.Size(160, 21);
@@ -379,71 +492,22 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label6.Location = new System.Drawing.Point(17, 142);
+            this.label6.Location = new System.Drawing.Point(17, 44);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(57, 12);
             this.label6.TabIndex = 12;
             this.label6.Text = "폴더 경로";
             // 
-            // lastFileName
-            // 
-            this.lastFileName.BackColor = System.Drawing.SystemColors.Window;
-            this.lastFileName.Location = new System.Drawing.Point(85, 70);
-            this.lastFileName.Name = "lastFileName";
-            this.lastFileName.ReadOnly = true;
-            this.lastFileName.Size = new System.Drawing.Size(160, 21);
-            this.lastFileName.TabIndex = 11;
-            // 
-            // firstFileName
-            // 
-            this.firstFileName.BackColor = System.Drawing.SystemColors.Window;
-            this.firstFileName.Location = new System.Drawing.Point(85, 42);
-            this.firstFileName.Name = "firstFileName";
-            this.firstFileName.ReadOnly = true;
-            this.firstFileName.Size = new System.Drawing.Size(160, 21);
-            this.firstFileName.TabIndex = 10;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label5.Location = new System.Drawing.Point(17, 75);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(57, 12);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "종료 파일";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label4.Location = new System.Drawing.Point(17, 47);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(57, 12);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "시작 파일";
-            // 
             // addFolderBtn
             // 
             this.addFolderBtn.ForeColor = System.Drawing.Color.Black;
-            this.addFolderBtn.Location = new System.Drawing.Point(10, 105);
+            this.addFolderBtn.Location = new System.Drawing.Point(10, 7);
             this.addFolderBtn.Name = "addFolderBtn";
             this.addFolderBtn.Size = new System.Drawing.Size(75, 25);
             this.addFolderBtn.TabIndex = 7;
             this.addFolderBtn.Text = "폴더 선택";
             this.addFolderBtn.UseVisualStyleBackColor = true;
             this.addFolderBtn.Click += new System.EventHandler(this.addFolderBtn_Click);
-            // 
-            // addFileBtn
-            // 
-            this.addFileBtn.ForeColor = System.Drawing.Color.Black;
-            this.addFileBtn.Location = new System.Drawing.Point(10, 10);
-            this.addFileBtn.Name = "addFileBtn";
-            this.addFileBtn.Size = new System.Drawing.Size(75, 25);
-            this.addFileBtn.TabIndex = 6;
-            this.addFileBtn.Text = "파일 선택";
-            this.addFileBtn.UseVisualStyleBackColor = true;
-            this.addFileBtn.Click += new System.EventHandler(this.addFileBtn_Click);
             // 
             // label3
             // 
@@ -605,6 +669,7 @@
             this.timeController.Location = new System.Drawing.Point(10, 15);
             this.timeController.Name = "timeController";
             this.timeController.Size = new System.Drawing.Size(510, 44);
+            this.timeController.StartAction = 0;
             this.timeController.StartFileTime = "00 : 00 : 00";
             this.timeController.StartRepeatTime = 0;
             this.timeController.TabIndex = 18;
@@ -639,6 +704,22 @@
             // 
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
+            // dataViewComboBox
+            // 
+            this.dataViewComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.dataViewComboBox.FormattingEnabled = true;
+            this.dataViewComboBox.Items.AddRange(new object[] {
+            "Onboard 데이터",
+            "AIS 데이터",
+            "Weather 데이터",
+            "Target 데이터"});
+            this.dataViewComboBox.Location = new System.Drawing.Point(434, 394);
+            this.dataViewComboBox.Name = "dataViewComboBox";
+            this.dataViewComboBox.Size = new System.Drawing.Size(121, 20);
+            this.dataViewComboBox.TabIndex = 9;
+            this.dataViewComboBox.Visible = false;
+            this.dataViewComboBox.SelectedIndexChanged += new System.EventHandler(this.dataViewComboBox_SelectedIndexChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -646,6 +727,7 @@
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(570, 400);
+            this.Controls.Add(this.dataViewComboBox);
             this.Controls.Add(this.dataViewText);
             this.Controls.Add(this.dataViewTextBox);
             this.Controls.Add(this.panel3);
@@ -663,6 +745,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Close)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.panel7.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
             this.panel6.PerformLayout();
@@ -693,7 +777,6 @@
         public System.Windows.Forms.Label currTimeText;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel5;
-        private System.Windows.Forms.Button addFileBtn;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.Button addFolderBtn;
@@ -706,10 +789,6 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox fileLocation;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox lastFileName;
-        private System.Windows.Forms.TextBox firstFileName;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.ComboBox speedComboBox;
         private System.Windows.Forms.Label label9;
@@ -726,6 +805,17 @@
         private System.Windows.Forms.Label loadStateText;
         private System.Windows.Forms.ProgressBar loadingProgressBar;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.ComboBox dataViewComboBox;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox tFileCountTxt;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox wFileCountTxt;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox aFileCountTxt;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox oFileCountTxt;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label17;
     }
 }
 

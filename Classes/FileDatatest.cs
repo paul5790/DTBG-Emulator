@@ -112,7 +112,7 @@ namespace DTBGEmulator.Classes
             }
             using (var openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.Filter = "Text files (*.txt)|*.txt|Binary files (*.bin)|*.bin|All files (*.*)|*.*";
                 openFileDialog.RestoreDirectory = true;
                 openFileDialog.Multiselect = true;
 
@@ -167,8 +167,8 @@ namespace DTBGEmulator.Classes
         {
             // 파일 이름에서 숫자 부분을 추출하여 시간과 분으로 나누고 분 단위로 계산
             string[] fileNameParts = Path.GetFileNameWithoutExtension(fileName).Split(' ');
-            int hour = int.Parse(fileNameParts[1].Substring(0, 2));
-            int minute = int.Parse(fileNameParts[1].Substring(2, 2));
+            int hour = int.Parse(fileNameParts[2].Substring(0, 2));
+            int minute = int.Parse(fileNameParts[2].Substring(2, 2));
 
             return hour * 60 + minute;
         }
@@ -283,8 +283,8 @@ namespace DTBGEmulator.Classes
         private List<string> SplitIntoPackets(string fileContent)
         {
             // Split the content into packets based on "}\r\n{" and remove leading/trailing whitespace
-            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n{", "}\n{", "}{", "},\r\n{", "}\r\n,{", "}\r\n,\r\n{" }, StringSplitOptions.None));
-            // "}\r\n-----\r\n{", 
+            List<string> packets = new List<string>(fileContent.Split(new string[] { "}\r\n-----\r\n{", "}\r\n{", "}\n{", "}{", "},\r\n{", "}\r\n,{", "}\r\n,\r\n{" }, StringSplitOptions.None));
+
             // Iterate through each packet and process it
             for (int i = 0; i < packets.Count; i++)
             {

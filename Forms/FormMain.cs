@@ -9,6 +9,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -18,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
@@ -73,6 +75,13 @@ namespace DTBGEmulator
         // 파일, 폴더 데이터
         private bool trueFile;
         private SortedDictionary<string, List<string>> fullFilePackets; // 보낼 dictionary 데이터
+
+        private SortedDictionary<string, List<string>> DataDictionaryAIS;
+        private SortedDictionary<string, List<string>> DataDictionaryOnboard;
+        private SortedDictionary<string, List<byte[]>> DataDictionaryWeather;
+        private SortedDictionary<string, List<byte[]>> DataDictionaryTarget;
+
+
         private int takenTime;
         private string startTime;
         private string endTime;
@@ -85,6 +94,8 @@ namespace DTBGEmulator
         // 데이터 재생
         private string runState = "stop";
         private ManualResetEvent pauseEvent = new ManualResetEvent(true); // 초기 상태는 신호가 올라가 있음
+
+        private string selectDataView = "Onboard";
 
         // 데이터 로딩
         private int progressValue;
@@ -104,6 +115,7 @@ namespace DTBGEmulator
             timeController.CurrTime = ChangeTimeToStrSec(currTime);
 
             speedComboBox.SelectedIndex = 3;
+            dataViewComboBox.SelectedIndex = 0;
 
             // 버튼 설정
             UpdateButtonState("default");
@@ -154,25 +166,25 @@ namespace DTBGEmulator
                     byte[] byteData = Encoding.UTF8.GetBytes(data);
 
                     // MTU(Maximum Transmission Unit) 크기를 고려하여 패킷을 나눔
-                    int mtu = 1400; // 조절 가능한 MTU 크기
+                    //int mtu = 1024*4; // 조절 가능한 MTU 크기
 
-                    if (byteData.Length > mtu)
-                    {
-                        for (int i = 0; i < byteData.Length; i += mtu)
-                        {
-                            int remainingBytes = Math.Min(mtu, byteData.Length - i);
-                            byte[] segment = new byte[remainingBytes];
-                            Array.Copy(byteData, i, segment, 0, remainingBytes);
+                    //if (byteData.Length > mtu)
+                    //{
+                    //    for (int i = 0; i < byteData.Length; i += mtu)
+                    //    {
+                    //        int remainingBytes = Math.Min(mtu, byteData.Length - i);
+                    //        byte[] segment = new byte[remainingBytes];
+                    //        Array.Copy(byteData, i, segment, 0, remainingBytes);
 
-                            // 데이터 분할 전송
-                            udpClient.Send(segment, segment.Length, new IPEndPoint(serverIP, serverPort));
-                        }
-                    }
-                    else
-                    {
+                    //        // 데이터 분할 전송
+                    //        udpClient.Send(segment, segment.Length, new IPEndPoint(serverIP, serverPort));
+                    //    }
+                    //}
+                    //else
+                    //{
                         // 데이터 크기가 MTU보다 작으면 전체 데이터를 한 번에 전송
                         udpClient.Send(byteData, byteData.Length, new IPEndPoint(serverIP, serverPort));
-                    }
+                    //}
                 }
             }
             catch (Exception ex)
@@ -181,13 +193,40 @@ namespace DTBGEmulator
             }
         }
 
+        private void UdpBinSender(byte[] data, string ip, int port)
+        {
+            try
+            {
+                using (UdpClient udpClient = new UdpClient())
+                {
+                    IPAddress serverIP = IPAddress.Parse(ip);
+                    int serverPort = port;
+
+                    udpClient.Send(data, data.Length, new IPEndPoint(serverIP, serverPort));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending UDP data: {ex.Message}");
+            }
+        }
+
+
         private void UdpSenderThread()
         {
             // sdto = setting.GenerateSettingDTO();
             string setip = settingClass.UdpTargetIPAddress;
-            int setport = settingClass.UdpTargetPortNum;
+            int setOnboardPort = settingClass.UdpOnboardPortNum;
+            int setAisPort = settingClass.UdpAISPortNum;
+            int setVtsPort = settingClass.UdpVTSPortNum;
             if (trueFile) fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
-            else fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+            else
+            {
+                DataDictionaryAIS = FolderData.Instance.FolderDataDictionaryAIS;
+                DataDictionaryOnboard = FolderData.Instance.FolderDataDictionaryOnboard;
+                DataDictionaryWeather = FolderData.Instance.FolderDataDictionaryWeather;
+                DataDictionaryTarget = FolderData.Instance.FolderDataDictionaryTarget;
+            }
 
             int sleepTime = 1000;
             bool firstTime = true;
@@ -198,7 +237,7 @@ namespace DTBGEmulator
             while (true)
             {
                 // 코드 실행 시작 시간 기록
-                int keyCount = fullFilePackets.Count; // dict의 key갯수 
+                int keyCount = DataDictionaryOnboard.Count; // dict의 key갯수 
                 int keyIndex = 1; // 첫 번째 키부터 시작 (몇번째 파일이 진행중인지)
                 int keyFirst = 1;
                 int defingI;
@@ -229,13 +268,20 @@ namespace DTBGEmulator
                     for (int i = defingI; i < loopI; i++)
                     {
                         // var kvp = fullFilePackets.ElementAt(i);
-                        var kvp = fullFilePackets.ElementAt(i);
-                        Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {kvp.Value.Count}");
+                        var chanePlz = DataDictionaryOnboard.ElementAt(i);
+                        var OnboardData = DataDictionaryOnboard.ElementAt(i);
+                        var AISData = DataDictionaryAIS.ElementAt(i);
+                        var WeatherData = DataDictionaryWeather.ElementAt(i);
+                        var TargetData = DataDictionaryTarget.ElementAt(i);
+
+                        
+                        Console.WriteLine($"리스트 갯수: {OnboardData.Value.Count}");
+                        Console.WriteLine($"{keyIndex} 번째 키의 리스트 갯수: {chanePlz.Value.Count}");
                         // 만약 skip 상태면
                         if (skipState == true)
                         {
                             // 만약 스킵된 곳에 진행바를 놓으면
-                            if (kvp.Value.Count == 0)
+                            if (OnboardData.Value.Count == 0 && AISData.Value.Count == 0 && WeatherData.Value.Count == 0 && TargetData.Value.Count == 0)
                             {
                                 if (keyFirst == 1 && !currEvent)
                                 {
@@ -274,38 +320,62 @@ namespace DTBGEmulator
                             }
                         }
 
-                        int count = 0; // dictionary List의 index값
+                        int odIndex = 0; 
+                        int adIndex = 0; 
+                        int wdIndex = 0; 
+                        int tdIndex = 0; 
+
                         int count1 = 0; // 저배속을 위한 타임 조절
                         int loopJ = 60;
                         int defingK = 0;
-                        int loopK;
                         int slowSpeed;
                         int oneSecond = 1000;
-                        if (kvp.Value.Count < 60) { 
+                        if (chanePlz.Value.Count < 60) { 
                             slowSpeed = 1;
                             oneSecond = 1000 * filecontrol;
                         }
                         else { slowSpeed = filecontrol; }
 
-                        if (kvp.Value.Count % 60 == 0)
+                        // 데이터 마다 달라져야 하는 변수 선언
+                        int odCount, adCount, wdCount, tdCount;
+
+                        // 데이터 개수 계산
+                        CalculateDataCount(OnboardData.Value.Count, out odCount);
+                        CalculateDataCount(AISData.Value.Count, out adCount);
+                        CalculateDataCount(WeatherData.Value.Count, out wdCount);
+                        CalculateDataCount(TargetData.Value.Count, out tdCount);
+
+                        void CalculateDataCount(int dataCount, out int result)
                         {
-                            loopK = (kvp.Value.Count / 60) / slowSpeed;
+                            int packetsPerMinute = 60;
+
+                            int totalPackets = dataCount / packetsPerMinute;
+                            if (dataCount % packetsPerMinute != 0)
+                            {
+                                totalPackets++;
+                            }
+
+                            result = totalPackets / slowSpeed;
                         }
-                        else
-                        {
-                            loopK = (kvp.Value.Count / 60 + 1) / slowSpeed;
-                        }
+
+
                         if (currEvent)
                         {
                             loopJ = 60 - currentSeconds;
-                            count = currentSeconds * loopK;
+                            odIndex = currentSeconds * odCount;
+                            adIndex = currentSeconds * adCount;
+                            wdIndex = currentSeconds * wdCount;
+                            tdIndex = currentSeconds * tdCount;
                             currEvent = false;
                         }
                         else
                         {
                             if (keyIndex == 1) // 첫번째 루프인지
                             {
-                                count = firstSeconds * loopK; // 초 * 1초당 보낼 갯수 = 시작 count 계산
+                                odIndex = firstSeconds * odCount; // 초 * 1초당 보낼 갯수 = 시작 count 계산
+                                adIndex = firstSeconds * adCount; 
+                                wdIndex = firstSeconds * wdCount; 
+                                tdIndex = firstSeconds * tdCount; 
                                 if (keyCount == keyIndex) // 총 파일 갯수 == 현재 진행중인 파일 순번 (마지막 파일인지)
                                 {
                                     loopJ = lastSeconds - firstSeconds + 1; // 왜있는지 의문 까먹음.
@@ -334,26 +404,33 @@ namespace DTBGEmulator
                             stopwatch1.Reset();
                             stopwatch1.Start();
 
-                            if (kvp.Value.Count > 0)
+                            if (OnboardData.Value.Count >= 0 && AISData.Value.Count >= 0 && WeatherData.Value.Count >= 0 && TargetData.Value.Count >= 0)
                             {
-                                int sendFileNumber;
+                                int sendOnboardNumber;
+                                int sendAISNumber;
+                                int sendWeatherNumber;
+                                int sendTargetNumber;
 
-                                if (kvp.Value.Count % 60 == 0)
-                                {
-                                    sendFileNumber = (kvp.Value.Count / 60) / slowSpeed;
-                                }
-                                else
-                                {
-                                    sendFileNumber = (kvp.Value.Count / 60 + 1) / slowSpeed;
-                                }
-                                for (int k = defingK; k < sendFileNumber; k++)
+                                if (OnboardData.Value.Count % 60 == 0) sendOnboardNumber = (OnboardData.Value.Count / 60) / slowSpeed;
+                                else sendOnboardNumber = (OnboardData.Value.Count / 60 + 1) / slowSpeed;
+
+                                if (AISData.Value.Count % 60 == 0) sendAISNumber = (AISData.Value.Count / 60) / slowSpeed;
+                                else sendAISNumber = (AISData.Value.Count / 60 + 1) / slowSpeed;
+
+                                if (WeatherData.Value.Count % 60 == 0) sendWeatherNumber = (WeatherData.Value.Count / 60) / slowSpeed;
+                                else sendWeatherNumber = (WeatherData.Value.Count / 60 + 1) / slowSpeed;
+
+                                if (TargetData.Value.Count % 60 == 0) sendTargetNumber = (TargetData.Value.Count / 60) / slowSpeed;
+                                else sendTargetNumber = (TargetData.Value.Count / 60 + 1) / slowSpeed;
+
+
+                                for (int k = defingK; k < sendOnboardNumber; k++)
                                 {
                                     try
                                     {
                                         // Console.WriteLine(kvp.Value[count].ToString());
-                                        udpSender(kvp.Value[count].ToString(), setip, setport);
-
-                                        count++;
+                                        udpSender(OnboardData.Value[odIndex].ToString(), setip, setOnboardPort);
+                                        odIndex++;
                                     }
                                     catch (ArgumentOutOfRangeException)
                                     {
@@ -362,8 +439,83 @@ namespace DTBGEmulator
                                         break; // for 루프를 중지하고 다음 키로 이동
                                     }
                                 }
+
+                                for (int k = defingK; k < sendAISNumber; k++)
+                                {
+                                    try
+                                    {
+                                        // Console.WriteLine(kvp.Value[count].ToString());
+                                        udpSender(AISData.Value[adIndex].ToString(), setip, setAisPort);
+                                        adIndex++;
+                                    }
+                                    catch (ArgumentOutOfRangeException)
+                                    {
+                                        // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
+                                        Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
+                                        break; // for 루프를 중지하고 다음 키로 이동
+                                    }
+                                }
+
+                                for (int k = defingK; k < sendWeatherNumber; k++)
+                                {
+                                    try
+                                    {
+                                        // Console.WriteLine(kvp.Value[count].ToString());
+                                        Type type = WeatherData.Value[wdIndex].GetType();
+                                        UdpBinSender(WeatherData.Value[wdIndex], setip, setVtsPort);
+                                        wdIndex++;
+                                    }
+                                    catch (ArgumentOutOfRangeException)
+                                    {
+                                        // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
+                                        Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
+                                        break; // for 루프를 중지하고 다음 키로 이동
+                                    }
+                                }
+
+                                for (int k = defingK; k < sendTargetNumber; k++)
+                                {
+                                    try
+                                    {
+                                        // Console.WriteLine(kvp.Value[count].ToString());
+                                        Type type = TargetData.Value[tdIndex].GetType();
+                                        UdpBinSender(TargetData.Value[tdIndex], setip, setVtsPort);
+                                        tdIndex++;
+                                    }
+                                    catch (ArgumentOutOfRangeException)
+                                    {
+                                        // 리스트의 인덱스가 범위를 벗어날 때 예외 처리
+                                        Console.WriteLine("리스트의 인덱스가 범위를 벗어났습니다.");
+                                        break; // for 루프를 중지하고 다음 키로 이동
+                                    }
+                                }
+
+
                                 Console.WriteLine(timeController.CurrTime);
-                                UpdateDataViewTextBox(kvp.Value[count - sendFileNumber].ToString());
+
+                                switch (selectDataView)
+                                {
+                                    case "Onboard":
+                                        if(OnboardData.Value.Count != 0) UpdateDataViewTextBox(OnboardData.Value[odIndex - sendOnboardNumber / 2].ToString());
+                                        else UpdateDataViewTextBox("데이터 없음");
+                                        break;
+                                    case "AIS":
+                                        if(AISData.Value.Count != 0) UpdateDataViewTextBox(AISData.Value[adIndex - sendAISNumber / 2].ToString());
+                                        else UpdateDataViewTextBox("데이터 없음");
+                                        break;
+                                    case "Weather":
+                                        if (WeatherData.Value.Count != 0) UpdateDataViewTextBox(BitConverter.ToString(WeatherData.Value[wdIndex - sendWeatherNumber / 2]));
+                                        else UpdateDataViewTextBox("데이터 없음");
+                                        break;
+                                    case "Target":
+                                        if (TargetData.Value.Count != 0) UpdateDataViewTextBox(BitConverter.ToString(TargetData.Value[tdIndex - sendTargetNumber / 2]));
+                                        else UpdateDataViewTextBox("데이터 없음");
+                                        break;
+                                    default:
+                                        // 기본값 설정
+                                        selectDataView = "Unknown";
+                                        break;
+                                }
                             }
                             else
                             {
@@ -556,12 +708,28 @@ namespace DTBGEmulator
 
         private void SetTimeFormatSetting()
         {
+            string[] startDateTimeFormat = Path.GetFileNameWithoutExtension(startTime).Split(' ');
+            string[] endDateTimeFormat = Path.GetFileNameWithoutExtension(endTime).Split(' ');
+
             // "yyyyMMdd HHmm" 형식으로 변환
-            string formattedStartDateTime = startTime.Substring(0, 4) + startTime.Substring(5, 2) + startTime.Substring(8, 2) + " " + startTime.Substring(11, 4);
-            string formattedEndDateTime = endTime.Substring(0, 4) + endTime.Substring(5, 2) + endTime.Substring(8, 2) + " " + endTime.Substring(11, 4);
+            string formattedStartDateTime1 = 
+                startDateTimeFormat[1].Substring(8, 4) + 
+                startDateTimeFormat[1].Substring(13, 2) + 
+                startDateTimeFormat[1].Substring(16, 2) + 
+                " " + 
+                startDateTimeFormat[2].Substring(0, 4);
+           
+
+
+            string formattedEndDateTime =
+                endDateTimeFormat[1].Substring(8, 4) +
+                endDateTimeFormat[1].Substring(13, 2) +
+                endDateTimeFormat[1].Substring(16, 2) + 
+                " " +
+                endDateTimeFormat[2].Substring(0, 4);
 
             // 주어진 형식의 문자열을 DateTime으로 파싱
-            DateTime dateStartTime = DateTime.ParseExact(formattedStartDateTime, "yyyyMMdd HHmm", null);
+            DateTime dateStartTime = DateTime.ParseExact(formattedStartDateTime1, "yyyyMMdd HHmm", null);
             DateTime dateEndTime = DateTime.ParseExact(formattedEndDateTime, "yyyyMMdd HHmm", null);
 
             // 새로운 형식의 문자열로 변환
@@ -630,6 +798,14 @@ namespace DTBGEmulator
             Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
             timeController.UseController = true;
             fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
+
+            DataDictionaryAIS = new SortedDictionary<string, List<string>>();
+            DataDictionaryOnboard = new SortedDictionary<string, List<string>>();
+            DataDictionaryWeather = new SortedDictionary<string, List<byte[]>>();  
+            DataDictionaryTarget = new SortedDictionary<string, List<byte[]>>();
+
+
+
             timeController.InvalidatePanel();
             UpdateLoadStateText("로딩완료");
             Console.WriteLine("파일 갯수 카운트" + fullFilePackets.Count);
@@ -650,6 +826,10 @@ namespace DTBGEmulator
             Console.WriteLine($"Code execution time: {stopwatch.ElapsedMilliseconds} ms");
             timeController.UseController = true;
             fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+            DataDictionaryAIS = FolderData.Instance.FolderDataDictionaryAIS;
+            DataDictionaryOnboard = FolderData.Instance.FolderDataDictionaryOnboard;
+            DataDictionaryWeather = FolderData.Instance.FolderDataDictionaryWeather;
+            DataDictionaryTarget = FolderData.Instance.FolderDataDictionaryTarget;
             timeController.InvalidatePanel();
             UpdateLoadStateText("로딩완료");
             Console.WriteLine("파일 갯수 카운트" + fullFilePackets.Count);
@@ -660,62 +840,62 @@ namespace DTBGEmulator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addFileBtn_Click(object sender, EventArgs e)
-        {
-            fileLocation.Text = "";
-            bool fileSelected = FileDatatest.Instance.SelectFile();
-            // 파일이 선택되었을 때만 쓰레드를 생성하고 시작
-            if (fileSelected)
-            {
-                trueFile = true;
-                timeController.TrueFile = true;
-                loadStateText.Text = "로딩 중";
+        //private void addFileBtn_Click(object sender, EventArgs e)
+        //{
+        //    fileLocation.Text = "";
+        //    bool fileSelected = FileDatatest.Instance.SelectFile();
+        //    // 파일이 선택되었을 때만 쓰레드를 생성하고 시작
+        //    if (fileSelected)
+        //    {
+        //        trueFile = true;
+        //        timeController.TrueFile = true;
+        //        loadStateText.Text = "로딩 중";
 
-                // 쓰레드 실행중이면 정지
-                if (udpSenderThread != null && udpSenderThread.IsAlive)
-                {
-                    udpSenderThread.Abort();
-                }
+        //        // 쓰레드 실행중이면 정지
+        //        if (udpSenderThread != null && udpSenderThread.IsAlive)
+        //        {
+        //            udpSenderThread.Abort();
+        //        }
 
-                Thread dataLoadThread = new Thread(LoadFileData);
-                dataLoadThread.Start();
+        //        Thread dataLoadThread = new Thread(LoadFileData);
+        //        dataLoadThread.Start();
 
 
-                startTime = FileDatatest.Instance.FirstFileName;
-                endTime = FileDatatest.Instance.LastFileName;
-                takenTime = FileDatatest.Instance.TakenTime;
+        //        startTime = FileDatatest.Instance.FirstFileName;
+        //        endTime = FileDatatest.Instance.LastFileName;
+        //        takenTime = FileDatatest.Instance.TakenTime;
 
-                SetTimeFormatSetting();
+        //        SetTimeFormatSetting();
 
-                firstFileName.Text = $"{startTime}";
-                lastFileName.Text = $"{endTime}";
-                timeController.StartFileTime = timeControllerStartTime;
-                timeController.EndFileTime = timeControllerEndTime;
+        //        firstFileName.Text = $"{startTime}";
+        //        lastFileName.Text = $"{endTime}";
+        //        timeController.StartFileTime = timeControllerStartTime;
+        //        timeController.EndFileTime = timeControllerEndTime;
 
-                SetFullTimeData(takenTime);
+        //        SetFullTimeData(takenTime);
 
-                firstSeconds = 0;
-                lastSeconds = 59;
+        //        firstSeconds = 0;
+        //        lastSeconds = 59;
 
-                // 버튼 설정
-                UpdateButtonState("stop");
+        //        // 버튼 설정
+        //        UpdateButtonState("stop");
 
-                fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
-                fileNum = FileDatatest.Instance.SelectedFileCount;
+        //        fullFilePackets = FileDatatest.Instance.FileDataDictionaryVirtual;
+        //        fileNum = FileDatatest.Instance.SelectedFileCount;
 
-                SetTimeControllerValue();
+        //        SetTimeControllerValue();
 
-                // 데이터 로딩 확인
+        //        // 데이터 로딩 확인
 
-                loadingProgressBar.Maximum = fileNum;
-                timer.Start();
-            }
-            else
-            {
-                MessageBox.Show("올바르지 않은 형식의 파일 선택입니다.");
-                UpdateButtonState("default");
-            }
-        }
+        //        loadingProgressBar.Maximum = fileNum;
+        //        timer.Start();
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("올바르지 않은 형식의 파일 선택입니다.");
+        //        UpdateButtonState("default");
+        //    }
+        //}
 
         private void addFolderBtn_Click(object sender, EventArgs e)
         {
@@ -741,10 +921,14 @@ namespace DTBGEmulator
                 fileLocation.Text = FolderData.Instance.FolderPath;
                 takenTime = FolderData.Instance.TakenTime;
 
+                aFileCountTxt.Text = FolderData.Instance.SelectedTotalFileCount[0].ToString() + "개";
+                oFileCountTxt.Text = FolderData.Instance.SelectedTotalFileCount[1].ToString() + "개";
+                tFileCountTxt.Text = FolderData.Instance.SelectedTotalFileCount[2].ToString() + "개";
+                wFileCountTxt.Text = FolderData.Instance.SelectedTotalFileCount[3].ToString() + "개";
+
+
                 SetTimeFormatSetting();
 
-                firstFileName.Text = $"{startTime}";
-                lastFileName.Text = $"{endTime}";
                 timeController.StartFileTime = timeControllerStartTime;
                 timeController.EndFileTime = timeControllerEndTime;
 
@@ -756,6 +940,11 @@ namespace DTBGEmulator
                 UpdateButtonState("stop");
 
                 fullFilePackets = FolderData.Instance.FolderDataDictionaryVirtual;
+
+                DataDictionaryAIS = FolderData.Instance.FolderDataDictionaryAIS;
+                DataDictionaryOnboard = FolderData.Instance.FolderDataDictionaryOnboard;
+                DataDictionaryWeather = FolderData.Instance.FolderDataDictionaryWeather;
+                DataDictionaryTarget = FolderData.Instance.FolderDataDictionaryTarget;
                 fileNum = FolderData.Instance.SelectedFileCount;
 
                 SetTimeControllerValue();
@@ -767,7 +956,7 @@ namespace DTBGEmulator
             }
             else
             {
-                MessageBox.Show("올바르지 않은 형식의 파일 선택입니다.");
+                
                 UpdateButtonState("default");
             }
         }
@@ -854,9 +1043,32 @@ namespace DTBGEmulator
             }
         }
 
+        private void dataViewComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (dataViewComboBox.SelectedIndex)
+            {
+                case 0:
+                    selectDataView = "Onboard";
+                    break;
+                case 1:
+                    selectDataView = "AIS";
+                    break;
+                case 2:
+                    selectDataView = "Weather";
+                    break;
+                case 3:
+                    selectDataView = "Target";
+                    break;
+                default:
+                    // 기본값 설정
+                    selectDataView = "Unknown";
+                    break;
+            }
+        }
+
         public void threadRestart()
         {
-            if (udpSenderThread != null || udpSenderThread.IsAlive)
+            if ((udpSenderThread != null || udpSenderThread.IsAlive) && runState != "stop")
             {
                 udpSenderThread.Abort();
                 udpSenderThread.Join(); // 이전 스레드가 완전히 종료될 때까지 기다림
@@ -876,6 +1088,7 @@ namespace DTBGEmulator
                 // 체크되었을 때의 폼 크기 설정
                 dataViewTextBox.Visible = true;
                 dataViewText.Visible = true;
+                dataViewComboBox.Visible = true;
                 this.Size = new Size(570, 800);
             }
             else
@@ -883,6 +1096,7 @@ namespace DTBGEmulator
                 // 체크가 해제되었을 때의 폼 크기 설정
                 dataViewTextBox.Visible = false;
                 dataViewText.Visible = false;
+                dataViewComboBox.Visible = false;
                 this.Size = new Size(570, 400);
             }
         }
@@ -894,7 +1108,8 @@ namespace DTBGEmulator
             {
                 skipState = true;
                 timeController.skipState = true;
-                SetFullTimeData(fileNum);
+                int isfile = FolderData.Instance.IsFile.Count;
+                SetFullTimeData(isfile);
             }
             else
             {
@@ -902,7 +1117,7 @@ namespace DTBGEmulator
                 timeController.skipState = false;
                 SetFullTimeData(takenTime);
             }
-            threadRestart();
+            // threadRestart();
         }
 
 
@@ -975,7 +1190,7 @@ namespace DTBGEmulator
             runBtn.Enabled = runEnabled;
             pauseBtn.Enabled = pauseEnabled;
             stopBtn.Enabled = stopEnabled;
-            addFileBtn.Enabled = selectEnabled;
+            // addFileBtn.Enabled = selectEnabled;
             addFolderBtn.Enabled = selectEnabled;
         }
 

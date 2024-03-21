@@ -15,7 +15,9 @@ namespace DTBGEmulator.Classes
         private static SettingClass mInstance = null;                       // Instance
 
         public string UdpTargetIPAddress { get; set; }   // Target IP Address for UDP
-        public int UdpTargetPortNum { get; set; } = 12345;               // Recive Port Number for UDP
+        public int UdpOnboardPortNum { get; set; } = 12345;               // Recive Port Number for UDP
+        public int UdpAISPortNum { get; set; } = 10002;               // Recive Port Number for UDP
+        public int UdpVTSPortNum { get; set; } = 10005;               // Recive Port Number for UDP
 
         #endregion 변수 선언
 
@@ -49,9 +51,10 @@ namespace DTBGEmulator.Classes
                 XmlNode node = doc.SelectSingleNode("/Settings/Values");
 
                 // Get values
-
                 UdpTargetIPAddress = node.SelectSingleNode("UdpTargetIP").InnerText;
-                UdpTargetPortNum = int.Parse(node.SelectSingleNode("UdpTargetPortNum").InnerText);
+                UdpOnboardPortNum = int.Parse(node.SelectSingleNode("UdpOnboardPortNum").InnerText);
+                UdpAISPortNum = int.Parse(node.SelectSingleNode("UdpAISPortNum").InnerText);
+                UdpVTSPortNum = int.Parse(node.SelectSingleNode("UdpVTSPortNum").InnerText);
                 // ==================================================================================================================================
             }
             catch (Exception) { }
@@ -79,7 +82,9 @@ namespace DTBGEmulator.Classes
                 XmlNode node = doc.SelectSingleNode("Settings/Values");
 
                 node.SelectSingleNode("UdpTargetIP").InnerText = UdpTargetIPAddress;
-                node.SelectSingleNode("UdpTargetPortNum").InnerText = UdpTargetPortNum.ToString();
+                node.SelectSingleNode("UdpOnboardPortNum").InnerText = UdpOnboardPortNum.ToString();
+                node.SelectSingleNode("UdpAISPortNum").InnerText = UdpAISPortNum.ToString();
+                node.SelectSingleNode("UdpVTSPortNum").InnerText = UdpVTSPortNum.ToString();
 
                 doc.Save(filePath);
             }

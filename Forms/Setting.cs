@@ -35,7 +35,6 @@ namespace DTBGEmulator.Forms
 
         private void Setting_Load(object sender, EventArgs e)
         {
-
             GetValuesForControls();
         }
 
@@ -47,7 +46,9 @@ namespace DTBGEmulator.Forms
             // Get UDP IP address of Target
             shipIP.Text = settings.UdpTargetIPAddress;
             // Get port number of Target
-            shipPort.Text = settings.UdpTargetPortNum.ToString();
+            shipPort.Text = settings.UdpOnboardPortNum.ToString();
+            aisPort.Text = settings.UdpAISPortNum.ToString();
+            vtsPort.Text = settings.UdpVTSPortNum.ToString();
 
         }
 
@@ -59,7 +60,9 @@ namespace DTBGEmulator.Forms
             // Set target IP address 
             settings.UdpTargetIPAddress = shipIP.Text;
             // Set target port numbers
-            settings.UdpTargetPortNum = int.Parse(shipPort.Text);
+            settings.UdpOnboardPortNum = int.Parse(shipPort.Text);
+            settings.UdpAISPortNum = int.Parse(aisPort.Text);
+            settings.UdpVTSPortNum = int.Parse(vtsPort.Text);
             settings.SaveSettings();
         }
 
